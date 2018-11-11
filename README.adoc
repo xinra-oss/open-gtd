@@ -1,0 +1,39 @@
+# OpenGTD
+
+https://waffle.io/xinra-oss/open-gtd[image:https://badge.waffle.io/xinra-oss/open-gtd.svg?columns=all[Waffle.io]] 
+https://lernajs.io[image:https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg[lerna]]
+
+OpenGTD is free open source software for _getting things done_!
+
+## Setup for development
+
+This is a monorepo managed with https://lernajs.io[Lerna]. Sub-modules are located in `packages/`. The `lerna bootstrap` command installs dependencies of all sub-modules and creates symlinks for dependencies between sub-modules.
+
+    npm install
+    npx lerna bootstrap
+
+NOTE: All following `lerna run` commands can be used for individual sub-modules by using the https://www.npmjs.com/package/@lerna/filter-options#--scope-glob[`--scope`] parameter or by using `npm run` inside the sub-module directory.
+
+### Run the application
+
+    npx lerna run start
+
+### Verify changes before commiting
+
+Run tests:
+
+    npx lerna run test
+
+Run linters:
+
+    npx lerna run lint
+
+Try to automatically fix linting issues:
+
+    npx lerna run fix
+
+Run tests and linters:
+
+NOTE: Always run this before submitting a pull-request. If this command does't complete successfully, a pull-requests cannot be merged.
+
+    npx lerna run verify
