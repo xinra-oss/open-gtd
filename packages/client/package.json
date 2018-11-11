@@ -1,0 +1,24 @@
+{
+  "name": "@open-gtd/client",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "antd": "^3.10.7",
+    "react": "^16.6.1",
+    "react-dom": "^16.6.1",
+    "react-scripts-ts-antd": "2.17.0"
+  },
+  "scripts": {
+    "start": "react-scripts-ts-antd start",
+    "build": "react-scripts-ts-antd build",
+    "test": "react-scripts-ts-antd test --env=jsdom",
+    "eject": "react-scripts-ts-antd eject"
+  },
+  "devDependencies": {
+    "@types/jest": "^23.3.9",
+    "@types/node": "^10.12.5",
+    "@types/react": "^16.7.3",
+    "@types/react-dom": "^16.0.9",
+    "typescript": "^3.1.6"
+  }
+}
