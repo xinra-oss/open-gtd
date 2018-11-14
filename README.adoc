@@ -30,6 +30,6 @@ Try to automatically fix linting issues:
 
 Run tests and linters:
 
-NOTE: Always run this before submitting a pull-request. If this command does't complete successfully, a pull-requests cannot be merged.
+NOTE: Always run this before submitting a pull-request. If this command does't complete successfully, a pull-request cannot be merged.
 
     npx lerna run verify
