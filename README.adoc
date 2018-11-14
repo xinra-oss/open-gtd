@@ -14,10 +14,6 @@ This is a monorepo managed with https://lernajs.io[Lerna]. Sub-modules are locat
 
 NOTE: All following `lerna run` commands can be used for individual sub-modules by using the https://www.npmjs.com/package/@lerna/filter-options#--scope-glob[`--scope`] parameter or by using `npm run` inside the sub-module directory.
 
-### Run the application
-
-    npx lerna run start
-
 ### Verify changes before commiting
 
 Run tests:
