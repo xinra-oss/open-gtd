@@ -1,0 +1,7 @@
+{
+  "name": "@open-gtd/aggregator",
+  "private": true,
+  "devDependencies": {
+    "lerna": "^3.4.3"
+  }
+}
