@@ -1,5 +1,6 @@
 # OpenGTD
 
+image:https://travis-ci.com/xinra-oss/open-gtd.svg?branch=master["Build Status", link="https://travis-ci.com/xinra-oss/open-gtd"]
 https://waffle.io/xinra-oss/open-gtd[image:https://badge.waffle.io/xinra-oss/open-gtd.svg?columns=all[Waffle.io]] 
 https://lernajs.io[image:https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg[lerna]]
 
