@@ -1,0 +1,15 @@
+language: node_js
+
+node_js:
+  - '8'
+  - 'node'
+
+cache: npm
+
+install:
+  - npm install
+  - npx lerna bootstrap
+
+script:
+  - npm run lint
+  - npm run test
