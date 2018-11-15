@@ -1,5 +1,6 @@
 # OpenGTD
 
+image:https://travis-ci.com/xinra-oss/open-gtd.svg?branch=master["Build Status", link="https://travis-ci.com/xinra-oss/open-gtd"]
 https://waffle.io/xinra-oss/open-gtd[image:https://badge.waffle.io/xinra-oss/open-gtd.svg?columns=all[Waffle.io]] 
 https://lernajs.io[image:https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg[lerna]]
 
@@ -12,24 +13,34 @@ This is a monorepo managed with https://lernajs.io[Lerna]. Sub-modules are locat
     npm install
     npx lerna bootstrap
 
-NOTE: All following `lerna run` commands can be used for individual sub-modules by using the https://www.npmjs.com/package/@lerna/filter-options#--scope-glob[`--scope`] parameter or by using `npm run` inside the sub-module directory.
+NOTE: The following commands can either be run at the project root to affect all sub-modules or individually inside of each sub-module. Note that there are inter-module dependencies. If you want to build/start the client or server individually, you first have to build all shared modules.
+
+### Run the application
+
+    npm start
+
+Server listens at http://localhost:3001
+
+Client is accessible at http://localhost:3000
+
+This will also watch for changes in the sources of the module(s) and automatically re-compile.
 
 ### Verify changes before commiting
 
 Run tests:
 
-    npx lerna run test
+    npm test
 
 Run linters:
 
-    npx lerna run lint
+    npm run lint
 
 Try to automatically fix linting issues:
 
-    npx lerna run fix
+    npm run fix
 
 Run tests and linters:
 
 NOTE: Always run this before submitting a pull-request. If this command does't complete successfully, a pull-request cannot be merged.
 
-    npx lerna run verify
+    npm run verify
