@@ -1,5 +1,5 @@
-import { Entity } from './entity'
 import { Context } from './context'
+import { Entity } from './entity'
 
 export interface Task extends Entity {
   readonly title: string
