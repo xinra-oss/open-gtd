@@ -1,6 +1,7 @@
 {
   "name": "@open-gtd/server",
   "version": "1.0.0",
+  "private": true,
   "description": "OpenGTD Server",
   "main": "dist/index.js",
   "scripts": {
