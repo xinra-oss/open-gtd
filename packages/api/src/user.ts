@@ -1,8 +1,8 @@
 import { User } from '@open-gtd/model'
-import { ApiDefinition, POST } from 'rest-ts-core'
+import { defineAPI, POST } from 'rest-ts-core'
 
-export const UserApi: ApiDefinition = {
+export const UserApi = defineAPI({
   createUser: POST(`/users`)
     .body(User)
     .response(User)
-}
+})

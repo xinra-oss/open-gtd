@@ -1,7 +1,7 @@
 import { Task } from '@open-gtd/model'
-import { ApiDefinition, DELETE, POST, PUT } from 'rest-ts-core'
+import { defineAPI, DELETE, POST, PUT } from 'rest-ts-core'
 
-export const TaskApi: ApiDefinition = {
+export const TaskApi = defineAPI({
   createTask: POST(`/tasks`)
     .body(Task)
     .response(Task),
@@ -9,4 +9,4 @@ export const TaskApi: ApiDefinition = {
   updateTask: PUT(`/tasks/${'id'}`)
     .body(Task)
     .response(Task)
-}
+})
