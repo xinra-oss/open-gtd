@@ -14,7 +14,7 @@
     "fix:prettier": "prettier --write src/**/*",
     "lint": "npm-run-all lint:**",
     "fix": "npm-run-all fix:**",
-    "verify": "npm-run-all lint test"
+    "verify": "npm-run-all build lint test"
   },
   "author": "",
   "license": "BSD-3-Clause",

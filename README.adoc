@@ -27,6 +27,10 @@ This will also watch for changes in the sources of the module(s) and automatical
 
 ### Verify changes before commiting
 
+Run build:
+
+    npm run build
+
 Run tests:
 
     npm test
@@ -39,7 +43,7 @@ Try to automatically fix linting issues:
 
     npm run fix
 
-Run tests and linters:
+Run build, tests and linters:
 
 NOTE: Always run this before submitting a pull-request. If this command does't complete successfully, a pull-request cannot be merged.
 
