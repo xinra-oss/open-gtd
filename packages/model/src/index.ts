@@ -1,6 +1,6 @@
 import { Context } from './context'
-import { Entity } from './entity'
+import { Entity, EntityId } from './entity'
 import { Task } from './task'
 import { User } from './user'
 
-export { Entity, User, Context, Task }
+export { Entity, EntityId, User, Context, Task }
