@@ -3,11 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@open-gtd/api": "^1.0.0",
     "@open-gtd/model": "^1.0.0",
     "antd": "^3.10.7",
+    "axios": "^0.18.0",
     "react": "^16.6.1",
     "react-dom": "^16.6.1",
-    "react-scripts-ts-antd": "2.17.0"
+    "react-scripts-ts-antd": "2.17.0",
+    "rest-ts-axios": "0.0.7",
+    "rest-ts-core": "0.0.7",
+    "runtypes": "^2.1.6"
   },
   "scripts": {
     "start": "react-scripts-ts-antd start",
