@@ -1,9 +1,10 @@
-import * as Koa from 'koa'
+import * as BodyParser from 'body-parser'
+import * as express from 'express'
+import { OpenGtdRouter } from './router'
 
-const app = new Koa()
+const app = express()
 
-app.use(ctx => {
-  ctx.body = 'Hallo Koa'
-})
+app.use(BodyParser.json())
+app.use('/api', OpenGtdRouter)
 
 app.listen(3001)

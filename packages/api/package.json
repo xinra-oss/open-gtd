@@ -1,5 +1,5 @@
 {
-  "name": "@open-gtd/model",
+  "name": "@open-gtd/api",
   "version": "1.0.0",
   "private": true,
   "description": "",
@@ -26,6 +26,8 @@
     "typescript": "^3.1.6"
   },
   "dependencies": {
+    "@open-gtd/model": "1.0.0",
+    "rest-ts-core": "0.0.7",
     "runtypes": "^2.1.6"
   }
 }

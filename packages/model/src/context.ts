@@ -1,6 +1,11 @@
-import { Entity } from './entity'
+import { Record, Static, String } from 'runtypes'
+import { Entity, EntityId } from './entity'
 
-export interface Context extends Entity {
-  readonly userId: string
-  readonly name: string
-}
+export const Context = Entity.And(
+  Record({
+    name: String,
+    userId: EntityId
+  })
+)
+
+export type Context = Static<typeof Context>

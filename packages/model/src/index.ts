@@ -1,6 +1,4 @@
-import { Context } from './context'
-import { Entity } from './entity'
-import { Task } from './task'
-import { User } from './user'
-
-export { Entity, User, Context, Task }
+export * from './context'
+export * from './entity'
+export * from './task'
+export * from './user'
