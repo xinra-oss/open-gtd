@@ -1,0 +1,35 @@
+{
+  "folders": [
+    {
+      "name": "aggregator",
+      "path": "."
+    },
+    {
+      "path": "packages\\client"
+    },
+    {
+      "path": "packages\\server"
+    },
+    {
+      "path": "packages\\api"
+    },
+    {
+      "path": "packages\\model"
+    }
+  ],
+  "settings": {
+    "editor.tabSize": 2,
+    "emmet.syntaxProfiles": {
+      "javascript": "jsx"
+    },
+    "editor.formatOnSave": true,
+    "tslint.autoFixOnSave": true
+  },
+  "extensions": {
+    "recommendations": [
+      "eg2.tslint",
+      "esbenp.prettier-vscode",
+      "zengxingxin.sort-js-object-keys"
+    ]
+  }
+}
