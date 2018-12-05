@@ -29,6 +29,8 @@
   "dependencies": {
     "@open-gtd/api": "^1.0.0",
     "@open-gtd/model": "^1.0.0",
+    "@types/body-parser": "^1.17.0",
+    "@types/express": "^4.16.0",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
     "rest-ts-core": "0.0.7",
