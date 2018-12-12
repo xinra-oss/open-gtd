@@ -21,7 +21,7 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
           .count()) === 0
       ) {
         // TODO: implement proper error handling
-        return 'parentId is set but does not exist in database'
+        throw new Error('parentId is set but does not exist in database')
       }
     }
 
@@ -32,7 +32,7 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
         .count()) === 0
     ) {
       // TODO: implement proper error handling
-      return 'userId does not exist in database'
+      throw new Error('userId does not exist in database')
     }
 
     const insertedElement = await dbo.collection('tasks').insertOne(task)
@@ -48,13 +48,13 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
         .count()) === 0
     ) {
       // TODO: implement proper error handling
-      console.error('requested taskId does not exist in database')
+      throw new Error('requested taskId does not exist in database')
     } else {
       await dbo
         .collection('tasks')
         .deleteOne({ _id: new ObjectId(req.params.id) })
     }
-    // TODO: implement proper HTTP response ("Cannot DELETE /api/tasks/:id" although deleting...)
+    // TODO: implement proper HTTP response (message "Cannot DELETE /api/tasks/:id" although deleting...)
   },
   updateTask: async (req, res) => {
     const task = req.body
@@ -67,12 +67,11 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
         .count()) === 0
     ) {
       // TODO: implement proper error handling
-      res.send('requested taskId does not exist in database')
+      throw new Error('requested taskId does not exist in database')
     } else {
       await dbo
         .collection('tasks')
         .replaceOne({ _id: new ObjectId(req.params.id) }, task)
-      // TODO: decide if objects should be replaced or classic "updated"
     }
     return task
   }
