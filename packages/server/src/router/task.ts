@@ -56,6 +56,16 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
     }
     // TODO: implement proper HTTP response (message "Cannot DELETE /api/tasks/:id" although deleting...)
   },
+  getTask: async (req, res) => {
+    const db = await MongoClient.connect('mongodb://localhost:27017/')
+    const dbo = db.db('open-gtd')
+    const result = await dbo.collection('tasks').findOne({_id: new ObjectId(req.params.id)})
+    if(result === undefined) {
+      // TODO: implement proper error handling
+      throw new Error('requested taskId does not exist in database')
+    }
+    return result
+  },
   updateTask: async (req, res) => {
     const task = req.body
     const db = await MongoClient.connect('mongodb://localhost:27017/')
