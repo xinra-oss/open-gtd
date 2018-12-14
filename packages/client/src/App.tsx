@@ -1,6 +1,7 @@
 import { Rate } from 'antd'
 import * as React from 'react'
 import './App.scss'
+import LoginPage from './LoginPage'
 
 class App extends React.Component {
   public render() {
@@ -13,6 +14,7 @@ class App extends React.Component {
           To get started, edit <code>src/App.tsx</code> and save to reload.
         </p>
         <Rate character="6" />
+        <LoginPage />
       </div>
     )
   }
