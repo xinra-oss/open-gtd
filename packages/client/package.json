@@ -4,7 +4,6 @@
   "private": true,
   "dependencies": {
     "@open-gtd/api": "^1.0.0",
-    "@open-gtd/model": "^1.0.0",
     "antd": "^3.10.7",
     "axios": "^0.18.0",
     "react": "^16.6.1",
