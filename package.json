@@ -11,7 +11,6 @@
     "test": "lerna run test --stream --concurrency 1",
     "verify": "lerna run verify --stream --concurrency 1",
     "build": "lerna run build --stream --concurrency 1",
-    "start": "lerna run start --parallel",
-    "clean": "lerna exec -- rm -rf ./node_modules"
+    "start": "lerna run start --parallel"
   }
 }
