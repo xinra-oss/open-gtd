@@ -17,7 +17,7 @@ export const UserRouter: RouterDefinition<typeof UserApi> = {
         .count()) > 0
     ) {
       // TODO: implement proper error handling
-      return 'mail address is already in use'
+      throw new Error('mail address is already in use')
     } else {
       const insertUser : User = {
         ...user,
