@@ -14,6 +14,20 @@ export function getUserId(req: Request): string {
   return req.session.userId
 }
 
+export function signUserIn(req: Request, userId: string) {
+  if (req.session === undefined) {
+    throw new Error('there is no session')
+  }
+  req.session.userId = userId
+}
+
+export function signUserOut(req: Request) {
+  if (req.session === undefined) {
+    throw new Error('there is no session')
+  }
+  delete req.session.userId
+}
+
 export function authMiddleware(
   req: Request,
   res: Response,
