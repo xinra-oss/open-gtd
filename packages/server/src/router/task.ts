@@ -56,14 +56,14 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
     }
     // TODO: implement proper HTTP response (message "Cannot DELETE /api/tasks/:id" although deleting...)
   },
-  getAllTasks: async (req, res) => {
+  getAllTasks: async () => {
     const db = await MongoClient.connect('mongodb://localhost:27017/')
     const dbo = db.db('open-gtd')
     // TODO: implement getting user id from session instead of 'abc123...'
     const result = await dbo.collection('tasks').find({userId: "abc123abc123abc123abc123"}).toArray()
     return result as Task[]
   },
-  getTask: async (req, res) => {
+  getTask: async req => {
     const db = await MongoClient.connect('mongodb://localhost:27017/')
     const dbo = db.db('open-gtd')
     const result = await dbo.collection('tasks').findOne({_id: new ObjectId(req.params.id)})
@@ -73,7 +73,7 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
     }
     return result
   },
-  updateTask: async (req, res) => {
+  updateTask: async req => {
     const task = req.body
     const db = await MongoClient.connect('mongodb://localhost:27017/')
     const dbo = db.db('open-gtd')
