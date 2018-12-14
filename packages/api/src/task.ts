@@ -7,10 +7,10 @@ export const TaskApi = defineAPI({
     .body(NewTask)
     .response(Task),
   deleteTask: DELETE `/tasks/${'id'}`, // prettier-ignore
-  getAllTasks: GET `/tasks` // prettier-ignore
-    .response(Array(Task)),
   getTask: GET `/tasks/${'id'}` // prettier-ignore
     .response(Task),
+  getTaskList: GET `/tasks` // prettier-ignore
+    .response(Array(Task)),
   updateTask: PUT `/tasks/${'id'}` // prettier-ignore
     .body(Task)
     .response(Task)

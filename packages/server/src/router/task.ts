@@ -56,7 +56,7 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
     }
     // TODO: implement proper HTTP response (message "Cannot DELETE /api/tasks/:id" although deleting...)
   },
-  getAllTasks: async () => {
+  getTaskList: async () => {
     const db = await MongoClient.connect('mongodb://localhost:27017/')
     const dbo = db.db('open-gtd')
     // TODO: implement getting user id from session instead of 'abc123...'
