@@ -1,4 +1,4 @@
-import { UserApi, User } from '@open-gtd/api'
+import { User, UserApi } from '@open-gtd/api'
 import { RouterDefinition } from 'rest-ts-express'
 
 export const UserRouter: RouterDefinition<typeof UserApi> = {

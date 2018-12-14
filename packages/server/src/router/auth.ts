@@ -1,5 +1,5 @@
-import { RouterDefinition } from 'rest-ts-express'
 import { AuthApi } from '@open-gtd/api'
+import { RouterDefinition } from 'rest-ts-express'
 import { signUserIn, signUserOut } from '../auth'
 
 export const AuthRouter: RouterDefinition<typeof AuthApi> = {

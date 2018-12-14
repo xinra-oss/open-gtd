@@ -1,5 +1,5 @@
+import { defineAPI, DELETE, POST } from 'rest-ts-core'
 import { Credentials } from './model'
-import { defineAPI, POST, DELETE } from 'rest-ts-core'
 
 export const AuthApi = defineAPI({
   createSession: POST `/session` // prettier-ignore
