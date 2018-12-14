@@ -10,8 +10,8 @@
     "react": "^16.6.1",
     "react-dom": "^16.6.1",
     "react-scripts-ts-antd": "2.17.0",
-    "rest-ts-axios": "0.0.7",
-    "rest-ts-core": "0.0.7",
+    "rest-ts-axios": "0.3.2",
+    "rest-ts-core": "0.3.2",
     "runtypes": "^2.1.6"
   },
   "scripts": {
