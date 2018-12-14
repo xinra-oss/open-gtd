@@ -1,5 +1,4 @@
-import { UserApi } from '@open-gtd/api'
-import { User } from '@open-gtd/model'
+import { User, UserApi } from '@open-gtd/api'
 import { hash } from 'bcrypt'
 import { MongoClient } from 'mongodb'
 import { RouterDefinition } from 'rest-ts-express'
@@ -19,11 +18,13 @@ export const UserRouter: RouterDefinition<typeof UserApi> = {
       // TODO: implement proper error handling
       throw new Error('mail address is already in use')
     } else {
-      const insertUser : User = {
+      const insertUser: User = {
         ...user,
         password: await hash(user.password, 10)
-  }
-      const insertedElement = await dbo.collection('users').insertOne(insertUser)
+      }
+      const insertedElement = await dbo
+        .collection('users')
+        .insertOne(insertUser)
       return insertedElement.ops[0]
     }
   }
