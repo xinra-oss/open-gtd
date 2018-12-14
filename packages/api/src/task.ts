@@ -1,4 +1,4 @@
-import { Task } from '@open-gtd/model'
+import { Task } from './model'
 import { defineAPI, DELETE, POST, PUT } from 'rest-ts-core'
 
 export const TaskApi = defineAPI({

@@ -1,4 +1,4 @@
-import { User } from '@open-gtd/model'
+import { User } from './model'
 import { defineAPI, POST } from 'rest-ts-core'
 
 export const UserApi = defineAPI({
