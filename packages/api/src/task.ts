@@ -1,6 +1,6 @@
-import { NewTask, Task } from '@open-gtd/model'
 import { defineAPI, DELETE, GET, POST, PUT } from 'rest-ts-core'
-import {Array} from 'runtypes'
+import { Array } from 'runtypes'
+import { NewTask, Task } from './model'
 
 export const TaskApi = defineAPI({
   createTask: POST `/tasks` // prettier-ignore

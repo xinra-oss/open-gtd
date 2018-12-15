@@ -1,6 +1,5 @@
-import { TaskApi } from '@open-gtd/api'
+import { Task, TaskApi } from '@open-gtd/api'
 import { MongoClient, ObjectId } from 'mongodb'
-import { Task } from 'packages/model/lib'
 import { RouterDefinition } from 'rest-ts-express'
 
 export const TaskRouter: RouterDefinition<typeof TaskApi> = {
@@ -56,22 +55,27 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
     }
     // TODO: implement proper HTTP response (message "Cannot DELETE /api/tasks/:id" although deleting...)
   },
-  getTaskList: async () => {
-    const db = await MongoClient.connect('mongodb://localhost:27017/')
-    const dbo = db.db('open-gtd')
-    // TODO: implement getting user id from session instead of 'abc123...'
-    const result = await dbo.collection('tasks').find({userId: "abc123abc123abc123abc123"}).toArray()
-    return result as Task[]
-  },
   getTask: async req => {
     const db = await MongoClient.connect('mongodb://localhost:27017/')
     const dbo = db.db('open-gtd')
-    const result = await dbo.collection('tasks').findOne({_id: new ObjectId(req.params.id)})
-    if(result === undefined) {
+    const result = await dbo
+      .collection('tasks')
+      .findOne({ _id: new ObjectId(req.params.id) })
+    if (result === undefined) {
       // TODO: implement proper error handling
       throw new Error('requested taskId does not exist in database')
     }
     return result
+  },
+  getTaskList: async () => {
+    const db = await MongoClient.connect('mongodb://localhost:27017/')
+    const dbo = db.db('open-gtd')
+    // TODO: implement getting user id from session instead of 'abc123...'
+    const result = await dbo
+      .collection('tasks')
+      .find({ userId: 'abc123abc123abc123abc123' })
+      .toArray()
+    return result as Task[]
   },
   updateTask: async req => {
     const task = req.body
