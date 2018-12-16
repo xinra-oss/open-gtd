@@ -1,14 +1,14 @@
 import { Task, TaskApi } from '@open-gtd/api'
 import { MongoClient, ObjectId } from 'mongodb'
 import { RouterDefinition } from 'rest-ts-express'
+import { getUserId } from '../auth'
 
 export const TaskRouter: RouterDefinition<typeof TaskApi> = {
   createTask: async req => {
     const newTask = req.body
-    // TODO: implement getting user id from session instead of 'abc123...'
     const task: Task = {
       ...newTask,
-      userId: 'abc123abc123abc123abc123'
+      userId: getUserId(req)
     }
     const db = await MongoClient.connect('mongodb://localhost:27017/')
     const dbo = db.db('open-gtd')
@@ -67,13 +67,12 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
     }
     return result
   },
-  getTaskList: async () => {
+  getTaskList: async req => {
     const db = await MongoClient.connect('mongodb://localhost:27017/')
     const dbo = db.db('open-gtd')
-    // TODO: implement getting user id from session instead of 'abc123...'
     const result = await dbo
       .collection('tasks')
-      .find({ userId: 'abc123abc123abc123abc123' })
+      .find({ userId: getUserId(req) })
       .toArray()
     return result as Task[]
   },
