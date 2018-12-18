@@ -7,3 +7,4 @@ export const Entity = Partial({
 })
 
 export type Entity = Static<typeof Entity>
+export type EntityId = Static<typeof EntityId>

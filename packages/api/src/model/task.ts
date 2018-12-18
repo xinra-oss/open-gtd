@@ -7,23 +7,19 @@ import {
   Static,
   String
 } from 'runtypes'
-import { Context } from './context'
 import { Entity, EntityId } from './entity'
 
-export const NewTask = Entity.And(
-  Record({
-    contextIds: Array(Context),
-    isDone: Boolean,
-    isFolder: Boolean,
-    isNeverActive: Boolean,
-    isProject: Boolean,
-    title: String.withConstraint(
-      s =>
-        s.length <= 50 ||
-        `the title must have a maximal length of 50 characters`
-    )
-  })
-).And(
+export const NewTask = Record({
+  contextIds: Array(EntityId),
+  isDone: Boolean,
+  isFolder: Boolean,
+  isNeverActive: Boolean,
+  isProject: Boolean,
+  title: String.withConstraint(
+    s =>
+      s.length <= 50 || `the title must have a maximal length of 50 characters`
+  )
+}).And(
   Partial({
     dueDate: InstanceOf(Date),
     notes: String,
@@ -32,7 +28,7 @@ export const NewTask = Entity.And(
   })
 )
 
-export const Task = NewTask.And(
+export const Task = Entity.And(NewTask).And(
   Record({
     userId: EntityId
   })
