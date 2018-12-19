@@ -7,6 +7,7 @@ import { history } from './history'
 
 import { Layout } from 'antd'
 import './App.scss'
+import LoginPage from './LoginPage'
 
 class App extends React.Component {
   public render() {
@@ -17,6 +18,7 @@ class App extends React.Component {
             <Layout>
               <Switch>
                 <Route path="/registration" component={RegisterForm} />
+                <Route path="login" component={LoginPage} />
                 <Route path="/" exact component={Home} />
               </Switch>
             </Layout>
