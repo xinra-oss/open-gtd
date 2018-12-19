@@ -1,21 +1,20 @@
-import { Task, TaskApi } from '@open-gtd/api'
-import { MongoClient, ObjectId } from 'mongodb'
+import { TaskApi } from '@open-gtd/api'
+import { ObjectId } from 'mongodb'
 import { RouterDefinition } from 'rest-ts-express'
 import { getUserId } from '../auth'
+import { db } from '../db'
 
 export const TaskRouter: RouterDefinition<typeof TaskApi> = {
   createTask: async req => {
     const newTask = req.body
-    const task: Task = {
+    const task = {
       ...newTask,
       userId: getUserId(req)
     }
-    const db = await MongoClient.connect('mongodb://localhost:27017/')
-    const dbo = db.db('open-gtd')
     if (newTask.parentId !== undefined) {
       if (
-        (await dbo
-          .collection('tasks')
+        (await db
+          .taskCollection()
           .find({ _id: new ObjectId(task.parentId) })
           .count()) === 0
       ) {
@@ -24,75 +23,54 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
       }
     }
 
-    if (
-      (await dbo
-        .collection('users')
-        .find({ _id: new ObjectId(task.userId) })
-        .count()) === 0
-    ) {
-      // TODO: implement proper error handling
-      throw new Error('userId does not exist in database')
-    }
-
-    const insertedElement = await dbo.collection('tasks').insertOne(task)
+    const insertedElement = await db.taskCollection().insertOne(task)
     return insertedElement.ops[0]
   },
   deleteTask: async req => {
-    const db = await MongoClient.connect('mongodb://localhost:27017/')
-    const dbo = db.db('open-gtd')
     if (
-      (await dbo
-        .collection('tasks')
+      (await db
+        .taskCollection()
         .find({ _id: new ObjectId(req.params.id) })
         .count()) === 0
     ) {
       // TODO: implement proper error handling
       throw new Error('requested taskId does not exist in database')
     } else {
-      await dbo
-        .collection('tasks')
-        .deleteOne({ _id: new ObjectId(req.params.id) })
+      await db.taskCollection().deleteOne({ _id: new ObjectId(req.params.id) })
     }
     // TODO: implement proper HTTP response (message "Cannot DELETE /api/tasks/:id" although deleting...)
   },
   getTask: async req => {
-    const db = await MongoClient.connect('mongodb://localhost:27017/')
-    const dbo = db.db('open-gtd')
-    const result = await dbo
-      .collection('tasks')
+    const result = await db
+      .taskCollection()
       .findOne({ _id: new ObjectId(req.params.id) })
-    if (result === undefined) {
+    if (result === null) {
       // TODO: implement proper error handling
       throw new Error('requested taskId does not exist in database')
     }
     return result
   },
   getTaskList: async req => {
-    const db = await MongoClient.connect('mongodb://localhost:27017/')
-    const dbo = db.db('open-gtd')
-    const result = await dbo
-      .collection('tasks')
+    const result = await db
+      .taskCollection()
       .find({ userId: getUserId(req) })
       .toArray()
-    return result as Task[]
+    return result
   },
   updateTask: async req => {
     const task = req.body
-    const db = await MongoClient.connect('mongodb://localhost:27017/')
-    const dbo = db.db('open-gtd')
     if (
-      (await dbo
-        .collection('tasks')
+      (await db
+        .taskCollection()
         .find({ _id: new ObjectId(req.params.id) })
         .count()) === 0
     ) {
       // TODO: implement proper error handling
       throw new Error('requested taskId does not exist in database')
-    } else {
-      await dbo
-        .collection('tasks')
-        .replaceOne({ _id: new ObjectId(req.params.id) }, task)
     }
+    await db
+      .taskCollection()
+      .replaceOne({ _id: new ObjectId(req.params.id) }, task)
     return task
   }
 }
