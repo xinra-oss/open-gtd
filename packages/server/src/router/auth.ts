@@ -1,4 +1,5 @@
 import { AuthApi } from '@open-gtd/api'
+import { UnauthorizedHttpException } from '@senhung/http-exceptions'
 import { RouterDefinition } from 'rest-ts-express'
 import { signUserIn, signUserOut } from '../auth'
 
@@ -11,7 +12,7 @@ export const AuthRouter: RouterDefinition<typeof AuthApi> = {
       signUserIn(req, userId)
       res.sendStatus(200)
     } else {
-      res.sendStatus(401)
+      throw new UnauthorizedHttpException('Invalid username or password.')
     }
   },
   deleteSession: (req, res) => {
