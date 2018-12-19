@@ -56,14 +56,7 @@ export const db = {
   },
   taskCollection: () => getCollection<DbEntity<Task>>('tasks'),
   userCollection: () => getCollection<DbEntity<User>>('users'),
-  contextCollection: () => getCollection<DbEntity<Context>>('contexts'),
-  makeResponseEntity: <T extends Entity>(entity: DbEntity<T>) => {
-    if (entity._id !== null && entity._id !== undefined) {
-      entity.id = entity._id
-      delete entity._id
-    }
-    return entity as T
-  }
+  contextCollection: () => getCollection<DbEntity<Context>>('contexts')
 }
 
 function getCollection<T>(name: string) {

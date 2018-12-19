@@ -58,14 +58,14 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
       // TODO: implement proper error handling
       throw new Error('requested taskId does not exist in database')
     }
-    return db.makeResponseEntity(result)
+    return result
   },
   getTaskList: async req => {
     const result = await db
       .taskCollection()
       .find({ userId: getUserId(req) })
       .toArray()
-    return result.map(db.makeResponseEntity)
+    return result
   },
   updateTask: async req => {
     const task = req.body
