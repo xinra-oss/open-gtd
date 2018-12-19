@@ -1,12 +1,8 @@
-import { Context, Entity, Task, User } from '@open-gtd/api'
+import { Context, Task, User } from '@open-gtd/api'
 import debug from 'debug'
 import { Db, MongoClient } from 'mongodb'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import { config } from './config'
-
-export type DbEntity<T extends Entity> = T & {
-  _id?: string | null
-}
 
 const log = debug('db')
 let mongoClient: MongoClient | undefined
@@ -19,11 +15,8 @@ export const db = {
       throw new Error('db already connected')
     }
     const env = config.get('env')
-    if (config.get('db').inmemory === true && env !== 'production') {
-      log(
-        'Creating in-memory database because db.inmemory=true and env=%s',
-        env
-      )
+    if (config.get('db').embedded === true && env !== 'production') {
+      log('Creating embedded database because db.embedded=true and env=%s', env)
       memoryServer = new MongoMemoryServer({
         instance: {
           dbName: config.get('db').name
@@ -54,9 +47,9 @@ export const db = {
       memoryServer = undefined
     }
   },
-  taskCollection: () => getCollection<DbEntity<Task>>('tasks'),
-  userCollection: () => getCollection<DbEntity<User>>('users'),
-  contextCollection: () => getCollection<DbEntity<Context>>('contexts')
+  taskCollection: () => getCollection<Task>('tasks'),
+  userCollection: () => getCollection<User>('users'),
+  contextCollection: () => getCollection<Context>('contexts')
 }
 
 function getCollection<T>(name: string) {

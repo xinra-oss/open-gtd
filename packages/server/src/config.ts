@@ -6,10 +6,10 @@ export const config = convict({
       default: 'localhost',
       format: '*'
     },
-    inmemory: {
+    embedded: {
       default: true,
       doc:
-        'If set to true, a dynamically created in-memory database is used in development and test environment.',
+        'If set to true, a dynamically created embedded database is used in development and test environment.',
       format: Boolean
     },
     name: {
