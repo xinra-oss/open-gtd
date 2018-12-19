@@ -23,16 +23,6 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
       }
     }
 
-    // if (
-    //   (await db
-    //     .userCollection()
-    //     .find({ _id: new ObjectId(task.userId) })
-    //     .count()) === 0
-    // ) {
-    //   // TODO: implement proper error handling
-    //   throw new Error('userId does not exist in database')
-    // }
-
     const insertedElement = await db.taskCollection().insertOne(task)
     return insertedElement.ops[0]
   },
