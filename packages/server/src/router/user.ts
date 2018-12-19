@@ -1,11 +1,11 @@
-import { User, UserApi } from '@open-gtd/api'
+import { User, UserApi, ValidationException } from '@open-gtd/api'
 import { hash } from 'bcrypt'
 import { RouterDefinition } from 'rest-ts-express'
 import { db } from '../db'
 
 export const UserRouter: RouterDefinition<typeof UserApi> = {
   createUser: async req => {
-    const user = req.body as User
+    const user = req.body
 
     if (
       (await db
@@ -13,8 +13,9 @@ export const UserRouter: RouterDefinition<typeof UserApi> = {
         .find({ email: user.email })
         .count()) > 0
     ) {
-      // TODO: implement proper error handling
-      throw new Error('mail address is already in use')
+      throw new ValidationException<User>({
+        email: 'Email address is already in use.'
+      })
     } else {
       const insertUser: User = {
         ...user,
