@@ -19,6 +19,22 @@
   .App-intro {
     font-size: large;
   }
+  .login-form {
+    flex-direction: column;
+  }
+  .login-form {
+    width: 400px;
+    margin: auto;
+    //max-width: 300px;
+
+    //margin-left: 150px;
+  }
+  .login-form-forgot {
+    float: centre;
+  }
+  .login-form-button {
+    width: 50%;
+  }
 }
 
 @keyframes App-logo-spin {
