@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { Route, Router, Switch } from 'react-router-dom'
 
-import { Registration } from './components/Registration'
 import { Home } from './components/Home'
+import RegisterForm from './components/RegisterForm'
 import { history } from './history'
 
+import { Layout } from 'antd'
 import './App.scss'
-import { Layout } from 'antd';
 
 class App extends React.Component {
   public render() {
@@ -14,16 +14,15 @@ class App extends React.Component {
       <Router history={history}>
         <div className="App">
           <div>
-          <Layout>
-            <Switch>
-              <Route path="/registration" component={Registration} />
-              <Route path="/" exact component={Home} /> 
-            </Switch>
-          </Layout>
+            <Layout>
+              <Switch>
+                <Route path="/registration" component={RegisterForm} />
+                <Route path="/" exact component={Home} />
+              </Switch>
+            </Layout>
           </div>
         </div>
       </Router>
-      
     )
   }
 }
