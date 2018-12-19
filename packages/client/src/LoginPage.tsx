@@ -1,4 +1,3 @@
-import { Rate } from 'antd'
 import * as React from 'react'
 import './App.scss'
 import LoginForm from './LoginForm'

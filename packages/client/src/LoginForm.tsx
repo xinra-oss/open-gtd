@@ -56,6 +56,8 @@ export class LoginForm extends React.Component<
           <a className="login-form-forgot" href="">
             Forgot password
           </a>
+        </FormItem>
+        <FormItem>
           <Button
             type="primary"
             htmlType="submit"
@@ -63,6 +65,8 @@ export class LoginForm extends React.Component<
           >
             Log in
           </Button>
+        </FormItem>
+        <FormItem>
           Or <a href="">register now!</a>
         </FormItem>
       </Form>
