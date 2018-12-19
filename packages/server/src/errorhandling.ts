@@ -1,9 +1,7 @@
 import {
   HttpException,
   InternalServerErrorHttpException,
-  TypedHttpException,
-  UnprocessableEntityHttpException,
-  ValidationException
+  TypedHttpException
 } from '@open-gtd/api'
 import { ErrorRequestHandler } from 'express'
 import { logger } from './logging'
@@ -14,9 +12,6 @@ export const handleNonHttpExceptions: ErrorRequestHandler = (
   res,
   next
 ) => {
-  logger.info('%O', err instanceof HttpException)
-  logger.info('%O', err instanceof UnprocessableEntityHttpException)
-  logger.info('%O', err instanceof ValidationException)
   if (err instanceof HttpException) {
     next(err)
   } else {

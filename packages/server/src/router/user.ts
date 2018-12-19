@@ -14,7 +14,7 @@ export const UserRouter: RouterDefinition<typeof UserApi> = {
         .count()) > 0
     ) {
       throw new ValidationException<User>({
-        email: 'E-Mail address is already in use.'
+        email: 'Email address is already in use.'
       })
     } else {
       const insertUser: User = {
