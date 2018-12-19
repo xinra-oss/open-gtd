@@ -4,12 +4,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-interface HomeProps {}
-
-interface HomeDispatchProps extends HomeProps {}
-
-export class Home extends React.Component<HomeProps & HomeDispatchProps> {
-  constructor(props: HomeProps & HomeDispatchProps) {
+export class Home extends React.Component {
+  constructor(props: any) {
     super(props)
     this.state = {}
   }
@@ -25,7 +21,9 @@ export class Home extends React.Component<HomeProps & HomeDispatchProps> {
     )
   }
 
-  public openRegistration = () => {}
+  public openRegistration = () => {
+    // todo
+  }
 }
 
 export default connect()(Home)
