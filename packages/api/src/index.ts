@@ -1,7 +1,7 @@
 import { defineAPI } from 'rest-ts-core'
-import { AuthApi } from './auth'
-import { TaskApi } from './task'
-import { UserApi } from './user'
+import { AuthApi } from './auth.api'
+import { TaskApi } from './task.api'
+import { UserApi } from './user.api'
 
 // export type OpenGtdApi = TaskApi & UserApi
 
