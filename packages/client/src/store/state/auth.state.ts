@@ -1,5 +1,6 @@
 import { User } from '@open-gtd/api'
+import { DeepReadonly } from 'utility-types'
 
-export interface AuthState {
+export type AuthState = DeepReadonly<{
   user?: User
-}
+}>

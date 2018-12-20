@@ -6,4 +6,6 @@ const driver = Axios.create({
   baseURL: 'http://localhost:3001/api'
 })
 
-export const OpenGtdApiConsumer = createConsumer(OpenGtdApi, driver)
+export const openGtdApi = createConsumer(OpenGtdApi, driver)
+
+export type OpenGtdApiConsumer = typeof openGtdApi
