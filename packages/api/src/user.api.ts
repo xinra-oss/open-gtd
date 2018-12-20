@@ -1,8 +1,8 @@
-import { User } from '@open-gtd/model'
 import { defineAPI, POST } from 'rest-ts-core'
+import { Credentials, User } from './model'
 
 export const UserApi = defineAPI({
   createUser: POST `/users` // prettier-ignore
-    .body(User)
+    .body(Credentials)
     .response(User)
 })

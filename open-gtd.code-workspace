@@ -12,9 +12,6 @@
     },
     {
       "path": "packages\\api"
-    },
-    {
-      "path": "packages\\model"
     }
   ],
   "settings": {

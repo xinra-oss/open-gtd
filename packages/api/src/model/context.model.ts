@@ -1,5 +1,5 @@
 import { Record, Static, String } from 'runtypes'
-import { Entity, EntityId } from './entity'
+import { Entity, EntityId } from './entity.model'
 
 export const Context = Entity.And(
   Record({
