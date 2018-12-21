@@ -1,6 +1,6 @@
 import { Static } from 'runtypes'
-import { Credentials } from './auth'
-import { Entity } from './entity'
+import { Credentials } from './auth.model'
+import { Entity } from './entity.model'
 
 export const User = Entity.And(Credentials)
 

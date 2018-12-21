@@ -7,7 +7,7 @@ import {
   Static,
   String
 } from 'runtypes'
-import { Entity, EntityId } from './entity'
+import { Entity, EntityId } from './entity.model'
 
 export const NewTask = Record({
   contextIds: Array(EntityId),

@@ -1,4 +1,9 @@
-import { TaskApi } from '@open-gtd/api'
+import {
+  NotFoundHttpException,
+  Task,
+  TaskApi,
+  ValidationException
+} from '@open-gtd/api'
 import { ObjectId } from 'mongodb'
 import { RouterDefinition } from 'rest-ts-express'
 import { getUserId } from '../auth'
@@ -18,35 +23,33 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
           .find({ _id: new ObjectId(task.parentId) })
           .count()) === 0
       ) {
-        // TODO: implement proper error handling
-        throw new Error('parentId is set but does not exist in database')
+        throw new ValidationException<Task>({
+          parentId: 'Parent does not exist.'
+        })
       }
     }
 
     const insertedElement = await db.taskCollection().insertOne(task)
     return insertedElement.ops[0]
   },
-  deleteTask: async req => {
+  deleteTask: async (req, res) => {
     if (
       (await db
         .taskCollection()
         .find({ _id: new ObjectId(req.params.id) })
         .count()) === 0
     ) {
-      // TODO: implement proper error handling
-      throw new Error('requested taskId does not exist in database')
-    } else {
-      await db.taskCollection().deleteOne({ _id: new ObjectId(req.params.id) })
+      throw new NotFoundHttpException()
     }
-    // TODO: implement proper HTTP response (message "Cannot DELETE /api/tasks/:id" although deleting...)
+    await db.taskCollection().deleteOne({ _id: new ObjectId(req.params.id) })
+    res.sendStatus(200)
   },
   getTask: async req => {
     const result = await db
       .taskCollection()
       .findOne({ _id: new ObjectId(req.params.id) })
     if (result === null) {
-      // TODO: implement proper error handling
-      throw new Error('requested taskId does not exist in database')
+      throw new NotFoundHttpException()
     }
     return result
   },
@@ -65,8 +68,7 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
         .find({ _id: new ObjectId(req.params.id) })
         .count()) === 0
     ) {
-      // TODO: implement proper error handling
-      throw new Error('requested taskId does not exist in database')
+      throw new NotFoundHttpException()
     }
     await db
       .taskCollection()
