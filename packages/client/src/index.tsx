@@ -4,12 +4,13 @@ import { Provider } from 'react-redux'
 import App from './App'
 import './index.scss'
 import registerServiceWorker from './registerServiceWorker'
-import { openGtdApi, Services } from './services'
+import { handleOpenGtdApiError, openGtdApi, Services } from './services'
 import { createAppStore } from './store'
 import { userActions } from './store/actions'
 
 const services: Services = {
-  openGtdApi
+  openGtdApi,
+  handleOpenGtdApiError
 }
 
 const store = createAppStore(services)
