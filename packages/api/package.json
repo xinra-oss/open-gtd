@@ -27,6 +27,7 @@
     "typescript": "^3.1.6"
   },
   "dependencies": {
+    "@senhung/http-exceptions": "^1.1.1",
     "rest-ts-core": "0.3.2",
     "runtypes": "^2.1.6",
     "validator": "^10.9.0"

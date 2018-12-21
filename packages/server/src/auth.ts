@@ -1,3 +1,4 @@
+import { UnauthorizedHttpException } from '@open-gtd/api'
 import { NextFunction, Request, Response } from 'express'
 
 export const sessionConfiguration = {
@@ -33,16 +34,17 @@ export function authMiddleware(
   res: Response,
   next: NextFunction
 ) {
-  if (
-    (req.path === '/session' || req.path === '/users') &&
-    req.method === 'POST'
-  ) {
-    next() // allow login and register
+  const isLoginRoute = req.method === 'POST' && req.path === '/users'
+  const isRegisterRoute = req.method === 'POST' && req.path === '/session'
+  if (isLoginRoute || isRegisterRoute) {
+    next()
     return
   }
-  if (req.session !== undefined && getUserId(req) !== undefined) {
+  const isUserSignedIn =
+    req.session !== undefined && getUserId(req) !== undefined
+  if (isUserSignedIn) {
     next()
   } else {
-    res.sendStatus(401)
+    throw new UnauthorizedHttpException()
   }
 }

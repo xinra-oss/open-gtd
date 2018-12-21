@@ -21,6 +21,7 @@ export class LoginForm extends React.Component<
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
       if (!err) {
+        // tslint:disable-next-line
         console.log('Received values of form: ', values)
       }
     })
