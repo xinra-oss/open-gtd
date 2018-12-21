@@ -1,4 +1,4 @@
-import { Divider, Table, Tag } from 'antd'
+import { Table } from 'antd'
 import * as React from 'react'
 
 const { Column, ColumnGroup } = Table
