@@ -1,7 +1,21 @@
+import { Task } from '@open-gtd/api'
 import { Table } from 'antd'
 import * as React from 'react'
 
 const { Column, ColumnGroup } = Table
+
+const tasks: Task[] = [
+  {
+    _id: '12345',
+    title: 'Sample Task',
+    contextIds: [],
+    isDone: false,
+    isFolder: false,
+    isNeverActive: false,
+    isProject: false,
+    userId: '12345'
+  }
+]
 
 const data = [
   {
