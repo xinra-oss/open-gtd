@@ -1,4 +1,4 @@
-import { defineAPI, GET, POST } from 'rest-ts-core'
+import { defineAPI, DELETE, GET, POST } from 'rest-ts-core'
 import { Array } from 'runtypes'
 import { Context } from './model'
 
@@ -7,5 +7,6 @@ export const ContextApi = defineAPI({
     .body(Context)
     .response(Context),
   getContextList: GET `/contexts` // prettier-ignore
-    .response(Array(Context))
+    .response(Array(Context)),
+  deleteContext: DELETE `/contexts/${'id'}` // prettier-ignore
 })

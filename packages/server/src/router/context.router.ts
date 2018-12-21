@@ -1,4 +1,5 @@
-import { ContextApi } from '@open-gtd/api'
+import { ContextApi, NotFoundHttpException } from '@open-gtd/api'
+import { ObjectId } from 'mongodb'
 import { RouterDefinition } from 'rest-ts-express'
 import { getUserId } from '../auth'
 import { db } from '../db'
@@ -16,5 +17,17 @@ export const ContextRouter: RouterDefinition<typeof ContextApi> = {
       .find({ userId: getUserId(req) })
       .toArray()
     return result
+  },
+  deleteContext: async (req, res) => {
+    if (
+      (await db
+        .contextCollection()
+        .find({ _id: new ObjectId(req.params.id) })
+        .count()) === 0
+    ) {
+      throw new NotFoundHttpException()
+    }
+    await db.contextCollection().deleteOne({ _id: new ObjectId(req.params.id) })
+    res.sendStatus(200)
   }
 }
