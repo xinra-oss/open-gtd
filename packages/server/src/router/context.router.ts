@@ -11,6 +11,15 @@ export const ContextRouter: RouterDefinition<typeof ContextApi> = {
     const insertedElement = await db.contextCollection().insertOne(context)
     return insertedElement.ops[0]
   },
+  getContext: async req => {
+    const result = await db
+      .contextCollection()
+      .findOne({ _id: new ObjectId(req.params.id) })
+    if (result === null) {
+      throw new NotFoundHttpException()
+    }
+    return result
+  },
   getContextList: async req => {
     const result = await db
       .contextCollection()
