@@ -2,6 +2,7 @@ import * as React from 'react'
 import './App.scss'
 
 import { Button, Form, Icon, Input } from 'antd'
+import 'antd/dist/antd.css'
 import { FormComponentProps } from 'antd/lib/form/Form'
 
 const FormItem = Form.Item
