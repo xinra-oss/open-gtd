@@ -1,7 +1,8 @@
 import { catchError, filter, map, switchMap } from 'rxjs/operators'
-import { AC, isActionOf } from 'typesafe-actions/dist/is-action-of'
+import { isActionOf } from 'typesafe-actions'
 import { AppEpic } from '.'
 import { OpenGtdApiConsumer } from '../../services/api.service'
+import { AC } from '../action-creator'
 import { AppAction, AppPayloadAction } from '../actions'
 
 interface ApiActionCreator<REQ_AC extends AC<AppAction>, OUT> {
