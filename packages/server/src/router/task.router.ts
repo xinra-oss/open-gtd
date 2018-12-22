@@ -30,6 +30,26 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
         })
       }
     }
+    if (newTask.contextIds.length > 0) {
+      for (const contextId in task.contextIds) {
+        if (task.contextIds.hasOwnProperty(contextId)) {
+          const element = task.contextIds[contextId]
+          const context = await db
+            .contextCollection()
+            .findOne({ _id: new ObjectId(element) })
+          if (!context) {
+            throw new ValidationException<Task>({
+              contextIds: 'contextId does not exist.'
+            })
+          }
+          if (context.userId !== task.userId) {
+            throw new ValidationException<Task>({
+              contextIds: 'Context belongs to different user.'
+            })
+          }
+        }
+      }
+    }
 
     const insertedElement = await db.taskCollection().insertOne(task)
     return insertedElement.ops[0]
