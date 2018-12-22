@@ -5,16 +5,16 @@
  * Travis build.
  */
 
-export declare type StringType = string
-export declare type SymbolType = symbol
+export type StringType = string
+export type SymbolType = symbol
 
-export declare type StringOrSymbol = StringType | SymbolType
+export type StringOrSymbol = StringType | SymbolType
 
-export declare interface TypeMeta<T extends StringOrSymbol> {
+export interface TypeMeta<T extends StringOrSymbol> {
   getType?: () => T
 }
 
-export declare type AC<
+export type AC<
   T extends {
     type: string
   }
