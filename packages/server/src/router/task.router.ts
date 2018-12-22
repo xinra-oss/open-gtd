@@ -17,14 +17,16 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
       userId: getUserId(req)
     }
     if (newTask.parentId !== undefined) {
-      if (
-        (await db
-          .taskCollection()
-          .find({ _id: new ObjectId(task.parentId) })
-          .count()) === 0
-      ) {
+      const parentTask = await db
+        .taskCollection()
+        .findOne({ _id: new ObjectId(task.parentId) })
+      if (!parentTask) {
         throw new ValidationException<Task>({
           parentId: 'Parent does not exist.'
+        })
+      } else if (parentTask.userId !== task.userId) {
+        throw new ValidationException<Task>({
+          userId: 'Parent has different userId.'
         })
       }
     }
