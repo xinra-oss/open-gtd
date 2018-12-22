@@ -9,7 +9,7 @@ export const AuthRouter: RouterDefinition<typeof AuthApi> = {
   createSession: async (req, res) => {
     const credentials = req.body
     const userId = await checkCredentials(
-      credentials.email,
+      credentials.email.toLowerCase(),
       credentials.password
     )
     if (credentials && userId !== null && userId !== undefined) {
