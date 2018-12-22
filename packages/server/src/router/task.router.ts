@@ -17,38 +17,18 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
       userId: getUserId(req)
     }
     if (newTask.parentId !== undefined) {
-      const parentTask = await db
-        .taskCollection()
-        .findOne({ _id: new ObjectId(task.parentId) })
-      if (!parentTask) {
+      const parentError = await checkParentTask(newTask.parentId, task.userId)
+      if (parentError) {
         throw new ValidationException<Task>({
-          parentId: 'Parent does not exist.'
-        })
-      } else if (parentTask.userId !== task.userId) {
-        throw new ValidationException<Task>({
-          userId: 'Parent has different userId.'
+          parentId: parentError
         })
       }
     }
-    if (newTask.contextIds.length > 0) {
-      for (const contextId in task.contextIds) {
-        if (task.contextIds.hasOwnProperty(contextId)) {
-          const element = task.contextIds[contextId]
-          const context = await db
-            .contextCollection()
-            .findOne({ _id: new ObjectId(element) })
-          if (!context) {
-            throw new ValidationException<Task>({
-              contextIds: 'contextId does not exist.'
-            })
-          }
-          if (context.userId !== task.userId) {
-            throw new ValidationException<Task>({
-              contextIds: 'Context belongs to different user.'
-            })
-          }
-        }
-      }
+    const contextError = await checkContextIds(newTask.contextIds, task.userId)
+    if (contextError) {
+      throw new ValidationException<Task>({
+        contextIds: contextError
+      })
     }
 
     const insertedElement = await db.taskCollection().insertOne(task)
@@ -92,9 +72,58 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
     ) {
       throw new NotFoundHttpException()
     }
+
+    if (task.parentId !== undefined) {
+      const parentError = await checkParentTask(task.parentId, task.userId)
+      if (parentError) {
+        throw new ValidationException<Task>({
+          parentId: parentError
+        })
+      }
+    }
+    const contextError = await checkContextIds(task.contextIds, task.userId)
+    if (contextError) {
+      throw new ValidationException<Task>({
+        contextIds: contextError
+      })
+    }
+
     await db
       .taskCollection()
       .replaceOne({ _id: new ObjectId(req.params.id) }, task)
     return task
   }
+}
+
+async function checkParentTask(parentId: string, userId: string) {
+  const task = await db
+    .taskCollection()
+    .findOne({ _id: new ObjectId(parentId) })
+  if (!task) {
+    return 'Parent does not exist.'
+  }
+  if (task.userId !== userId) {
+    return 'Parent belongs to different user.'
+  }
+  return null
+}
+
+async function checkContextIds(contextIds: string[], userId: string) {
+  if (contextIds.length > 0) {
+    for (const contextId in contextIds) {
+      if (contextIds.hasOwnProperty(contextId)) {
+        const element = contextIds[contextId]
+        const context = await db
+          .contextCollection()
+          .findOne({ _id: new ObjectId(element) })
+        if (!context) {
+          return 'contextId does not exist.'
+        }
+        if (context.userId !== userId) {
+          return 'Context belongs to different user.'
+        }
+      }
+    }
+  }
+  return null
 }
