@@ -6,7 +6,6 @@ import { db } from '../db'
 export const UserRouter: RouterDefinition<typeof UserApi> = {
   createUser: async (req, res) => {
     const user = req.body
-    user.email = user.email.toLowerCase()
 
     if (
       (await db

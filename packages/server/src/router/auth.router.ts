@@ -9,7 +9,7 @@ export const AuthRouter: RouterDefinition<typeof AuthApi> = {
   createSession: async (req, res) => {
     const credentials = req.body
     const userId = await checkCredentials(
-      credentials.email.toLowerCase(),
+      credentials.email,
       credentials.password
     )
     if (credentials && userId !== null && userId !== undefined) {
@@ -26,7 +26,9 @@ export const AuthRouter: RouterDefinition<typeof AuthApi> = {
 }
 
 async function checkCredentials(email: string, password: string) {
-  const result = await db.userCollection().findOne({ email })
+  const result = await db
+    .userCollection()
+    .findOne({ email: { $regex: email, $options: 'i' } })
   if (result && (await compare(password, result.password))) {
     return result._id
   }
