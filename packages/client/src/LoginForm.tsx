@@ -3,6 +3,7 @@ import './App.scss'
 
 import { Button, Form, Icon, Input } from 'antd'
 import { FormComponentProps } from 'antd/lib/form/Form'
+import { Link } from 'react-router-dom'
 
 const FormItem = Form.Item
 interface LoginFormState {
@@ -68,7 +69,7 @@ export class LoginForm extends React.Component<
           </Button>
         </FormItem>
         <FormItem>
-          Or <a href="">register now!</a>
+          Or <Link to="/register">register now!</Link>
         </FormItem>
       </Form>
     )

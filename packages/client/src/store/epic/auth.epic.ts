@@ -1,5 +1,8 @@
+import { LOCATION_CHANGE } from 'connected-react-router'
 import { combineEpics } from 'redux-observable'
-import { authActions } from '../actions'
+import { filter, map } from 'rxjs/operators'
+import { AppEpic } from '.'
+import { authActions, routerActions } from '../actions'
 import {
   createDefaultApiEpic,
   createDefaultApiEpicWithPayloadAsBody
@@ -14,4 +17,20 @@ const deleteSession = createDefaultApiEpic(authActions.deleteSession, api =>
   api.deleteSession()
 )
 
-export const authEpic = combineEpics(createSession, deleteSession)
+const redirectToLogin: AppEpic = (action$, state$) =>
+  action$.pipe(
+    filter(
+      action =>
+        action.type === LOCATION_CHANGE &&
+        action.payload.location.pathname !== '/login' &&
+        action.payload.location.pathname !== '/register' &&
+        state$.value.auth.user === undefined
+    ),
+    map(() => routerActions.push('/login'))
+  )
+
+export const authEpic = combineEpics(
+  createSession,
+  deleteSession,
+  redirectToLogin
+)
