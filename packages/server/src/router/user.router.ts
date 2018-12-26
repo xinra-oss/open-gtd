@@ -1,4 +1,9 @@
-import { User, UserApi, ValidationException } from '@open-gtd/api'
+import {
+  EmptyResponse,
+  User,
+  UserApi,
+  ValidationException
+} from '@open-gtd/api'
 import { hash } from 'bcrypt'
 import { RouterDefinition } from 'rest-ts-express'
 import { db } from '../db'
@@ -21,9 +26,8 @@ export const UserRouter: RouterDefinition<typeof UserApi> = {
         ...user,
         password: await hash(user.password, 10)
       }
-      if (await db.userCollection().insertOne(insertUser)) {
-        res.sendStatus(200)
-      }
+      await db.userCollection().insertOne(insertUser)
+      return EmptyResponse
     }
   }
 }
