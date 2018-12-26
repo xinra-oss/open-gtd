@@ -4,7 +4,7 @@ import { RouterDefinition } from 'rest-ts-express'
 import { db } from '../db'
 
 export const UserRouter: RouterDefinition<typeof UserApi> = {
-  createUser: async req => {
+  createUser: async (req, res) => {
     const user = req.body
     user.email = user.email.toLowerCase()
 
@@ -22,8 +22,9 @@ export const UserRouter: RouterDefinition<typeof UserApi> = {
         ...user,
         password: await hash(user.password, 10)
       }
-      const insertedElement = await db.userCollection().insertOne(insertUser)
-      return insertedElement.ops[0]
+      if (await db.userCollection().insertOne(insertUser)) {
+        res.sendStatus(200)
+      }
     }
   }
 }
