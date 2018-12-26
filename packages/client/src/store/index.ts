@@ -1,4 +1,4 @@
-import { applyMiddleware, createStore, Store } from 'redux'
+import { applyMiddleware, createStore, Dispatch, Store } from 'redux'
 import { composeWithDevTools } from 'redux-devtools-extension'
 import { Services } from '../services'
 import { AppAction } from './actions'
@@ -17,3 +17,13 @@ export function createAppStore(services: Services): Store<AppState, AppAction> {
   epicMiddleware.run(appEpic)
   return store
 }
+
+export interface DispatchProps {
+  dispatch: Dispatch<AppAction>
+}
+
+export const mapDispatchToProps = (dispatch: Dispatch<AppAction>) => ({
+  dispatch
+})
+
+export const mapStateToEmptyProps = (state: AppState) => ({})

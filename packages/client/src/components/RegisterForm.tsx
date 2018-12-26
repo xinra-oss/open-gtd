@@ -1,38 +1,36 @@
+import { Credentials } from '@open-gtd/api'
 import { Button, Form, Input } from 'antd'
 import { WrappedFormUtils } from 'antd/lib/form/Form'
 import React from 'react'
+import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
+import {
+  DispatchProps,
+  mapDispatchToProps,
+  mapStateToEmptyProps
+} from '../store'
+import { userActions } from '../store/actions'
 
 interface RegistrationRouterParams {
   id: string
 }
 
-interface RegisterFormState {
-  email: string
-  password: string
-}
-
 interface RegistrationProps
-  extends RouteComponentProps<RegistrationRouterParams> {
+  extends RouteComponentProps<RegistrationRouterParams>,
+    DispatchProps {
   form: WrappedFormUtils
 }
 
-interface RegistrationDispatchProps
-  extends RegistrationProps,
-    RouteComponentProps<RegistrationRouterParams> {}
-
 const FormItem = Form.Item
 
-class RegisterForm extends React.Component<
-  RegistrationProps & RegistrationDispatchProps,
-  RegisterFormState
-> {
+class RegisterForm extends React.Component<RegistrationProps> {
   public handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        // tslint:disable-next-line
-        console.log('Received values of form: ', values)
+        this.props.dispatch(
+          userActions.createUser.request(values as Credentials)
+        )
       }
     })
   }
@@ -60,7 +58,7 @@ class RegisterForm extends React.Component<
     }
 
     return (
-      <div>
+      <Form onSubmit={this.handleSubmit}>
         <FormItem {...formItemLayout} label="E-mail">
           {getFieldDecorator('email', {
             rules: [
@@ -85,10 +83,15 @@ class RegisterForm extends React.Component<
             ]
           })(<Input type="password" />)}
         </FormItem>
-        <Button>Cancel</Button> <Button type="primary">Save</Button>
-      </div>
+        <Button type="primary" htmlType="submit">
+          Register
+        </Button>
+      </Form>
     )
   }
 }
-const WrappedNormalRegisterForm = Form.create<RegisterFormState>()(RegisterForm)
-export default WrappedNormalRegisterForm
+
+export default connect(
+  mapStateToEmptyProps,
+  mapDispatchToProps
+)(Form.create()(RegisterForm))

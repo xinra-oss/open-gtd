@@ -18,7 +18,7 @@ class App extends React.Component {
             <Layout>
               <Switch>
                 <Route path="/registration" component={RegisterForm} />
-                <Route path="login" component={LoginPage} />
+                <Route path="/login" component={LoginPage} />
                 <Route path="/" exact component={Home} />
               </Switch>
             </Layout>
