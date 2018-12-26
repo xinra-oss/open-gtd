@@ -28,7 +28,7 @@ export const AuthRouter: RouterDefinition<typeof AuthApi> = {
 async function checkCredentials(email: string, password: string) {
   const result = await db
     .userCollection()
-    .findOne({ email: { $regex: email, $options: 'i' } })
+    .findOne({ $text: { $search: email, $caseSensitive: false } })
   if (result && (await compare(password, result.password))) {
     return result._id
   }

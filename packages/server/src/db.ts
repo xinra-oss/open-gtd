@@ -58,5 +58,9 @@ function getCollection<T>(name: string) {
   if (mongoDb === undefined) {
     throw new Error('db is not connected')
   }
-  return mongoDb.collection<T>(name)
+  const coll = mongoDb.collection<T>(name)
+  if (name === 'users') {
+    coll.createIndex({ email: 'text' })
+  }
+  return coll
 }
