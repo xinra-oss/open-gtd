@@ -1,4 +1,8 @@
-import { ContextApi, NotFoundHttpException } from '@open-gtd/api'
+import {
+  ContextApi,
+  NotFoundHttpException,
+  ValidationException
+} from '@open-gtd/api'
 import { ObjectId } from 'mongodb'
 import { RouterDefinition } from 'rest-ts-express'
 import { getUserId } from '../auth'
@@ -49,6 +53,22 @@ export const ContextRouter: RouterDefinition<typeof ContextApi> = {
     ) {
       throw new NotFoundHttpException()
     }
+    const oldContext = await db
+      .contextCollection()
+      .findOne({ _id: new ObjectId(req.params.id) })
+    if (oldContext) {
+      if (oldContext.userId !== getUserId(req)) {
+        throw new ValidationException({
+          userId: 'Context to be updated does not belong to current user.'
+        })
+      }
+    }
+    if (context.userId !== getUserId(req)) {
+      throw new ValidationException({
+        userId: 'Updated Context does not belong to current user.'
+      })
+    }
+
     await db
       .contextCollection()
       .replaceOne({ _id: new ObjectId(req.params.id) }, context)
