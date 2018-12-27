@@ -19,6 +19,9 @@ export const db = {
         'Creating embedded database because db.embedded=true and env=%s',
         env
       )
+      logger.info(
+        'NOTE: The first time may take a few minutes to download the MongoDB binaries'
+      )
       memoryServer = new MongoMemoryServer({
         instance: {
           dbName: config.get('db').name
