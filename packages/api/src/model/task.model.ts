@@ -9,7 +9,7 @@ import {
 } from 'runtypes'
 import { Entity, EntityId } from './entity.model'
 
-export const NewTask = Record({
+export const Task = Record({
   contextIds: Array(EntityId),
   isDone: Boolean,
   isFolder: Boolean,
@@ -28,11 +28,11 @@ export const NewTask = Record({
   })
 )
 
-export const Task = Entity.And(NewTask).And(
+export const TaskEntity = Task.And(Entity).And(
   Record({
     userId: EntityId
   })
 )
 
+export type TaskEntity = Static<typeof TaskEntity>
 export type Task = Static<typeof Task>
-export type NewTask = Static<typeof NewTask>

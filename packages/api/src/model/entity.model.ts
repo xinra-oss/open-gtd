@@ -1,11 +1,11 @@
-import { Partial, Static, String } from 'runtypes'
+import { Record, Static, String } from 'runtypes'
 import { isHexadecimal } from 'validator'
 
 export const EntityId = String.withConstraint(
   id => (isHexadecimal(id) && id.length === 24) || `id is not valid`
 )
 
-export const Entity = Partial({
+export const Entity = Record({
   _id: EntityId
 })
 
