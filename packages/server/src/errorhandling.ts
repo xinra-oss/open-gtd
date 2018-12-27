@@ -1,8 +1,10 @@
 import {
+  BadRequestHttpException,
   HttpException,
   InternalServerErrorHttpException,
   TypedHttpException
 } from '@open-gtd/api'
+import { BadRequestHttpException as RestTsExpressBadRequestHttpException } from '@senhung/http-exceptions'
 import { ErrorRequestHandler } from 'express'
 import { logger } from './logging'
 
@@ -12,11 +14,18 @@ export const handleNonHttpExceptions: ErrorRequestHandler = (
   res,
   next
 ) => {
-  if (err instanceof HttpException) {
-    next(err)
-  } else {
-    logger.error('UNCAUGHT EXCEPTION: %O', err)
-    next(new InternalServerErrorHttpException())
+  if (err) {
+    if (err instanceof RestTsExpressBadRequestHttpException) {
+      // This is the same class but we need the one exported by @open-gtd/api
+      // for `instanceof` to work correctly
+      Object.setPrototypeOf(err, BadRequestHttpException.prototype)
+    }
+    if (err instanceof HttpException) {
+      next(err)
+    } else {
+      logger.error('UNCAUGHT EXCEPTION: %O', err)
+      next(new InternalServerErrorHttpException())
+    }
   }
 }
 
