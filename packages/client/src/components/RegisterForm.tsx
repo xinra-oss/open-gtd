@@ -4,11 +4,7 @@ import { WrappedFormUtils } from 'antd/lib/form/Form'
 import React from 'react'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import {
-  DispatchProps,
-  mapDispatchToProps,
-  mapStateToEmptyProps
-} from '../store'
+import { DispatchProps, mapDispatchToProps } from '../store'
 import { userActions } from '../store/actions'
 
 interface RegistrationRouterParams {
@@ -91,7 +87,4 @@ class RegisterForm extends React.Component<RegistrationProps> {
   }
 }
 
-export default connect(
-  mapStateToEmptyProps,
-  mapDispatchToProps
-)(Form.create()(RegisterForm))
+export default connect(mapDispatchToProps)(Form.create()(RegisterForm))

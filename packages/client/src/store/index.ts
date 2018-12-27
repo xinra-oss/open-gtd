@@ -32,5 +32,3 @@ export interface DispatchProps {
 export const mapDispatchToProps = (dispatch: Dispatch<AppAction>) => ({
   dispatch
 })
-
-export const mapStateToEmptyProps = (state: AppState) => ({})
