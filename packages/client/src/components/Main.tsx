@@ -1,5 +1,6 @@
 import { Layout, Menu, Breadcrumb, Icon} from 'antd';
 import React from 'react'
+import '../App.scss'
 
 import { connect } from 'react-redux'
 
@@ -15,7 +16,7 @@ export class Main extends React.Component {
     const {} = this.props
 
     return (
-        <Layout>
+    <Layout>
     <Header className="header">
       <div className="logo" />
       <Menu
@@ -24,9 +25,14 @@ export class Main extends React.Component {
         defaultSelectedKeys={['2']}
         style={{ lineHeight: '64px' }}
       >
-        <Menu.Item key="1">nav 1</Menu.Item>
-        <Menu.Item key="2">nav 2</Menu.Item>
-        <Menu.Item key="3">nav 3</Menu.Item>
+        <Menu.Item key="1" className="menu-item-left">
+                <Icon type="plus-square" style={{ fontSize: '24px', color: '#fff'}} theme="outlined" />
+                Create Task
+        </Menu.Item>
+        <Menu.Item key="3"  className="menu-item-right">
+        <Icon type="logout" style={{ fontSize: '24px', color: '#fff'}} theme="outlined"/>
+        Logout
+        </Menu.Item>
       </Menu>
     </Header>
     <Layout>
@@ -37,7 +43,7 @@ export class Main extends React.Component {
           defaultOpenKeys={['sub1']}
           style={{ height: '100%', borderRight: 0 }}
         >
-          <SubMenu key="sub1" title={<span><Icon type="user" />subnav 1</span>}>
+          <SubMenu key="inbox" title={<span><Icon type="user" />subnav</span>}>
             <Menu.Item key="1">option1</Menu.Item>
             <Menu.Item key="2">option2</Menu.Item>
             <Menu.Item key="3">option3</Menu.Item>

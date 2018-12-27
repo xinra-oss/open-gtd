@@ -35,6 +35,20 @@
   .login-form-button {
     width: 50%;
   }
+  .menu-item-left {
+    float: left
+  }
+  .menu-item-right {
+    float: right
+  }
+  .logo {
+    width: 120px;
+    height: 31px;
+    background: rgba(255,255,255,.2);  
+    margin: 16px 28px 16px 0;
+    float: left;
+  }
+
 }
 
 @keyframes App-logo-spin {
