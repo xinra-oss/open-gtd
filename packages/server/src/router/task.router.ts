@@ -1,5 +1,5 @@
 import {
-  EmptyResponse,
+  EMPTY_RESPONSE,
   NotFoundHttpException,
   Task,
   TaskApi,
@@ -45,7 +45,7 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
       throw new NotFoundHttpException()
     }
     await db.taskCollection().deleteOne({ _id: new ObjectId(req.params.id) })
-    return EmptyResponse
+    return EMPTY_RESPONSE
   },
   getTask: async req => {
     const result = await db

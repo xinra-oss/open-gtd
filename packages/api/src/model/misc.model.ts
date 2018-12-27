@@ -1,3 +1,3 @@
-export const EmptyResponse = 'OK'
+export const EMPTY_RESPONSE = 'OK'
 
-export type EmptyResponse = typeof EmptyResponse
+export type EmptyResponse = typeof EMPTY_RESPONSE

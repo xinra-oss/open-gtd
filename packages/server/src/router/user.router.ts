@@ -1,5 +1,5 @@
 import {
-  EmptyResponse,
+  EMPTY_RESPONSE,
   User,
   UserApi,
   ValidationException
@@ -29,6 +29,6 @@ export const UserRouter: RouterDefinition<typeof UserApi> = {
     }
     const insertedElement = await db.userCollection().insertOne(insertUser)
     logger.debug('Created user', insertedElement.ops[0])
-    return EmptyResponse
+    return EMPTY_RESPONSE
   }
 }
