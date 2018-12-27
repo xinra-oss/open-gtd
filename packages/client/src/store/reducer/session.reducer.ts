@@ -5,7 +5,7 @@ import { AppAction } from '..'
 import { sessionActions } from '../actions'
 
 const initialState: Session = {
-  csrfToken: 'not set yet'
+  csrfToken: 'not initialized'
 }
 
 export const sessionReducer: Reducer<Session, AppAction> = (

@@ -13,6 +13,7 @@ import {
   Services
 } from './services'
 import { createAppStore } from './store'
+import { sessionActions } from './store/actions'
 
 const services: Services = {
   openGtdApi,
@@ -34,3 +35,5 @@ const app = (
 
 ReactDOM.render(app, document.getElementById('root') as HTMLElement)
 registerServiceWorker()
+
+store.dispatch(sessionActions.getSession.request())
