@@ -110,20 +110,15 @@ async function checkParentTask(parentId: string, userId: string) {
 }
 
 async function checkContextIds(contextIds: string[], userId: string) {
-  if (contextIds.length > 0) {
-    for (const contextId in contextIds) {
-      if (contextIds.hasOwnProperty(contextId)) {
-        const element = contextIds[contextId]
-        const context = await db
-          .contextCollection()
-          .findOne({ _id: new ObjectId(element) })
-        if (!context) {
-          return 'contextId does not exist.'
-        }
-        if (context.userId !== userId) {
-          return 'Context belongs to different user.'
-        }
-      }
+  for (const contextId of contextIds) {
+    const context = await db
+      .contextCollection()
+      .findOne({ _id: new ObjectId(contextId) })
+    if (!context) {
+      return 'contextId does not exist.'
+    }
+    if (context.userId !== userId) {
+      return 'Context belongs to different user.'
     }
   }
   return null
