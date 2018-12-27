@@ -37,6 +37,8 @@ export const db = {
       }
     )
     mongoDb = mongoClient.db(config.get('db').name)
+
+    await db.userCollection().createIndex({ email: 'text' })
   },
   disconnect: async () => {
     if (mongoClient !== undefined) {
@@ -58,9 +60,5 @@ function getCollection<T>(name: string) {
   if (mongoDb === undefined) {
     throw new Error('db is not connected')
   }
-  const coll = mongoDb.collection<T>(name)
-  if (name === 'users') {
-    coll.createIndex({ email: 'text' })
-  }
-  return coll
+  return mongoDb.collection<T>(name)
 }
