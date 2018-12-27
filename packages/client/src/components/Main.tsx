@@ -1,20 +1,33 @@
 import { Layout, Menu, Breadcrumb, Icon} from 'antd';
-import React from 'react'
+import * as React from 'react'
 import '../App.scss'
 
 import { connect } from 'react-redux'
+
+interface State {
+    readonly collapsed: boolean,
+}
 
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
 
 export class Main extends React.Component {
-  constructor(props: any) {
-    super(props)
-    this.state = {}
-  }
-  public render() {
-    const {} = this.props
+//   constructor(props: any) {
+//     super(props)
+//     this.state = {
+//         collapsed: false
+//         }
+//     }
+    readonly state: State = {
+        collapsed: false,
+    }
 
+    onCollapse = (collapsed: boolean) => {
+        console.log(collapsed);
+        this.setState({ collapsed });
+      }
+    
+  public render() {
     return (
     <Layout>
     <Header className="header">
@@ -36,7 +49,11 @@ export class Main extends React.Component {
       </Menu>
     </Header>
     <Layout>
-      <Sider width={200} style={{ background: '#fff' }}>
+      <Sider style={{ background: '#fff' }}
+        theme="light"
+        collapsible
+        collapsed={this.state.collapsed}
+        onCollapse={this.onCollapse}>
         <Menu
           mode="inline"
           defaultSelectedKeys={['1']}
@@ -45,9 +62,11 @@ export class Main extends React.Component {
         >
           <Menu.Item key="inbox">
             <Icon type="inbox" style={{ fontSize: '16px'}} />
-            inbox
+            {this.state.collapsed ? '' : 'inbox'}
           </Menu.Item>
-          <SubMenu key="projekt" title={<span><Icon type="folder" />projekt</span>}>
+          <SubMenu key="projekt" title={<span><Icon type="folder" />
+                {this.state.collapsed ? '' : 'projekt'}
+            </span>}>
             <Menu.Item key="1">Task 1</Menu.Item>
             <Menu.Item key="2">Task 2</Menu.Item>
           </SubMenu>
