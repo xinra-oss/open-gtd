@@ -21,6 +21,7 @@ export function createAppStore(
       applyMiddleware(routerMiddleware(history), epicMiddleware)
     )
   )
+  services.openGtdApi.storeHolder.store = store
   epicMiddleware.run(appEpic)
   return store
 }
