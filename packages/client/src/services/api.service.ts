@@ -6,15 +6,32 @@ import {
   ValidationException
 } from '@open-gtd/api'
 import Axios from 'axios'
+import { Store } from 'redux'
 import { createConsumer } from 'rest-ts-axios'
 import { of } from 'rxjs'
 import { ApiErrorHandler } from '.'
+import { AppAction, AppState } from '../store'
+
+const storeHolder = {
+  store: {} as Store<AppState, AppAction>
+}
 
 const driver = Axios.create({
-  baseURL: 'http://localhost:3001/api'
+  baseURL: 'http://localhost:3001/api',
+  withCredentials: true,
+  transformRequest: [
+    (data, headers) => {
+      headers['Content-Type'] = 'application/json'
+      headers['CSRF-Token'] = storeHolder.store.getState().session.csrfToken
+      return JSON.stringify(data)
+    }
+  ]
 })
 
-export const openGtdApi = createConsumer(OpenGtdApi, driver)
+export const openGtdApi = {
+  ...createConsumer(OpenGtdApi, driver),
+  storeHolder
+}
 
 export type OpenGtdApiConsumer = typeof openGtdApi
 

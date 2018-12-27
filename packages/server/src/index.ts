@@ -18,7 +18,13 @@ async function main() {
   await db.connect()
 
   const app = express()
-  app.use(cors())
+  app.use(
+    cors({
+      origin: ['http://localhost:3000'],
+      methods: ['GET', 'POST', 'DELETE'],
+      credentials: true
+    })
+  )
   app.use(BodyParser.json())
   app.use(session(sessionConfiguration))
   app.use(csrf())

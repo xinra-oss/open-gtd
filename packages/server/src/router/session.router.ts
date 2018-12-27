@@ -1,5 +1,4 @@
-import { AuthApi, User } from '@open-gtd/api'
-import { UnauthorizedHttpException } from '@senhung/http-exceptions'
+import { AuthApi, UnauthorizedHttpException, User } from '@open-gtd/api'
 import { compare } from 'bcrypt'
 import { ObjectId } from 'mongodb'
 import { RouterDefinition } from 'rest-ts-express'
