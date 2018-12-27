@@ -6,12 +6,18 @@ import { Provider } from 'react-redux'
 import App from './App'
 import './index.scss'
 import registerServiceWorker from './registerServiceWorker'
-import { handleOpenGtdApiError, openGtdApi, Services } from './services'
+import {
+  antDesignFeedback,
+  handleOpenGtdApiError,
+  openGtdApi,
+  Services
+} from './services'
 import { createAppStore } from './store'
 
 const services: Services = {
   openGtdApi,
-  handleOpenGtdApiError
+  handleOpenGtdApiError,
+  feedback: antDesignFeedback
 }
 
 const history = createBrowserHistory()

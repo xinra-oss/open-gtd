@@ -1,6 +1,6 @@
 import { LOCATION_CHANGE } from 'connected-react-router'
 import { combineEpics } from 'redux-observable'
-import { filter, map } from 'rxjs/operators'
+import { filter, map, tap } from 'rxjs/operators'
 import { isActionOf } from 'typesafe-actions'
 import { AppEpic } from '.'
 import { authActions, routerActions } from '../actions'
@@ -24,9 +24,10 @@ const deleteSession = createDefaultApiEpic(authActions.deleteSession, api =>
   api.deleteSession()
 )
 
-const deleteSessionSuccess: AppEpic = action$ =>
+const deleteSessionSuccess: AppEpic = (action$, _, { feedback }) =>
   action$.pipe(
     filter(isActionOf(authActions.deleteSession.success)),
+    tap(() => feedback.successMessage("You've been successfully signed out.")),
     map(() => routerActions.push('/login'))
   )
 

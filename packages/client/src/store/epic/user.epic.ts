@@ -1,5 +1,5 @@
 import { combineEpics } from 'redux-observable'
-import { filter, map } from 'rxjs/operators'
+import { filter, map, tap } from 'rxjs/operators'
 import { isActionOf } from 'typesafe-actions'
 import { AppEpic } from '.'
 import { routerActions, userActions } from '../actions'
@@ -10,9 +10,15 @@ const createUser = createDefaultApiEpicWithPayloadAsBody(
   api => api.createUser
 )
 
-const createUserSuccess: AppEpic = action$ =>
+const createUserSuccess: AppEpic = (action$, _, { feedback }) =>
   action$.pipe(
     filter(isActionOf(userActions.createUser.success)),
+    tap(() =>
+      feedback.successMessage(
+        'Your account has been created successfully. You can now use it to log in.',
+        10
+      )
+    ),
     map(() => routerActions.push('/login'))
   )
 
