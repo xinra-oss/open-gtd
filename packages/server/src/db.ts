@@ -37,6 +37,8 @@ export const db = {
       }
     )
     mongoDb = mongoClient.db(config.get('db').name)
+
+    await db.userCollection().createIndex({ email: 'text' })
   },
   disconnect: async () => {
     if (mongoClient !== undefined) {
