@@ -1,27 +1,26 @@
 import * as React from 'react'
 import './App.scss'
 
+import { Credentials } from '@open-gtd/api'
 import { Button, Form, Icon, Input } from 'antd'
 import { FormComponentProps } from 'antd/lib/form/Form'
+import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
+import { DispatchProps, mapDispatchToProps } from './store'
+import { authActions } from './store/actions'
 
 const FormItem = Form.Item
-interface LoginFormState {
-  email: string
-  password: string
-}
 
-// interface NormalLoginProps {}
+interface LoginFormProps extends FormComponentProps, DispatchProps {}
 
-export class LoginForm extends React.Component<
-  FormComponentProps,
-  LoginFormState
-> {
+export class LoginForm extends React.Component<LoginFormProps> {
   public handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        // tslint:disable-next-line
-        console.log('Received values of form: ', values)
+        this.props.dispatch(
+          authActions.createSession.request(values as Credentials)
+        )
       }
     })
   }
@@ -68,12 +67,11 @@ export class LoginForm extends React.Component<
           </Button>
         </FormItem>
         <FormItem>
-          Or <a href="">register now!</a>
+          Or <Link to="/register">register now!</Link>
         </FormItem>
       </Form>
     )
   }
 }
 
-const WrappedNormalLoginForm = Form.create<LoginFormState>()(LoginForm)
-export default WrappedNormalLoginForm
+export default connect(mapDispatchToProps)(Form.create()(LoginForm))
