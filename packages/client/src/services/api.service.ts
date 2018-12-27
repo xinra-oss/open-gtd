@@ -40,7 +40,7 @@ interface ClassType<T> {
  */
 const RECONSTRUCTABLE_HTTP_EXCEPTIONS: ReadonlyArray<
   ClassType<HttpException>
-> = [ValidationException, UnauthorizedHttpException]
+> = [HttpException, ValidationException, UnauthorizedHttpException]
 
 /**
  * Creates an instance of the original exception type that can be used with
@@ -49,13 +49,22 @@ const RECONSTRUCTABLE_HTTP_EXCEPTIONS: ReadonlyArray<
 function reconstructOriginalHttpException(
   typedException: TypedHttpException
 ): HttpException {
-  let reconstructedType: ClassType<HttpException> = HttpException
+  let reconstructedType: ClassType<HttpException> | undefined
   for (const reconstructableType of RECONSTRUCTABLE_HTTP_EXCEPTIONS) {
     if (reconstructableType.name === typedException.type) {
       reconstructedType = reconstructableType
     }
   }
   const reconstructedException = { ...typedException }
+  if (reconstructedType === undefined) {
+    reconstructedType = HttpException
+    // tslint:disable-next-line
+    reconstructedException['__NOTE'] = `This error was originally of type ${
+      typedException.type
+    } but has been reconstructed to HttpEsception. If you want to reconstruct the original type, add it to ${
+      Object.keys({ RECONSTRUCTABLE_HTTP_EXCEPTIONS })[0]
+    } in services/api.service.ts`
+  }
   delete reconstructedException.type
   Object.setPrototypeOf(reconstructedException, reconstructedType.prototype)
   return (reconstructedException as unknown) as HttpException
