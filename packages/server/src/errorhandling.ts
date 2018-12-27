@@ -1,5 +1,6 @@
 import {
   BadRequestHttpException,
+  ForbiddenHttpException,
   HttpException,
   InternalServerErrorHttpException,
   TypedHttpException
@@ -19,8 +20,10 @@ export const handleNonHttpExceptions: ErrorRequestHandler = (
       // This is the same class but we need the one exported by @open-gtd/api
       // for `instanceof` to work correctly
       Object.setPrototypeOf(err, BadRequestHttpException.prototype)
-    }
-    if (err instanceof HttpException) {
+      next(err)
+    } else if (err.code === 'EBADCSRFTOKEN') {
+      next(new ForbiddenHttpException(err.message))
+    } else if (err instanceof HttpException) {
       next(err)
     } else {
       logger.error('UNCAUGHT EXCEPTION: %O', err)
