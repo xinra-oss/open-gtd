@@ -1,26 +1,22 @@
-import { produce } from 'immer'
+import { Session } from '@open-gtd/api'
 import { Reducer } from 'react'
 import { getType } from 'typesafe-actions'
 import { AppAction } from '..'
-import { authActions } from '../actions'
-import { AuthState } from '../state/auth.state'
+import { sessionActions } from '../actions'
 
-const initialState: AuthState = {
-  user: undefined
+const initialState: Session = {
+  csrfToken: 'not set yet'
 }
 
-export const authReducer: Reducer<AuthState, AppAction> = (
+export const sessionReducer: Reducer<Session, AppAction> = (
   state = initialState,
   action
 ) => {
-  return produce(state, draft => {
-    switch (action.type) {
-      case getType(authActions.createSession.success):
-        draft.user = action.payload
-        break
-      case getType(authActions.deleteSession.success):
-        draft.user = undefined
-        break
-    }
-  })
+  switch (action.type) {
+    case getType(sessionActions.createSession.success):
+    case getType(sessionActions.deleteSession.success):
+    case getType(sessionActions.getSession.success):
+      return action.payload
+  }
+  return state
 }

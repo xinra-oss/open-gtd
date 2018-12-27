@@ -7,7 +7,7 @@ import { FormComponentProps } from 'antd/lib/form/Form'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { DispatchProps, mapDispatchToProps } from './store'
-import { authActions } from './store/actions'
+import { sessionActions } from './store/actions'
 
 const FormItem = Form.Item
 
@@ -19,7 +19,7 @@ export class LoginForm extends React.Component<LoginFormProps> {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         this.props.dispatch(
-          authActions.createSession.request(values as Credentials)
+          sessionActions.createSession.request(values as Credentials)
         )
       }
     })

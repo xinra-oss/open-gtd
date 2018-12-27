@@ -1,4 +1,4 @@
-export * from './auth.model'
+export * from './session.model'
 export * from './context.model'
 export * from './entity.model'
 export * from './task.model'

@@ -3,33 +3,37 @@ import { combineEpics } from 'redux-observable'
 import { filter, map, tap } from 'rxjs/operators'
 import { isActionOf } from 'typesafe-actions'
 import { AppEpic } from '.'
-import { authActions, routerActions } from '../actions'
+import { routerActions, sessionActions } from '../actions'
 import {
   createDefaultApiEpic,
   createDefaultApiEpicWithPayloadAsBody
 } from './api-default.epic'
 
 const createSession = createDefaultApiEpicWithPayloadAsBody(
-  authActions.createSession,
+  sessionActions.createSession,
   api => api.createSession
 )
 
 const createSessionSuccess: AppEpic = action$ =>
   action$.pipe(
-    filter(isActionOf(authActions.createSession.success)),
+    filter(isActionOf(sessionActions.createSession.success)),
     map(() => routerActions.push('/'))
   )
 
-const deleteSession = createDefaultApiEpic(authActions.deleteSession, api =>
+const deleteSession = createDefaultApiEpic(sessionActions.deleteSession, api =>
   api.deleteSession()
 )
 
 const deleteSessionSuccess: AppEpic = (action$, _, { feedback }) =>
   action$.pipe(
-    filter(isActionOf(authActions.deleteSession.success)),
+    filter(isActionOf(sessionActions.deleteSession.success)),
     tap(() => feedback.successMessage("You've been successfully signed out.")),
     map(() => routerActions.push('/login'))
   )
+
+const getSession = createDefaultApiEpic(sessionActions.getSession, api =>
+  api.getSession()
+)
 
 const redirectToLogin: AppEpic = (action$, state$) =>
   action$.pipe(
@@ -38,7 +42,7 @@ const redirectToLogin: AppEpic = (action$, state$) =>
         action.type === LOCATION_CHANGE &&
         action.payload.location.pathname !== '/login' &&
         action.payload.location.pathname !== '/register' &&
-        state$.value.auth.user === undefined
+        state$.value.session.user === undefined
     ),
     map(() => routerActions.push('/login'))
   )
@@ -48,5 +52,6 @@ export const authEpic = combineEpics(
   createSessionSuccess,
   deleteSession,
   deleteSessionSuccess,
+  getSession,
   redirectToLogin
 )

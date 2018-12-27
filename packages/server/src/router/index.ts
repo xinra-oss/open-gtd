@@ -1,7 +1,7 @@
 import { OpenGtdApi } from '@open-gtd/api'
 import { createRouter } from 'rest-ts-express'
-import { AuthRouter } from './auth.router'
 import { ContextRouter } from './context.router'
+import { AuthRouter } from './session.router'
 import { TaskRouter } from './task.router'
 import { UserRouter } from './user.router'
 

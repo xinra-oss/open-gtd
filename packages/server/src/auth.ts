@@ -29,20 +29,22 @@ export function signUserOut(req: Request) {
   delete req.session.userId
 }
 
+export const isUserSignedIn = (req: Request) =>
+  req.session !== undefined && getUserId(req) !== undefined
+
 export function authMiddleware(
   req: Request,
   res: Response,
   next: NextFunction
 ) {
-  const isLoginRoute = req.method === 'POST' && req.path === '/users'
-  const isRegisterRoute = req.method === 'POST' && req.path === '/session'
-  if (isLoginRoute || isRegisterRoute) {
+  const isLoginRoute = req.method === 'POST' && req.path === '/session'
+  const isGetSessionRoute = req.method === 'GET' && req.path === '/session'
+  const isRegisterRoute = req.method === 'POST' && req.path === '/users'
+  if (isLoginRoute || isRegisterRoute || isGetSessionRoute) {
     next()
     return
   }
-  const isUserSignedIn =
-    req.session !== undefined && getUserId(req) !== undefined
-  if (isUserSignedIn) {
+  if (isUserSignedIn(req)) {
     next()
   } else {
     throw new UnauthorizedHttpException()
