@@ -61,7 +61,7 @@ function reconstructOriginalHttpException(
     // tslint:disable-next-line
     reconstructedException['__NOTE'] = `This error was originally of type ${
       typedException.type
-    } but has been reconstructed to HttpEsception. If you want to reconstruct the original type, add it to ${
+    } but has been reconstructed to HttpException. If you want to reconstruct the original type, add it to ${
       Object.keys({ RECONSTRUCTABLE_HTTP_EXCEPTIONS })[0]
     } in services/api.service.ts`
   }
