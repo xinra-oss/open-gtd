@@ -1,4 +1,9 @@
-import { Context, Task, User } from '@open-gtd/api'
+import {
+  ContextEntity,
+  CredentialsEntity,
+  TaskEntity,
+  UserEntity
+} from '@open-gtd/api'
 import { Db, MongoClient } from 'mongodb'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import { config } from './config'
@@ -18,6 +23,9 @@ export const db = {
       logger.info(
         'Creating embedded database because db.embedded=true and env=%s',
         env
+      )
+      logger.info(
+        'NOTE: The first time may take a few minutes to download the MongoDB binaries'
       )
       memoryServer = new MongoMemoryServer({
         instance: {
@@ -49,9 +57,10 @@ export const db = {
       memoryServer = undefined
     }
   },
-  taskCollection: () => getCollection<Task>('tasks'),
-  userCollection: () => getCollection<User>('users'),
-  contextCollection: () => getCollection<Context>('contexts')
+  taskCollection: () => getCollection<TaskEntity>('tasks'),
+  userCollection: () => getCollection<UserEntity>('users'),
+  contextCollection: () => getCollection<ContextEntity>('contexts'),
+  credentialsCollection: () => getCollection<CredentialsEntity>('credentials')
 }
 
 function getCollection<T>(name: string) {
