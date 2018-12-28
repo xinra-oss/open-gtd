@@ -2,20 +2,7 @@ import { Task } from '@open-gtd/api'
 import { Table } from 'antd'
 import * as React from 'react'
 
-const { Column, ColumnGroup } = Table
-
-const tasks: Task[] = [
-  {
-    _id: '12345',
-    title: 'Sample Task',
-    contextIds: [],
-    isDone: false,
-    isFolder: false,
-    isNeverActive: false,
-    isProject: false,
-    userId: '12345'
-  }
-]
+const { Column } = Table
 
 const data = [
   {
@@ -48,10 +35,8 @@ export class TaskList extends React.Component<any, any> {
   public render() {
     return (
       <Table dataSource={data}>
-        <ColumnGroup title="Name">
-          <Column title="First Name" dataIndex="firstName" key="firstName" />
-          <Column title="Last Name" dataIndex="lastName" key="lastName" />
-        </ColumnGroup>
+        <Column title="First Name" dataIndex="firstName" key="firstName" />
+        <Column title="Last Name" dataIndex="lastName" key="lastName" />
         <Column title="Age" dataIndex="age" key="age" />
         <Column title="Address" dataIndex="address" key="address" />
       </Table>
