@@ -16,7 +16,7 @@ const createUserSuccess: AppEpic = (action$, _, { feedback }) =>
     tap(() =>
       feedback.successMessage(
         'Your account has been created successfully. You can now use it to log in.',
-        10
+        5
       )
     ),
     map(() => routerActions.push('/login'))
