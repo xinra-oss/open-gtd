@@ -2,7 +2,7 @@ import { produce } from 'immer'
 import { Reducer } from 'react'
 import { getType } from 'typesafe-actions'
 import { AppAction } from '..'
-import { taskActions } from '../actions'
+import { loadingActions } from '../actions'
 import { TaskState } from '../state/task.state'
 
 export const taskReducer: Reducer<TaskState, AppAction> = (
@@ -11,8 +11,8 @@ export const taskReducer: Reducer<TaskState, AppAction> = (
 ) =>
   produce(state, draft => {
     switch (action.type) {
-      case getType(taskActions.getTaskList.success):
-        return action.payload
+      case getType(loadingActions.loadContent.success):
+        return action.payload.tasks
     }
     return
   })

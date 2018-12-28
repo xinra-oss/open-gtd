@@ -6,5 +6,6 @@ import { TaskState } from './task.state'
 export type AppState = DeepReadonly<{
   router: RouterState
   session: Session
+  loading: boolean
   tasks: TaskState
 }>
