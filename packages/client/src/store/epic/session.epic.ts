@@ -1,13 +1,18 @@
-import { LOCATION_CHANGE } from 'connected-react-router'
 import { combineEpics } from 'redux-observable'
-import { filter, flatMap, map, tap } from 'rxjs/operators'
+import { filter, map, tap } from 'rxjs/operators'
 import { isActionOf } from 'typesafe-actions'
 import { AppEpic } from '.'
-import { loadingActions, routerActions, sessionActions } from '../actions'
+import {
+  loadingActions,
+  noopAction,
+  routerActions,
+  sessionActions
+} from '../actions'
 import {
   createDefaultApiEpic,
-  createDefaultApiEpicWithPayloadAsBody
-} from './api-default.epic'
+  createDefaultApiEpicWithPayloadAsBody,
+  isCurrentPageLoginOrRegister
+} from './util'
 
 const createSession = createDefaultApiEpicWithPayloadAsBody(
   sessionActions.createSession,
@@ -17,10 +22,7 @@ const createSession = createDefaultApiEpicWithPayloadAsBody(
 const createSessionSuccess: AppEpic = action$ =>
   action$.pipe(
     filter(isActionOf(sessionActions.createSession.success)),
-    flatMap(() => [
-      routerActions.push('/'),
-      loadingActions.loadContent.request()
-    ])
+    map(loadingActions.loadContent.request)
   )
 
 const deleteSession = createDefaultApiEpic(sessionActions.deleteSession, api =>
@@ -38,23 +40,16 @@ const getSession = createDefaultApiEpic(sessionActions.getSession, api =>
   api.getSession()
 )
 
-const getSessionSuccess: AppEpic = action$ =>
+const getSessionSuccess: AppEpic = (action$, state$) =>
   action$.pipe(
     filter(isActionOf(sessionActions.getSession.success)),
-    filter(action => action.payload.user !== undefined),
-    map(loadingActions.loadContent.request)
-  )
-
-const redirectToLogin: AppEpic = (action$, state$) =>
-  action$.pipe(
-    filter(
-      action =>
-        action.type === LOCATION_CHANGE &&
-        action.payload.location.pathname !== '/login' &&
-        action.payload.location.pathname !== '/register' &&
-        state$.value.session.user === undefined
-    ),
-    map(() => routerActions.push('/login'))
+    map(action =>
+      action.payload.user !== undefined
+        ? loadingActions.loadContent.request()
+        : isCurrentPageLoginOrRegister(state$)
+        ? noopAction()
+        : routerActions.push('/login')
+    )
   )
 
 export const authEpic = combineEpics(
@@ -63,6 +58,5 @@ export const authEpic = combineEpics(
   deleteSession,
   deleteSessionSuccess,
   getSession,
-  getSessionSuccess,
-  redirectToLogin
+  getSessionSuccess
 )

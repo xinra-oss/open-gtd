@@ -1,11 +1,14 @@
 import { RouterAction, routerActions } from 'connected-react-router'
-import { ActionType } from 'typesafe-actions'
+import { ActionType, createStandardAction } from 'typesafe-actions'
 import * as loadingActions from './loading.actions'
 import * as sessionActions from './session.actions'
 import * as taskActions from './task.actions'
 import * as userActions from './user.actions'
 
+export const noopAction = createStandardAction('NO_OP')()
+
 export type AppAction =
+  | ActionType<typeof noopAction>
   | ActionType<typeof sessionActions>
   | ActionType<typeof userActions>
   | ActionType<typeof taskActions>

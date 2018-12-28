@@ -2,7 +2,8 @@ import { combineEpics } from 'redux-observable'
 import { catchError, filter, map, switchMap } from 'rxjs/operators'
 import { isActionOf } from 'typesafe-actions'
 import { AppEpic } from '.'
-import { loadingActions } from '../actions'
+import { loadingActions, routerActions } from '../actions'
+import { isCurrentPageLoginOrRegister } from './util'
 
 const loadContent: AppEpic = (
   action$,
@@ -19,4 +20,11 @@ const loadContent: AppEpic = (
     catchError(handleOpenGtdApiError(loadingActions.loadContent.failure))
   )
 
-export const loadingEpic = combineEpics(loadContent)
+const loadContentSuccess: AppEpic = (action$, state$) =>
+  action$.pipe(
+    filter(isActionOf(loadingActions.loadContent.success)),
+    filter(() => isCurrentPageLoginOrRegister(state$)),
+    map(() => routerActions.push('/'))
+  )
+
+export const loadingEpic = combineEpics(loadContent, loadContentSuccess)

@@ -1,6 +1,6 @@
 import { combineEpics } from 'redux-observable'
 import { taskActions } from '../actions'
-import { createDefaultApiEpicWithPayloadAsBody } from './api-default.epic'
+import { createDefaultApiEpicWithPayloadAsBody } from './util'
 
 const createTask = createDefaultApiEpicWithPayloadAsBody(
   taskActions.createTask,

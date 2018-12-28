@@ -1,9 +1,13 @@
 import { catchError, filter, map, switchMap } from 'rxjs/operators'
 import { isActionOf } from 'typesafe-actions'
 import { AppEpic } from '.'
+import { AppState } from '..'
 import { OpenGtdApiConsumer } from '../../services/api.service'
 import { AC } from '../action-creator'
 import { AppAction, AppPayloadAction } from '../actions'
+
+export const isCurrentPageLoginOrRegister = (state$: { value: AppState }) =>
+  ['/login', '/register'].indexOf(state$.value.router.location.pathname) > -1
 
 interface ApiActionCreator<REQ_AC extends AC<AppAction>, OUT> {
   request: REQ_AC
