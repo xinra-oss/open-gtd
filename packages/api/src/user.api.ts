@@ -1,8 +1,8 @@
 import { defineAPI, POST } from 'rest-ts-core'
-import { User } from './model'
+import { Credentials, EmptyResponse } from './model'
 
 export const UserApi = defineAPI({
   createUser: POST `/users` // prettier-ignore
-    .body(User)
-    .response(User)
+    .body(Credentials)
+    .response(EmptyResponse)
 })
