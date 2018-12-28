@@ -1,17 +1,22 @@
 import {
   ContextApi,
-  NotFoundHttpException,
-  ValidationException
+  ContextEntity,
+  ForbiddenHttpException,
+  NotFoundHttpException
 } from '@open-gtd/api'
 import { ObjectId } from 'mongodb'
 import { RouterDefinition } from 'rest-ts-express'
+import { WILL_BE_GENERATED_PLACEHOLDER } from '.'
 import { getUserId } from '../auth'
 import { db } from '../db'
 
 export const ContextRouter: RouterDefinition<typeof ContextApi> = {
   createContext: async req => {
-    const context = req.body
-    context.userId = getUserId(req)
+    const context: ContextEntity = {
+      ...req.body,
+      _id: WILL_BE_GENERATED_PLACEHOLDER,
+      userId: getUserId(req)
+    }
     const insertedElement = await db.contextCollection().insertOne(context)
     return insertedElement.ops[0]
   },
@@ -41,37 +46,26 @@ export const ContextRouter: RouterDefinition<typeof ContextApi> = {
       throw new NotFoundHttpException()
     }
     await db.contextCollection().deleteOne({ _id: new ObjectId(req.params.id) })
-    res.sendStatus(200)
+    return { _id: req.params.id }
   },
   updateContext: async (req, res) => {
-    const context = req.body
-    if (
-      (await db
-        .contextCollection()
-        .find({ _id: new ObjectId(req.params.id) })
-        .count()) === 0
-    ) {
-      throw new NotFoundHttpException()
-    }
     const oldContext = await db
       .contextCollection()
       .findOne({ _id: new ObjectId(req.params.id) })
-    if (oldContext) {
-      if (oldContext.userId !== getUserId(req)) {
-        throw new ValidationException({
-          userId: 'Context to be updated does not belong to current user.'
-        })
-      }
-    }
-    if (context.userId !== getUserId(req)) {
-      throw new ValidationException({
-        userId: 'Updated Context does not belong to current user.'
-      })
-    }
 
+    if (oldContext === null) {
+      throw new NotFoundHttpException()
+    }
+    if (oldContext.userId !== getUserId(req)) {
+      throw new ForbiddenHttpException()
+    }
+    const newContext = {
+      ...oldContext,
+      ...req.body
+    }
     await db
       .contextCollection()
-      .replaceOne({ _id: new ObjectId(req.params.id) }, context)
-    return context
+      .replaceOne({ _id: new ObjectId(req.params.id) }, newContext)
+    return newContext
   }
 }

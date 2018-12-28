@@ -1,4 +1,4 @@
-import { AuthApi, UnauthorizedHttpException, User } from '@open-gtd/api'
+import { AuthApi, UnauthorizedHttpException, UserEntity } from '@open-gtd/api'
 import { compare } from 'bcrypt'
 import { ObjectId } from 'mongodb'
 import { RouterDefinition } from 'rest-ts-express'
@@ -7,15 +7,29 @@ import { db } from '../db'
 
 export const AuthRouter: RouterDefinition<typeof AuthApi> = {
   createSession: async req => {
-    const credentials = req.body
-    const user = await db.userCollection().findOne({
-      $text: { $search: `"${credentials.email}"`, $caseSensitive: false }
-    })
-    if (user == null || !(await compare(credentials.password, user.password))) {
+    const emailLowerCase = req.body.email.toLowerCase()
+    const credentialsInDb = await db
+      .credentialsCollection()
+      .findOne({ email: emailLowerCase })
+
+    if (
+      credentialsInDb === null ||
+      !(await compare(req.body.password, credentialsInDb.password))
+    ) {
       throw new UnauthorizedHttpException('Invalid username or password.')
     }
-    signUserIn(req, user._id || "this can't happen, fix in #59")
-    delete user.password
+
+    const user = await db
+      .userCollection()
+      .findOne({ _id: new ObjectId(credentialsInDb.userId) })
+
+    if (user === null) {
+      throw new Error(
+        `User for credentials with ID ${credentialsInDb._id} does not exist.`
+      )
+    }
+
+    signUserIn(req, user._id)
     return {
       user,
       csrfToken: req.csrfToken()
@@ -28,15 +42,12 @@ export const AuthRouter: RouterDefinition<typeof AuthApi> = {
     }
   },
   getSession: async req => {
-    let user: User | undefined
+    let user: UserEntity | undefined
     if (isUserSignedIn(req)) {
       user =
         (await db.userCollection().findOne({
           _id: new ObjectId(getUserId(req))
         })) || undefined
-    }
-    if (user !== undefined) {
-      delete user.password
     }
     return {
       user,

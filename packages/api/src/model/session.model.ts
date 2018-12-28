@@ -1,11 +1,11 @@
 import { Partial, Record, Static, String } from 'runtypes'
-import { User } from '.'
+import { UserEntity } from '.'
 
 export const Session = Record({
   csrfToken: String
 }).And(
   Partial({
-    user: User
+    user: UserEntity
   })
 )
 

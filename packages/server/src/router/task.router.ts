@@ -1,31 +1,32 @@
 import {
-  EmptyResponse,
   NotFoundHttpException,
   Task,
   TaskApi,
+  TaskEntity,
   ValidationException
 } from '@open-gtd/api'
 import { ObjectId } from 'mongodb'
 import { RouterDefinition } from 'rest-ts-express'
+import { WILL_BE_GENERATED_PLACEHOLDER } from '.'
 import { getUserId } from '../auth'
 import { db } from '../db'
 
 export const TaskRouter: RouterDefinition<typeof TaskApi> = {
   createTask: async req => {
-    const newTask = req.body
-    const task = {
-      ...newTask,
+    const task: TaskEntity = {
+      ...req.body,
+      _id: WILL_BE_GENERATED_PLACEHOLDER,
       userId: getUserId(req)
     }
-    if (newTask.parentId !== undefined) {
-      const parentError = await checkParentTask(newTask.parentId, task.userId)
+    if (task.parentId !== null) {
+      const parentError = await checkParentTask(task.parentId, task.userId)
       if (parentError) {
         throw new ValidationException<Task>({
           parentId: parentError
         })
       }
     }
-    const contextError = await checkContextIds(newTask.contextIds, task.userId)
+    const contextError = await checkContextIds(task.contextIds, task.userId)
     if (contextError) {
       throw new ValidationException<Task>({
         contextIds: contextError
@@ -45,7 +46,9 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
       throw new NotFoundHttpException()
     }
     await db.taskCollection().deleteOne({ _id: new ObjectId(req.params.id) })
-    return EmptyResponse
+    return {
+      _id: req.params.id
+    }
   },
   getTask: async req => {
     const result = await db
@@ -64,25 +67,34 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
     return result
   },
   updateTask: async req => {
-    const task = req.body
-    if (
-      (await db
-        .taskCollection()
-        .find({ _id: new ObjectId(req.params.id) })
-        .count()) === 0
-    ) {
+    const oldTask = await db
+      .taskCollection()
+      .findOne({ _id: new ObjectId(req.params.id) })
+
+    if (oldTask === null) {
       throw new NotFoundHttpException()
     }
 
-    if (task.parentId !== undefined) {
-      const parentError = await checkParentTask(task.parentId, task.userId)
+    const newTask: TaskEntity = {
+      ...oldTask,
+      ...req.body
+    }
+
+    if (newTask.parentId !== null) {
+      const parentError = await checkParentTask(
+        newTask.parentId,
+        newTask.userId
+      )
       if (parentError) {
         throw new ValidationException<Task>({
           parentId: parentError
         })
       }
     }
-    const contextError = await checkContextIds(task.contextIds, task.userId)
+    const contextError = await checkContextIds(
+      newTask.contextIds,
+      newTask.userId
+    )
     if (contextError) {
       throw new ValidationException<Task>({
         contextIds: contextError
@@ -91,8 +103,8 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
 
     await db
       .taskCollection()
-      .replaceOne({ _id: new ObjectId(req.params.id) }, task)
-    return task
+      .replaceOne({ _id: new ObjectId(req.params.id) }, newTask)
+    return newTask
   }
 }
 
