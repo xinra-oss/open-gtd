@@ -21,13 +21,15 @@ export const ContextRouter: RouterDefinition<typeof ContextApi> = {
     return insertedElement.ops[0]
   },
   getContext: async req => {
-    const result = await db
+    const context = await db
       .contextCollection()
       .findOne({ _id: new ObjectId(req.params.id) })
-    if (result === null) {
+    if (context === null) {
       throw new NotFoundHttpException()
+    } else if (context.userId !== getUserId(req)) {
+      throw new ForbiddenHttpException()
     }
-    return result
+    return context
   },
   getContextList: async req => {
     const result = await db
@@ -37,13 +39,13 @@ export const ContextRouter: RouterDefinition<typeof ContextApi> = {
     return result
   },
   deleteContext: async (req, res) => {
-    if (
-      (await db
-        .contextCollection()
-        .find({ _id: new ObjectId(req.params.id) })
-        .count()) === 0
-    ) {
+    const context = await db
+      .contextCollection()
+      .findOne({ _id: new ObjectId(req.params.id) })
+    if (context === null) {
       throw new NotFoundHttpException()
+    } else if (context.userId !== getUserId(req)) {
+      throw new ForbiddenHttpException()
     }
     await db.contextCollection().deleteOne({ _id: new ObjectId(req.params.id) })
     return { _id: req.params.id }

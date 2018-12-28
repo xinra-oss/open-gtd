@@ -1,4 +1,5 @@
 import {
+  ForbiddenHttpException,
   NotFoundHttpException,
   Task,
   TaskApi,
@@ -37,13 +38,13 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
     return insertedElement.ops[0]
   },
   deleteTask: async (req, res) => {
-    if (
-      (await db
-        .taskCollection()
-        .find({ _id: new ObjectId(req.params.id) })
-        .count()) === 0
-    ) {
+    const task = await db
+      .taskCollection()
+      .findOne({ _id: new ObjectId(req.params.id) })
+    if (task === null) {
       throw new NotFoundHttpException()
+    } else if (task.userId !== getUserId(req)) {
+      throw new ForbiddenHttpException()
     }
     await db.taskCollection().deleteOne({ _id: new ObjectId(req.params.id) })
     return {
@@ -51,13 +52,15 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
     }
   },
   getTask: async req => {
-    const result = await db
+    const task = await db
       .taskCollection()
       .findOne({ _id: new ObjectId(req.params.id) })
-    if (result === null) {
+    if (task === null) {
       throw new NotFoundHttpException()
+    } else if (task.userId !== getUserId(req)) {
+      throw new ForbiddenHttpException()
     }
-    return result
+    return task
   },
   getTaskList: async req => {
     const result = await db
@@ -73,6 +76,8 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
 
     if (oldTask === null) {
       throw new NotFoundHttpException()
+    } else if (oldTask.userId !== getUserId(req)) {
+      throw new ForbiddenHttpException()
     }
 
     const newTask: TaskEntity = {
