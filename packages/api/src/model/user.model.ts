@@ -1,10 +1,10 @@
 import { Record, Static, String } from 'runtypes'
 import { Entity } from './entity.model'
 
-export const User = Entity.And(
+export const UserEntity = Entity.And(
   Record({
     email: String
   })
 )
 
-export type User = Static<typeof User>
+export type UserEntity = Static<typeof UserEntity>

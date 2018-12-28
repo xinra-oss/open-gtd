@@ -2,7 +2,7 @@ import {
   Array,
   Boolean,
   InstanceOf,
-  Partial,
+  Null,
   Record,
   Static,
   String
@@ -18,15 +18,12 @@ export const Task = Record({
   title: String.withConstraint(
     s =>
       s.length <= 50 || `the title must have a maximal length of 50 characters`
-  )
-}).And(
-  Partial({
-    dueDate: InstanceOf(Date),
-    notes: String,
-    parentId: EntityId,
-    startDate: InstanceOf(Date)
-  })
-)
+  ),
+  dueDate: InstanceOf(Date).Or(Null),
+  notes: String.Or(Null),
+  parentId: EntityId.Or(Null),
+  startDate: InstanceOf(Date).Or(Null)
+})
 
 export const TaskEntity = Task.And(Entity).And(
   Record({

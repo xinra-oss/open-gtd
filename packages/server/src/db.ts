@@ -1,4 +1,9 @@
-import { Context, Task, User } from '@open-gtd/api'
+import {
+  ContextEntity,
+  CredentialsEntity,
+  TaskEntity,
+  UserEntity
+} from '@open-gtd/api'
 import { Db, MongoClient } from 'mongodb'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import { config } from './config'
@@ -40,8 +45,6 @@ export const db = {
       }
     )
     mongoDb = mongoClient.db(config.get('db').name)
-
-    await db.userCollection().createIndex({ email: 'text' })
   },
   disconnect: async () => {
     if (mongoClient !== undefined) {
@@ -54,9 +57,10 @@ export const db = {
       memoryServer = undefined
     }
   },
-  taskCollection: () => getCollection<Task>('tasks'),
-  userCollection: () => getCollection<User>('users'),
-  contextCollection: () => getCollection<Context>('contexts')
+  taskCollection: () => getCollection<TaskEntity>('tasks'),
+  userCollection: () => getCollection<UserEntity>('users'),
+  contextCollection: () => getCollection<ContextEntity>('contexts'),
+  credentialsCollection: () => getCollection<CredentialsEntity>('credentials')
 }
 
 function getCollection<T>(name: string) {
