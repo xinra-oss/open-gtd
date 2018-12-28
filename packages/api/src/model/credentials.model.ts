@@ -1,5 +1,6 @@
 import { Record, Static, String } from 'runtypes'
 import { isEmail } from 'validator'
+import { Entity, EntityId } from './entity.model'
 
 export const Credentials = Record({
   email: String.withConstraint(s => isEmail(s) || `email address is not valid`),
@@ -8,4 +9,9 @@ export const Credentials = Record({
   )
 })
 
+export const CredentialsEntity = Credentials.And(Entity).And(
+  Record({ userId: EntityId })
+)
+
 export type Credentials = Static<typeof Credentials>
+export type CredentialsEntity = Static<typeof CredentialsEntity>
