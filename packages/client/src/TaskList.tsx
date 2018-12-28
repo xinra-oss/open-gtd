@@ -1,54 +1,79 @@
 import { Task } from '@open-gtd/api'
 import { Table } from 'antd'
 
+import { ColumnProps, TableRowSelection } from 'antd/lib/table'
 import * as React from 'react'
 
-const { Column } = Table
-
+const columns: Array<ColumnProps<Task>> = [
+  {
+    title: 'Task Name',
+    dataIndex: 'taskname',
+    render: text => <a href="#">{text}</a>
+  },
+  {
+    title: 'is Done',
+    dataIndex: 'isdone'
+  },
+  {
+    title: 'is Folder',
+    dataIndex: 'isfolder'
+  }
+]
 const tasks: Task[] = [
   {
-    _id: '12345',
     title: 'Make poster',
     contextIds: [],
     isDone: false,
     isFolder: false,
     isNeverActive: false,
     isProject: false,
-    userId: '12345'
+    dueDate: null,
+    notes: null,
+    parentId: null,
+    startDate: null
   },
   {
-    _id: '11111',
     title: 'Pay Grocery Bills',
     contextIds: [],
     isDone: false,
     isFolder: false,
     isNeverActive: false,
     isProject: false,
-    userId: '11111'
+    dueDate: null,
+    notes: null,
+    parentId: null,
+    startDate: null
   },
   {
-    _id: '12222',
     title: 'Learn React',
     contextIds: [],
     isDone: false,
     isFolder: false,
     isNeverActive: false,
     isProject: false,
-    userId: '12222'
+    dueDate: null,
+    notes: null,
+    parentId: null,
+    startDate: null
   }
 ]
+const rowSelection: TableRowSelection<Task> = {
+  onChange: (selectedRowKeys, selectedRows) => {
+    console.log(
+      `selectedRowKeys: ${selectedRowKeys}`,
+      'selectedRows: ',
+      selectedRows
+    )
+  },
+  getCheckboxProps: record => ({
+    name: record.title
+  })
+}
 
 export class TaskList extends React.Component<any, any> {
   public render() {
     return (
-      <Table dataSource={tasks}>
-        <Column title="Task Name" dataIndex="title" key="title" />
-        <Column title="is Folder" dataIndex="isFolder" key="_id" />
-
-        <Column title="is Done" dataIndex="isDone" key="isDone" />
-
-        <Column title="is Project" dataIndex="isProject" key="isProject" />
-      </Table>
+      <Table rowSelection={rowSelection} columns={columns} dataSource={tasks} />
     )
   }
 }
