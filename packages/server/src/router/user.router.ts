@@ -1,43 +1,28 @@
-import {
-  Credentials,
-  CredentialsEntity,
-  EmptyResponse,
-  UserApi,
-  UserEntity,
-  ValidationException
-} from '@open-gtd/api'
+import { User, UserApi, ValidationException } from '@open-gtd/api'
 import { hash } from 'bcrypt'
 import { RouterDefinition } from 'rest-ts-express'
-import { WILL_BE_GENERATED_PLACEHOLDER } from '.'
 import { db } from '../db'
-import { logger } from '../logging'
 
 export const UserRouter: RouterDefinition<typeof UserApi> = {
-  createUser: async (req, res) => {
-    const emailLowerCase = req.body.email.toLowerCase()
+  createUser: async req => {
+    const user = req.body
 
-    if (await db.credentialsCollection().findOne({ email: emailLowerCase })) {
-      throw new ValidationException<Credentials>({
+    if (
+      (await db
+        .userCollection()
+        .find({ email: user.email })
+        .count()) > 0
+    ) {
+      throw new ValidationException<User>({
         email: 'Email address is already in use.'
       })
+    } else {
+      const insertUser: User = {
+        ...user,
+        password: await hash(user.password, 10)
+      }
+      const insertedElement = await db.userCollection().insertOne(insertUser)
+      return insertedElement.ops[0]
     }
-
-    let user: UserEntity = {
-      _id: WILL_BE_GENERATED_PLACEHOLDER,
-      email: req.body.email // save user-defined casing
-    }
-    user = (await db.userCollection().insertOne(user)).ops[0]
-
-    const credentials: CredentialsEntity = {
-      _id: WILL_BE_GENERATED_PLACEHOLDER,
-      email: emailLowerCase,
-      password: await hash(req.body.password, 10),
-      userId: user._id
-    }
-
-    await db.credentialsCollection().insertOne(credentials)
-
-    logger.debug('Created user', user)
-    return EmptyResponse
   }
 }

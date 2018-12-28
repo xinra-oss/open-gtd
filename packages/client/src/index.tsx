@@ -1,39 +1,15 @@
-import { ConnectedRouter } from 'connected-react-router'
-import { createBrowserHistory } from 'history'
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
-import { Provider } from 'react-redux'
+import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import './index.scss'
 import registerServiceWorker from './registerServiceWorker'
-import {
-  antDesignFeedback,
-  handleOpenGtdApiError,
-  openGtdApi,
-  Services
-} from './services'
-import { createAppStore } from './store'
-import { sessionActions } from './store/actions'
-
-const services: Services = {
-  openGtdApi,
-  handleOpenGtdApiError,
-  feedback: antDesignFeedback
-}
-
-const history = createBrowserHistory()
-
-const store = createAppStore(services, history)
 
 const app = (
-  <Provider store={store}>
-    <ConnectedRouter history={history}>
-      <App />
-    </ConnectedRouter>
-  </Provider>
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>
 )
 
 ReactDOM.render(app, document.getElementById('root') as HTMLElement)
 registerServiceWorker()
-
-store.dispatch(sessionActions.getSession.request())

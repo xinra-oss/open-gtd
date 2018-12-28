@@ -1,18 +1,17 @@
 import { defineAPI, DELETE, GET, POST, PUT } from 'rest-ts-core'
 import { Array } from 'runtypes'
-import { Entity, Task, TaskEntity } from './model'
+import { NewTask, Task } from './model'
 
 export const TaskApi = defineAPI({
   createTask: POST `/tasks` // prettier-ignore
-    .body(Task)
-    .response(TaskEntity),
-  deleteTask: DELETE `/tasks/${'id'}` // prettier-ignore
-    .response(Entity),
+    .body(NewTask)
+    .response(Task),
+  deleteTask: DELETE `/tasks/${'id'}`, // prettier-ignore
   getTask: GET `/tasks/${'id'}` // prettier-ignore
-    .response(TaskEntity),
+    .response(Task),
   getTaskList: GET `/tasks` // prettier-ignore
-    .response(Array(TaskEntity)),
+    .response(Array(Task)),
   updateTask: PUT `/tasks/${'id'}` // prettier-ignore
-    .body(TaskEntity)
-    .response(TaskEntity)
+    .body(Task)
+    .response(Task)
 })

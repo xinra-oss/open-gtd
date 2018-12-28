@@ -2,14 +2,14 @@ import {
   Array,
   Boolean,
   InstanceOf,
-  Null,
+  Partial,
   Record,
   Static,
   String
 } from 'runtypes'
 import { Entity, EntityId } from './entity.model'
 
-export const Task = Record({
+export const NewTask = Record({
   contextIds: Array(EntityId),
   isDone: Boolean,
   isFolder: Boolean,
@@ -18,18 +18,21 @@ export const Task = Record({
   title: String.withConstraint(
     s =>
       s.length <= 50 || `the title must have a maximal length of 50 characters`
-  ),
-  dueDate: InstanceOf(Date).Or(Null),
-  notes: String.Or(Null),
-  parentId: EntityId.Or(Null),
-  startDate: InstanceOf(Date).Or(Null)
-})
+  )
+}).And(
+  Partial({
+    dueDate: InstanceOf(Date),
+    notes: String,
+    parentId: EntityId,
+    startDate: InstanceOf(Date)
+  })
+)
 
-export const TaskEntity = Task.And(Entity).And(
+export const Task = Entity.And(NewTask).And(
   Record({
     userId: EntityId
   })
 )
 
-export type TaskEntity = Static<typeof TaskEntity>
 export type Task = Static<typeof Task>
+export type NewTask = Static<typeof NewTask>

@@ -9,8 +9,7 @@
   },
   "rules": {
     "interface-name": [true, "never-prefix"],
-    "object-literal-sort-keys": false,
-    "triple-equals": true
+    "object-literal-sort-keys": false
   },
   "defaultSeverity": "warn"
 }

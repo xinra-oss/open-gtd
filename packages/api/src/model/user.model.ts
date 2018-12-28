@@ -1,10 +1,7 @@
-import { Record, Static, String } from 'runtypes'
+import { Static } from 'runtypes'
+import { Credentials } from './auth.model'
 import { Entity } from './entity.model'
 
-export const UserEntity = Entity.And(
-  Record({
-    email: String
-  })
-)
+export const User = Entity.And(Credentials)
 
-export type UserEntity = Static<typeof UserEntity>
+export type User = Static<typeof User>
