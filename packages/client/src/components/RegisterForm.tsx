@@ -18,23 +18,25 @@ interface RegistrationProps
 }
 
 interface RegistrationState {
-  readonly type: string,
+  readonly type: string
 }
 
 const FormItem = Form.Item
 
-class RegisterForm extends React.Component<RegistrationProps, RegistrationState> {
-
+class RegisterForm extends React.Component<
+  RegistrationProps,
+  RegistrationState
+> {
   public readonly state: RegistrationState = {
-    type: 'input',
-  };
-  
-  public showHide(e: any){
-    e.preventDefault();
-    e.stopPropagation();
+    type: 'input'
+  }
+
+  public showHide(e: any) {
+    e.preventDefault()
+    e.stopPropagation()
     this.setState({
       type: this.state.type === 'input' ? 'password' : 'input'
-    })  
+    })
   }
 
   public handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -50,7 +52,7 @@ class RegisterForm extends React.Component<RegistrationProps, RegistrationState>
 
   public render() {
     const { getFieldDecorator } = this.props.form
-    this.showHide = this.showHide.bind(this);
+    this.showHide = this.showHide.bind(this)
 
     return (
       <Form onSubmit={this.handleSubmit} className="login-form">
@@ -67,10 +69,10 @@ class RegisterForm extends React.Component<RegistrationProps, RegistrationState>
               }
             ]
           })(
-          <Input
-            prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
-            placeholder="Email"
-          />
+            <Input
+              prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
+              placeholder="Email"
+            />
           )}
         </FormItem>
         <FormItem>
@@ -82,13 +84,19 @@ class RegisterForm extends React.Component<RegistrationProps, RegistrationState>
               }
             ]
           })(
-          <Input
-            prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
-            type= {this.state.type}
-            placeholder="Password"
-            suffix={<Icon type={this.state.type === 'input' ? 'eye-invisible' : 'eye'} onClick={this.showHide}/>}
-          />)}
-        </FormItem> 
+            <Input
+              prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
+              type={this.state.type}
+              placeholder="Password"
+              suffix={
+                <Icon
+                  type={this.state.type === 'input' ? 'eye-invisible' : 'eye'}
+                  onClick={this.showHide}
+                />
+              }
+            />
+          )}
+        </FormItem>
         <Button type="primary" htmlType="submit">
           Register
         </Button>
