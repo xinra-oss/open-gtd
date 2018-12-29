@@ -1,6 +1,7 @@
 import { Session } from '@open-gtd/api'
 import { RouterState } from 'connected-react-router'
 import { DeepReadonly } from 'ts-essentials'
+import { ContextState } from './context.state'
 import { TaskState } from './task.state'
 
 export type AppState = DeepReadonly<{
@@ -8,4 +9,5 @@ export type AppState = DeepReadonly<{
   session: Session
   loading: boolean
   tasks: TaskState
+  contexts: ContextState
 }>
