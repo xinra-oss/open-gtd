@@ -1,14 +1,35 @@
+import { createMemoryHistory } from 'history'
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
+import { Provider } from 'react-redux'
 import { MemoryRouter } from 'react-router'
 import App from './App'
+import {
+  antDesignFeedback,
+  handleOpenGtdApiError,
+  openGtdApi,
+  Services
+} from './services'
+import { createAppStore } from './store'
 
 it('renders without crashing', () => {
   const div = document.createElement('div')
+
+  const services: Services = {
+    openGtdApi,
+    handleOpenGtdApiError,
+    feedback: antDesignFeedback
+  }
+
+  const history = createMemoryHistory()
+  const store = createAppStore(services, history)
+
   ReactDOM.render(
-    <MemoryRouter>
-      <App />
-    </MemoryRouter>,
+    <Provider store={store}>
+      <MemoryRouter>
+        <App />
+      </MemoryRouter>
+    </Provider>,
     div
   )
   ReactDOM.unmountComponentAtNode(div)
