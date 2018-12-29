@@ -1,13 +1,18 @@
-import { LOCATION_CHANGE } from 'connected-react-router'
 import { combineEpics } from 'redux-observable'
 import { filter, map, tap } from 'rxjs/operators'
 import { isActionOf } from 'typesafe-actions'
 import { AppEpic } from '.'
-import { routerActions, sessionActions } from '../actions'
+import {
+  loadingActions,
+  noopAction,
+  routerActions,
+  sessionActions
+} from '../actions'
 import {
   createDefaultApiEpic,
-  createDefaultApiEpicWithPayloadAsBody
-} from './api-default.epic'
+  createDefaultApiEpicWithPayloadAsBody,
+  isCurrentPageLoginOrRegister
+} from './util'
 
 const createSession = createDefaultApiEpicWithPayloadAsBody(
   sessionActions.createSession,
@@ -17,7 +22,7 @@ const createSession = createDefaultApiEpicWithPayloadAsBody(
 const createSessionSuccess: AppEpic = action$ =>
   action$.pipe(
     filter(isActionOf(sessionActions.createSession.success)),
-    map(() => routerActions.push('/'))
+    map(loadingActions.loadContent.request)
   )
 
 const deleteSession = createDefaultApiEpic(sessionActions.deleteSession, api =>
@@ -35,16 +40,16 @@ const getSession = createDefaultApiEpic(sessionActions.getSession, api =>
   api.getSession()
 )
 
-const redirectToLogin: AppEpic = (action$, state$) =>
+const getSessionSuccess: AppEpic = (action$, state$) =>
   action$.pipe(
-    filter(
-      action =>
-        action.type === LOCATION_CHANGE &&
-        action.payload.location.pathname !== '/login' &&
-        action.payload.location.pathname !== '/register' &&
-        state$.value.session.user === undefined
-    ),
-    map(() => routerActions.push('/login'))
+    filter(isActionOf(sessionActions.getSession.success)),
+    map(action =>
+      action.payload.user !== undefined
+        ? loadingActions.loadContent.request()
+        : isCurrentPageLoginOrRegister(state$)
+        ? noopAction()
+        : routerActions.push('/login')
+    )
   )
 
 export const authEpic = combineEpics(
@@ -53,5 +58,5 @@ export const authEpic = combineEpics(
   deleteSession,
   deleteSessionSuccess,
   getSession,
-  redirectToLogin
+  getSessionSuccess
 )
