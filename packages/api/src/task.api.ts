@@ -13,6 +13,6 @@ export const TaskApi = defineAPI({
   getTaskList: GET `/tasks` // prettier-ignore
     .response(Array(TaskEntity)),
   updateTask: PUT `/tasks/${'id'}` // prettier-ignore
-    .body(TaskEntity)
+    .body(Task)
     .response(TaskEntity)
 })
