@@ -1,24 +1,15 @@
 import { Credentials } from '@open-gtd/api'
 import { Button, Form, Icon, Input } from 'antd'
-import { WrappedFormUtils } from 'antd/lib/form/Form'
+import { FormComponentProps } from 'antd/lib/form/Form'
 import React from 'react'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
 import { DispatchProps, mapDispatchToProps } from '../store'
 import { userActions } from '../store/actions'
 
-interface RegistrationRouterParams {
-  id: string
-}
-
-interface RegistrationProps
-  extends RouteComponentProps<RegistrationRouterParams>,
-    DispatchProps {
-  form: WrappedFormUtils
-}
+interface RegistrationProps extends DispatchProps, FormComponentProps {}
 
 interface RegistrationState {
-  readonly type: string
+  readonly showPassword: boolean
 }
 
 const FormItem = Form.Item
@@ -27,17 +18,17 @@ class RegisterForm extends React.Component<
   RegistrationProps,
   RegistrationState
 > {
-  public readonly state: RegistrationState = {
-    type: 'input'
+  public constructor(props: RegistrationProps) {
+    super(props)
+    this.state = {
+      showPassword: false
+    }
   }
 
-  public showHide(e: any) {
-    e.preventDefault()
-    e.stopPropagation()
+  public toggleShowPassword = () =>
     this.setState({
-      type: this.state.type === 'input' ? 'password' : 'input'
+      showPassword: !this.state.showPassword
     })
-  }
 
   public handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -52,7 +43,7 @@ class RegisterForm extends React.Component<
 
   public render() {
     const { getFieldDecorator } = this.props.form
-    this.showHide = this.showHide.bind(this)
+    const { showPassword } = this.state
 
     return (
       <Form onSubmit={this.handleSubmit} className="login-form">
@@ -86,12 +77,12 @@ class RegisterForm extends React.Component<
           })(
             <Input
               prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
-              type={this.state.type}
+              type={showPassword ? 'input' : 'password'}
               placeholder="Password"
               suffix={
                 <Icon
-                  type={this.state.type === 'input' ? 'eye-invisible' : 'eye'}
-                  onClick={this.showHide}
+                  type={showPassword ? 'eye-invisible' : 'eye'}
+                  onClick={this.toggleShowPassword}
                 />
               }
             />
