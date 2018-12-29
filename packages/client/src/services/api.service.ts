@@ -6,14 +6,13 @@ import {
   ValidationException
 } from '@open-gtd/api'
 import Axios from 'axios'
-import { Store } from 'redux'
 import { createConsumer } from 'rest-ts-axios'
 import { of } from 'rxjs'
 import { ApiErrorHandler } from '.'
-import { AppAction, AppState } from '../store'
+import { AppStore } from '../store'
 
 const storeHolder = {
-  store: {} as Store<AppState, AppAction>
+  store: {} as AppStore
 }
 
 const driver = Axios.create({
