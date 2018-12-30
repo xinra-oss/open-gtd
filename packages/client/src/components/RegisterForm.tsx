@@ -1,25 +1,35 @@
 import { Credentials } from '@open-gtd/api'
-import { Button, Form, Input } from 'antd'
-import { WrappedFormUtils } from 'antd/lib/form/Form'
+import { Button, Form, Icon, Input } from 'antd'
+import { FormComponentProps } from 'antd/lib/form/Form'
 import React from 'react'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
 import { DispatchProps, mapDispatchToProps } from '../store'
 import { userActions } from '../store/actions'
 
-interface RegistrationRouterParams {
-  id: string
-}
+interface RegistrationProps extends DispatchProps, FormComponentProps {}
 
-interface RegistrationProps
-  extends RouteComponentProps<RegistrationRouterParams>,
-    DispatchProps {
-  form: WrappedFormUtils
+interface RegistrationState {
+  readonly showPassword: boolean
 }
 
 const FormItem = Form.Item
 
-class RegisterForm extends React.Component<RegistrationProps> {
+class RegisterForm extends React.Component<
+  RegistrationProps,
+  RegistrationState
+> {
+  public constructor(props: RegistrationProps) {
+    super(props)
+    this.state = {
+      showPassword: false
+    }
+  }
+
+  public toggleShowPassword = () =>
+    this.setState({
+      showPassword: !this.state.showPassword
+    })
+
   public handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
@@ -33,29 +43,11 @@ class RegisterForm extends React.Component<RegistrationProps> {
 
   public render() {
     const { getFieldDecorator } = this.props.form
-
-    const formItemLayout = {
-      labelCol: {
-        xs: {
-          span: 24
-        },
-        sm: {
-          span: 8
-        }
-      },
-      wrapperCol: {
-        xs: {
-          span: 24
-        },
-        sm: {
-          span: 16
-        }
-      }
-    }
+    const { showPassword } = this.state
 
     return (
-      <Form onSubmit={this.handleSubmit}>
-        <FormItem {...formItemLayout} label="E-mail">
+      <Form onSubmit={this.handleSubmit} className="login-form">
+        <FormItem>
           {getFieldDecorator('email', {
             rules: [
               {
@@ -67,9 +59,14 @@ class RegisterForm extends React.Component<RegistrationProps> {
                 message: 'Please input your E-mail!'
               }
             ]
-          })(<Input />)}
+          })(
+            <Input
+              prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
+              placeholder="Email"
+            />
+          )}
         </FormItem>
-        <FormItem {...formItemLayout} label="Password">
+        <FormItem>
           {getFieldDecorator('password', {
             rules: [
               {
@@ -77,7 +74,19 @@ class RegisterForm extends React.Component<RegistrationProps> {
                 message: 'Please input password!'
               }
             ]
-          })(<Input type="password" />)}
+          })(
+            <Input
+              prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
+              type={showPassword ? 'input' : 'password'}
+              placeholder="Password"
+              suffix={
+                <Icon
+                  type={showPassword ? 'eye-invisible' : 'eye'}
+                  onClick={this.toggleShowPassword}
+                />
+              }
+            />
+          )}
         </FormItem>
         <Button type="primary" htmlType="submit">
           Register
