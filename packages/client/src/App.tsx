@@ -9,6 +9,7 @@ import { connect } from 'react-redux'
 import './App.scss'
 import LoginPage from './LoginPage'
 import { AppState } from './store'
+import { TaskList } from './TaskList'
 
 interface AppProps {
   loading: boolean
@@ -33,6 +34,7 @@ class App extends React.Component<AppProps> {
         <Route path="/register" component={RegisterForm} />
         <Route path="/login" component={LoginPage} />
         <Route path="/" exact component={Main} />
+        <Route path="/tasks" component={TaskList} />
       </Switch>
     )
   }
