@@ -9,9 +9,9 @@ export const loadingReducer: Reducer<boolean, AppAction> = (
 ) => {
   switch (action.type) {
     case getType(loadingActions.loadContent.request):
+    case getType(sessionActions.deleteSession.request):
       return true
-    case getType(loadingActions.loadContent.success):
-    case getType(sessionActions.getSession.success):
+    case getType(loadingActions.finishLoading):
       return false
   }
   return state
