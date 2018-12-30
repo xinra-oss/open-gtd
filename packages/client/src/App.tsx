@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Route, Switch } from 'react-router-dom'
 
-import { Main } from './components/Main'
+import Main from './components/Main'
 import RegisterForm from './components/RegisterForm'
 
 import { Spin } from 'antd'

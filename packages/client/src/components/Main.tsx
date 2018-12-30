@@ -2,7 +2,15 @@ import { Breadcrumb, Icon, Layout, Menu } from 'antd'
 import * as React from 'react'
 import '../App.scss'
 
+import { UserEntity } from '@open-gtd/api'
+
 import { connect } from 'react-redux'
+import { AppState, DispatchProps, mapDispatchToProps } from '../store'
+import { sessionActions } from '../store/actions'
+
+interface MainProps extends DispatchProps {
+  user: UserEntity
+}
 
 interface State {
   readonly collapsed: boolean
@@ -11,7 +19,9 @@ interface State {
 const { SubMenu, ItemGroup } = Menu
 const { Header, Content, Sider } = Layout
 
-export class Main extends React.Component {
+const mapStateToProps = (state: AppState) => ({ user: state.session.user })
+
+class Main extends React.Component<MainProps, State> {
   //   constructor(props: any) {
   //     super(props)
   //     this.state = {
@@ -25,6 +35,10 @@ export class Main extends React.Component {
   public onCollapse = (collapsed: boolean) => {
     console.log(collapsed)
     this.setState({ collapsed })
+  }
+
+  public onLogout = () => {
+    this.props.dispatch(sessionActions.deleteSession.request())
   }
 
   public render() {
@@ -56,7 +70,7 @@ export class Main extends React.Component {
                     style={{ fontSize: '24px', color: '#fff' }}
                     theme="outlined"
                   />
-                  toby.moeller@gmx.de
+                  {this.props.user.email}
                   <Icon
                     type="caret-down"
                     style={{ fontSize: '24px', color: '#fff' }}
@@ -65,7 +79,9 @@ export class Main extends React.Component {
                 </span>
               }
             >
-              <Menu.Item key="logout">Logout</Menu.Item>
+              <Menu.Item key="logout" onClick={this.onLogout}>
+                Logout
+              </Menu.Item>
               <Menu.Item key="cancel">Cancel</Menu.Item>
             </SubMenu>
           </Menu>
@@ -90,15 +106,15 @@ export class Main extends React.Component {
               </Menu.Item>
               <ItemGroup
                 key="g1"
-                title="test"
+                title="Tasks"
                 // <span>
                 //   <Icon type="folder" />
                 //   {this.state.collapsed ? '' : 'projekt'}
                 // </span>
                 // }
               >
-                <Menu.Item key="1">Task 1</Menu.Item>
-                <Menu.Item key="2">Task 2</Menu.Item>
+                <Menu.Item key="active">Active</Menu.Item>
+                <Menu.Item key="next7Days">Next 7 Days</Menu.Item>
               </ItemGroup>
             </Menu>
           </Sider>
@@ -124,4 +140,7 @@ export class Main extends React.Component {
   }
 }
 
-export default connect()(Main)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Main)

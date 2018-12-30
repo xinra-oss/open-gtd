@@ -1,5 +1,5 @@
 import { ContextEntity, TaskEntity } from '@open-gtd/api'
-import { createAsyncAction } from 'typesafe-actions'
+import { createAsyncAction, createStandardAction } from 'typesafe-actions'
 
 export interface Content {
   tasks: TaskEntity[]
@@ -11,3 +11,5 @@ export const loadContent = createAsyncAction(
   'LOAD_CONTENT_SUCCESS',
   'LOAD_CONTENT_FAILURE'
 )<void, Content, Error>()
+
+export const finishLoading = createStandardAction('FINISH_LOADING')()

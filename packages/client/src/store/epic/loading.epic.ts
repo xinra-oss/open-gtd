@@ -1,8 +1,8 @@
 import { combineEpics } from 'redux-observable'
-import { catchError, filter, map, switchMap } from 'rxjs/operators'
+import { catchError, filter, flatMap, map, switchMap } from 'rxjs/operators'
 import { isActionOf } from 'typesafe-actions'
 import { AppEpic } from '.'
-import { loadingActions, routerActions } from '../actions'
+import { AppAction, loadingActions, routerActions } from '../actions'
 import { isCurrentPageLoginOrRegister } from './util'
 
 const loadContent: AppEpic = (
@@ -23,8 +23,14 @@ const loadContent: AppEpic = (
 const loadContentSuccess: AppEpic = (action$, state$) =>
   action$.pipe(
     filter(isActionOf(loadingActions.loadContent.success)),
-    filter(() => isCurrentPageLoginOrRegister(state$)),
-    map(() => routerActions.push('/'))
+    flatMap(() => {
+      const actions: AppAction[] = []
+      if (() => isCurrentPageLoginOrRegister(state$)) {
+        actions.push(routerActions.push('/'))
+      }
+      actions.push(loadingActions.finishLoading())
+      return actions
+    })
   )
 
 export const loadingEpic = combineEpics(loadContent, loadContentSuccess)
