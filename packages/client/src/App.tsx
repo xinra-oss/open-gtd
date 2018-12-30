@@ -18,8 +18,8 @@ class App extends React.Component {
             <Switch>
               <Route path="/register" component={RegisterForm} />
               <Route path="/login" component={LoginPage} />
-              <Route path="/" exact component={Main} />
-              <Route path="/tasks" component={TaskList} />
+              <Route path="/" exact component={TaskList} />
+              <Route path="/tasks" component={Main} />
             </Switch>
           </Layout>
         </div>

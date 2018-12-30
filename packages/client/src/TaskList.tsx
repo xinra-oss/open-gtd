@@ -1,22 +1,27 @@
 import { Task } from '@open-gtd/api'
-import { Table } from 'antd'
+import { Checkbox, Table } from 'antd'
 
+import { CheckboxChangeEvent } from 'antd/lib/checkbox'
 import { ColumnProps, TableRowSelection } from 'antd/lib/table'
 import * as React from 'react'
 
+function onChange(e: CheckboxChangeEvent) {
+  console.log(`checked = ${e.target.checked}`)
+}
 const columns: Array<ColumnProps<Task>> = [
   {
     title: 'Task Name',
-    dataIndex: 'taskname',
+    dataIndex: 'title',
     render: text => <a href="#">{text}</a>
   },
   {
-    title: 'is Done',
-    dataIndex: 'isdone'
-  },
-  {
-    title: 'is Folder',
-    dataIndex: 'isfolder'
+    title: 'Status',
+    dataIndex: 'isDone',
+    render: (text, record) => (
+      <span>
+        <Checkbox onChange={onChange}>Done</Checkbox>
+      </span>
+    )
   }
 ]
 const tasks: Task[] = [
