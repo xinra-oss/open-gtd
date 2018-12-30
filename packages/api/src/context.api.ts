@@ -1,17 +1,18 @@
 import { defineAPI, DELETE, GET, POST, PUT } from 'rest-ts-core'
 import { Array } from 'runtypes'
-import { Context } from './model'
+import { Context, ContextEntity, Entity } from './model'
 
 export const ContextApi = defineAPI({
   createContext: POST `/contexts` // prettier-ignore
     .body(Context)
-    .response(Context),
+    .response(ContextEntity),
   getContext: GET `/contexts/${'id'}` // prettier-ignore
-    .response(Context),
+    .response(ContextEntity),
   getContextList: GET `/contexts` // prettier-ignore
-    .response(Array(Context)),
-  updateContext: PUT`/contexts/${'id'}` // prettier-ignore
+    .response(Array(ContextEntity)),
+  updateContext: PUT `/contexts/${'id'}` // prettier-ignore
     .body(Context)
-    .response(Context),
+    .response(ContextEntity),
   deleteContext: DELETE `/contexts/${'id'}` // prettier-ignore
+    .response(Entity)
 })
