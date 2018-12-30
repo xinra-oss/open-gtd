@@ -6,6 +6,7 @@ import { ColumnProps, TableRowSelection } from 'antd/lib/table'
 import * as React from 'react'
 
 function onChange(e: CheckboxChangeEvent) {
+  // tslint:disable-next-line
   console.log(`checked = ${e.target.checked}`)
 }
 const columns: Array<ColumnProps<Task>> = [
@@ -64,6 +65,7 @@ const tasks: Task[] = [
 ]
 const rowSelection: TableRowSelection<Task> = {
   onChange: (selectedRowKeys, selectedRows) => {
+    // tslint:disable-next-line
     console.log(
       `selectedRowKeys: ${selectedRowKeys}`,
       'selectedRows: ',
