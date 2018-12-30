@@ -9,16 +9,25 @@ import { RouterDefinition } from 'rest-ts-express'
 import { WILL_BE_GENERATED_PLACEHOLDER } from '.'
 import { getUserId } from '../auth'
 import { db } from '../db'
+import { sync } from '../sync'
 
 export const ContextRouter: RouterDefinition<typeof ContextApi> = {
   createContext: async req => {
-    const context: ContextEntity = {
+    let context: ContextEntity = {
       ...req.body,
       _id: WILL_BE_GENERATED_PLACEHOLDER,
       userId: getUserId(req)
     }
-    const insertedElement = await db.contextCollection().insertOne(context)
-    return insertedElement.ops[0]
+    context = (await db.contextCollection().insertOne(context)).ops[0]
+    sync.push(
+      {
+        eventType: 'create',
+        payloadType: 'context',
+        payload: context
+      },
+      req
+    )
+    return context
   },
   getContext: async req => {
     const context = await db
@@ -48,7 +57,15 @@ export const ContextRouter: RouterDefinition<typeof ContextApi> = {
       throw new ForbiddenHttpException()
     }
     await db.contextCollection().deleteOne({ _id: new ObjectId(req.params.id) })
-    return { _id: req.params.id }
+    sync.push(
+      {
+        eventType: 'delete',
+        payloadType: 'context',
+        payload: context
+      },
+      req
+    )
+    return { _id: context._id }
   },
   updateContext: async (req, res) => {
     const oldContext = await db
@@ -65,9 +82,19 @@ export const ContextRouter: RouterDefinition<typeof ContextApi> = {
       ...oldContext,
       ...req.body
     }
+
     await db
       .contextCollection()
       .replaceOne({ _id: new ObjectId(req.params.id) }, newContext)
+
+    sync.push(
+      {
+        eventType: 'update',
+        payloadType: 'context',
+        payload: newContext
+      },
+      req
+    )
     return newContext
   }
 }

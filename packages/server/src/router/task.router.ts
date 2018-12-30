@@ -56,8 +56,16 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
       throw new ForbiddenHttpException()
     }
     await db.taskCollection().deleteOne({ _id: new ObjectId(req.params.id) })
+    sync.push(
+      {
+        eventType: 'delete',
+        payloadType: 'task',
+        payload: task
+      },
+      req
+    )
     return {
-      _id: req.params.id
+      _id: task._id
     }
   },
   getTask: async req => {
@@ -118,6 +126,15 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
     await db
       .taskCollection()
       .replaceOne({ _id: new ObjectId(req.params.id) }, newTask)
+
+    sync.push(
+      {
+        eventType: 'update',
+        payloadType: 'task',
+        payload: newTask
+      },
+      req
+    )
     return newTask
   }
 }
