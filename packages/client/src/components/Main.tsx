@@ -33,7 +33,6 @@ class Main extends React.Component<MainProps, State> {
   }
 
   public onCollapse = (collapsed: boolean) => {
-    console.log(collapsed)
     this.setState({ collapsed })
   }
 
