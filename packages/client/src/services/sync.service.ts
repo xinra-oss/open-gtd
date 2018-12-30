@@ -1,4 +1,5 @@
 import { AppStore } from '../store'
+import { syncActions } from '../store/actions'
 
 export interface SyncService {
   start(): void
@@ -13,8 +14,8 @@ export class WebsocketSync implements SyncService {
     this.ws = new WebSocket(this.url)
     this.store.getState()
 
-    this.ws.addEventListener('open', event => {
-      this.ws.send('Hello!')
+    this.ws.addEventListener('message', event => {
+      this.store.dispatch(syncActions.receivedSyncEvent(event.data))
     })
   }
   public setStore(store: AppStore) {

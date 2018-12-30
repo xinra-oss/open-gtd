@@ -3,6 +3,7 @@ import { ActionType, createStandardAction } from 'typesafe-actions'
 import * as contextActions from './context.actions'
 import * as loadingActions from './loading.actions'
 import * as sessionActions from './session.actions'
+import * as syncActions from './sync.actions'
 import * as taskActions from './task.actions'
 import * as userActions from './user.actions'
 
@@ -15,6 +16,7 @@ export type AppAction =
   | ActionType<typeof taskActions>
   | ActionType<typeof contextActions>
   | ActionType<typeof loadingActions>
+  | ActionType<typeof syncActions>
   | RouterAction
 
 export type AppPayloadAction<P> = AppAction & { payload: P }
@@ -25,5 +27,6 @@ export {
   routerActions,
   taskActions,
   contextActions,
-  loadingActions
+  loadingActions,
+  syncActions
 }

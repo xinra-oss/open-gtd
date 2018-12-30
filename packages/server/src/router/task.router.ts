@@ -11,10 +11,11 @@ import { RouterDefinition } from 'rest-ts-express'
 import { WILL_BE_GENERATED_PLACEHOLDER } from '.'
 import { getUserId } from '../auth'
 import { db } from '../db'
+import { sync } from '../sync'
 
 export const TaskRouter: RouterDefinition<typeof TaskApi> = {
   createTask: async req => {
-    const task: TaskEntity = {
+    let task: TaskEntity = {
       ...req.body,
       _id: WILL_BE_GENERATED_PLACEHOLDER,
       userId: getUserId(req)
@@ -34,8 +35,16 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
       })
     }
 
-    const insertedElement = await db.taskCollection().insertOne(task)
-    return insertedElement.ops[0]
+    task = (await db.taskCollection().insertOne(task)).ops[0]
+    sync.push(
+      {
+        eventType: 'create',
+        payloadType: 'task',
+        payload: task
+      },
+      req
+    )
+    return task
   },
   deleteTask: async (req, res) => {
     const task = await db

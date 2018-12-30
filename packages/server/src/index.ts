@@ -12,12 +12,14 @@ import {
 } from './errorhandling'
 import { logger } from './logging'
 import { OpenGtdRouter } from './router'
+import { sync } from './sync'
 
 async function main() {
   logger.info('Starting server...')
-  await db.connect()
 
+  await db.connect()
   const app = express()
+
   app.use(
     cors({
       origin: ['http://localhost:3000'],
@@ -33,6 +35,8 @@ async function main() {
 
   app.use(handleNonHttpExceptions)
   app.use(returnTypedHttpException)
+
+  sync.startServer(app, '/sync')
 
   const port = config.get('port')
   app.listen(port, () => logger.info('Server is listening on port %s', port))

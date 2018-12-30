@@ -19,6 +19,10 @@ export const config = convict({
     port: {
       default: 27017,
       format: 'port'
+    },
+    uri: {
+      format: String,
+      default: 'mongodb://localhost:27017/'
     }
   },
   env: {
