@@ -26,10 +26,6 @@
     }
   },
   "extensions": {
-    "recommendations": [
-      "eg2.tslint",
-      "esbenp.prettier-vscode",
-      "zengxingxin.sort-js-object-keys"
-    ]
+    "recommendations": ["eg2.tslint", "esbenp.prettier-vscode"]
   }
 }
