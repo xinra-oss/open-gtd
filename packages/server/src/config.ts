@@ -7,10 +7,11 @@ export const config = convict({
       format: '*'
     },
     embedded: {
-      default: true,
+      default: false,
       doc:
         'If set to true, a dynamically created embedded database is used in development and test environment.',
-      format: Boolean
+      format: Boolean,
+      arg: 'db.embedded'
     },
     name: {
       default: 'open-gtd',

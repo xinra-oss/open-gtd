@@ -60,7 +60,7 @@ export const ContextRouter: RouterDefinition<typeof ContextApi> = {
     await db.taskCollection().updateMany(
       {},
       {
-        $pull: { contextIds: context._id as any }
+        $pull: { contextIds: context._id.toString() as any }
       }
     )
     sync.push(

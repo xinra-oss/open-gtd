@@ -59,7 +59,7 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
 
     const taskAndAllDecendants = [
       task._id,
-      ...(await getAllDescendantIds(task._id))
+      ...(await getAllDescendantIds(task._id.toString()))
     ].map(id => ({ _id: id }))
 
     await db.taskCollection().deleteMany({
@@ -176,12 +176,13 @@ async function checkContextIds(contextIds: string[], userId: string) {
 }
 
 async function getAllDescendantIds(taskId: EntityId) {
-  let descendantIds: EntityId[] = (await db
+  const childIds: EntityId[] = (await db
     .taskCollection()
-    .find({ parendId: taskId })
-    .toArray()).map(t => t._id)
+    .find({ parentId: taskId })
+    .toArray()).map(t => t._id.toString())
 
-  for (const childId of [...descendantIds]) {
+  let descendantIds = [...childIds]
+  for (const childId of childIds) {
     descendantIds = descendantIds.concat(await getAllDescendantIds(childId))
   }
   return descendantIds
