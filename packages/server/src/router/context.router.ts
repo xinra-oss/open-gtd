@@ -56,7 +56,13 @@ export const ContextRouter: RouterDefinition<typeof ContextApi> = {
     } else if (context.userId !== getUserId(req)) {
       throw new ForbiddenHttpException()
     }
-    await db.contextCollection().deleteOne({ _id: new ObjectId(req.params.id) })
+    await db.contextCollection().deleteOne({ _id: new ObjectId(context._id) })
+    await db.taskCollection().updateMany(
+      {},
+      {
+        $pull: { contextIds: context._id as any }
+      }
+    )
     sync.push(
       {
         eventType: 'delete',
