@@ -1,4 +1,5 @@
 import {
+  EntityId,
   ForbiddenHttpException,
   NotFoundHttpException,
   Task,
@@ -55,18 +56,25 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
     } else if (task.userId !== getUserId(req)) {
       throw new ForbiddenHttpException()
     }
-    await db.taskCollection().deleteOne({ _id: new ObjectId(req.params.id) })
+
+    const taskAndAllDecendants = [
+      task._id,
+      ...(await getAllDescendantIds(task._id))
+    ].map(id => ({ _id: id }))
+
+    await db.taskCollection().deleteMany({
+      _id: { $in: taskAndAllDecendants.map(t => new ObjectId(t._id)) }
+    })
+
     sync.push(
       {
         eventType: 'delete',
         payloadType: 'task',
-        payload: task
+        payload: taskAndAllDecendants
       },
       req
     )
-    return {
-      _id: task._id
-    }
+    return taskAndAllDecendants
   },
   getTask: async req => {
     const task = await db
@@ -165,4 +173,16 @@ async function checkContextIds(contextIds: string[], userId: string) {
     }
   }
   return null
+}
+
+async function getAllDescendantIds(taskId: EntityId) {
+  let descendantIds: EntityId[] = (await db
+    .taskCollection()
+    .find({ parendId: taskId })
+    .toArray()).map(t => t._id)
+
+  for (const childId of [...descendantIds]) {
+    descendantIds = descendantIds.concat(await getAllDescendantIds(childId))
+  }
+  return descendantIds
 }

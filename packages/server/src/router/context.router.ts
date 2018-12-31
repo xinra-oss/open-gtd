@@ -61,7 +61,7 @@ export const ContextRouter: RouterDefinition<typeof ContextApi> = {
       {
         eventType: 'delete',
         payloadType: 'context',
-        payload: context
+        payload: [{ _id: context._id }]
       },
       req
     )
