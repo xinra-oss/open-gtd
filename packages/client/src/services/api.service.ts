@@ -46,9 +46,7 @@ export const handleOpenGtdApiError: ApiErrorHandler = failureActionCreator => (
   return of(failureActionCreator(err))
 }
 
-interface ClassType<T> {
-  new (...args: any[]): T
-}
+type ClassType<T> = new (...args: any[]) => T
 
 /**
  * Exception types that should recustructed. Every other `TypedException` is
