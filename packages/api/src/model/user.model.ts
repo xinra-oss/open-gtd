@@ -1,9 +1,10 @@
 import { Record, Static, String } from 'runtypes'
-import { Entity } from './entity.model'
+import { Entity, EntityId } from './entity.model'
 
 export const UserEntity = Entity.And(
   Record({
-    email: String
+    email: String,
+    inboxTaskId: EntityId
   })
 )
 
