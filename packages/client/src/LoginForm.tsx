@@ -3,6 +3,7 @@ import './App.scss'
 
 import { Credentials } from '@open-gtd/api'
 import { Button, Form, Icon, Input } from 'antd'
+import 'antd/dist/antd.css'
 import { FormComponentProps } from 'antd/lib/form/Form'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'

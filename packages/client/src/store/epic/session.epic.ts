@@ -1,10 +1,10 @@
 import { combineEpics } from 'redux-observable'
-import { filter, map, tap } from 'rxjs/operators'
+import { filter, flatMap, map, tap } from 'rxjs/operators'
 import { isActionOf } from 'typesafe-actions'
 import { AppEpic } from '.'
 import {
+  AppAction,
   loadingActions,
-  noopAction,
   routerActions,
   sessionActions
 } from '../actions'
@@ -33,7 +33,10 @@ const deleteSessionSuccess: AppEpic = (action$, _, { feedback }) =>
   action$.pipe(
     filter(isActionOf(sessionActions.deleteSession.success)),
     tap(() => feedback.successMessage("You've been successfully signed out.")),
-    map(() => routerActions.push('/login'))
+    flatMap(() => [
+      routerActions.push('/login'),
+      loadingActions.finishLoading()
+    ])
   )
 
 const getSession = createDefaultApiEpic(sessionActions.getSession, api =>
@@ -43,13 +46,17 @@ const getSession = createDefaultApiEpic(sessionActions.getSession, api =>
 const getSessionSuccess: AppEpic = (action$, state$) =>
   action$.pipe(
     filter(isActionOf(sessionActions.getSession.success)),
-    map(action =>
-      action.payload.user !== undefined
-        ? loadingActions.loadContent.request()
-        : isCurrentPageLoginOrRegister(state$)
-        ? noopAction()
-        : routerActions.push('/login')
-    )
+    flatMap(action => {
+      if (action.payload.user !== undefined) {
+        return [loadingActions.loadContent.request()]
+      }
+      const actions: AppAction[] = []
+      if (!isCurrentPageLoginOrRegister(state$)) {
+        actions.push(routerActions.push('/login'))
+      }
+      actions.push(loadingActions.finishLoading())
+      return actions
+    })
   )
 
 export const authEpic = combineEpics(
