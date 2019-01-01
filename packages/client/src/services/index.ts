@@ -6,6 +6,7 @@ import {
   OpenGtdApiConsumer
 } from './api.service'
 import { antDesignFeedback, FeedbackService } from './feedback.service'
+import { SyncService } from './sync.service'
 
 export type ApiErrorHandler = <T, CREATOR extends PayloadCreator<any, Error>>(
   failureActionCreator: CREATOR
@@ -15,6 +16,7 @@ export interface Services {
   openGtdApi: OpenGtdApiConsumer
   handleOpenGtdApiError: ApiErrorHandler
   feedback: FeedbackService
+  sync: SyncService
 }
 
 export { openGtdApi, handleOpenGtdApiError, antDesignFeedback }

@@ -10,11 +10,11 @@ import {
 } from '../actions'
 import {
   createDefaultApiEpic,
-  createDefaultApiEpicWithPayloadAsBody,
+  createDefaultCreateEntityApiEpic,
   isCurrentPageLoginOrRegister
 } from './util'
 
-const createSession = createDefaultApiEpicWithPayloadAsBody(
+const createSession = createDefaultCreateEntityApiEpic(
   sessionActions.createSession,
   api => api.createSession
 )

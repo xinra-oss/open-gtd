@@ -10,10 +10,9 @@ import { AppState } from './state/app.state'
 
 export { AppState, AppAction }
 
-export function createAppStore(
-  services: Services,
-  history: History
-): Store<AppState, AppAction> {
+export type AppStore = Store<AppState, AppAction>
+
+export function createAppStore(services: Services, history: History): AppStore {
   const epicMiddleware = createAppEpicMiddleware(services)
   const store = createStore(
     createAppReducer(history),
@@ -22,6 +21,7 @@ export function createAppStore(
     )
   )
   services.openGtdApi.storeHolder.store = store
+  services.sync.setStore(store)
   epicMiddleware.run(appEpic)
   return store
 }

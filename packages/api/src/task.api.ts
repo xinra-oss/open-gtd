@@ -7,7 +7,7 @@ export const TaskApi = defineAPI({
     .body(Task)
     .response(TaskEntity),
   deleteTask: DELETE `/tasks/${'id'}` // prettier-ignore
-    .response(Entity),
+    .response(Array(Entity)),
   getTask: GET `/tasks/${'id'}` // prettier-ignore
     .response(TaskEntity),
   getTaskList: GET `/tasks` // prettier-ignore

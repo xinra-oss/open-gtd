@@ -12,13 +12,21 @@ import {
 } from './services'
 import { createAppStore } from './store'
 
+const noop = () => {
+  return
+}
+
 it('renders without crashing', () => {
   const div = document.createElement('div')
 
   const services: Services = {
     openGtdApi,
     handleOpenGtdApiError,
-    feedback: antDesignFeedback
+    feedback: antDesignFeedback,
+    sync: {
+      setStore: noop,
+      start: noop
+    }
   }
 
   const history = createMemoryHistory()

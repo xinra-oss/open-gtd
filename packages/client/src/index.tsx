@@ -12,13 +12,15 @@ import {
   openGtdApi,
   Services
 } from './services'
+import { WebsocketSync } from './services/sync.service'
 import { createAppStore } from './store'
 import { sessionActions } from './store/actions'
 
 const services: Services = {
   openGtdApi,
   handleOpenGtdApiError,
-  feedback: antDesignFeedback
+  feedback: antDesignFeedback,
+  sync: new WebsocketSync('ws://localhost:3001/sync')
 }
 
 const history = createBrowserHistory()

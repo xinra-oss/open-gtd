@@ -1,4 +1,5 @@
 import {
+  EntityId,
   ForbiddenHttpException,
   NotFoundHttpException,
   Task,
@@ -11,10 +12,11 @@ import { RouterDefinition } from 'rest-ts-express'
 import { WILL_BE_GENERATED_PLACEHOLDER } from '.'
 import { getUserId } from '../auth'
 import { db } from '../db'
+import { sync } from '../sync'
 
 export const TaskRouter: RouterDefinition<typeof TaskApi> = {
   createTask: async req => {
-    const task: TaskEntity = {
+    let task: TaskEntity = {
       ...req.body,
       _id: WILL_BE_GENERATED_PLACEHOLDER,
       userId: getUserId(req)
@@ -34,8 +36,16 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
       })
     }
 
-    const insertedElement = await db.taskCollection().insertOne(task)
-    return insertedElement.ops[0]
+    task = (await db.taskCollection().insertOne(task)).ops[0]
+    sync.push(
+      {
+        eventType: 'create',
+        payloadType: 'task',
+        payload: task
+      },
+      req
+    )
+    return task
   },
   deleteTask: async (req, res) => {
     const task = await db
@@ -46,10 +56,25 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
     } else if (task.userId !== getUserId(req)) {
       throw new ForbiddenHttpException()
     }
-    await db.taskCollection().deleteOne({ _id: new ObjectId(req.params.id) })
-    return {
-      _id: req.params.id
-    }
+
+    const taskAndAllDecendants = [
+      task._id,
+      ...(await getAllDescendantIds(task._id.toString()))
+    ].map(id => ({ _id: id }))
+
+    await db.taskCollection().deleteMany({
+      _id: { $in: taskAndAllDecendants.map(t => new ObjectId(t._id)) }
+    })
+
+    sync.push(
+      {
+        eventType: 'delete',
+        payloadType: 'task',
+        payload: taskAndAllDecendants
+      },
+      req
+    )
+    return taskAndAllDecendants
   },
   getTask: async req => {
     const task = await db
@@ -109,6 +134,15 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
     await db
       .taskCollection()
       .replaceOne({ _id: new ObjectId(req.params.id) }, newTask)
+
+    sync.push(
+      {
+        eventType: 'update',
+        payloadType: 'task',
+        payload: newTask
+      },
+      req
+    )
     return newTask
   }
 }
@@ -139,4 +173,17 @@ async function checkContextIds(contextIds: string[], userId: string) {
     }
   }
   return null
+}
+
+async function getAllDescendantIds(taskId: EntityId) {
+  const childIds: EntityId[] = (await db
+    .taskCollection()
+    .find({ parentId: taskId })
+    .toArray()).map(t => t._id.toString())
+
+  let descendantIds = [...childIds]
+  for (const childId of childIds) {
+    descendantIds = descendantIds.concat(await getAllDescendantIds(childId))
+  }
+  return descendantIds
 }

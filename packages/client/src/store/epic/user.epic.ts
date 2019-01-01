@@ -3,9 +3,9 @@ import { filter, map, tap } from 'rxjs/operators'
 import { isActionOf } from 'typesafe-actions'
 import { AppEpic } from '.'
 import { routerActions, userActions } from '../actions'
-import { createDefaultApiEpicWithPayloadAsBody } from './util'
+import { createDefaultCreateEntityApiEpic } from './util'
 
-const createUser = createDefaultApiEpicWithPayloadAsBody(
+const createUser = createDefaultCreateEntityApiEpic(
   userActions.createUser,
   api => api.createUser
 )

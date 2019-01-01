@@ -9,10 +9,14 @@ export const sessionConfiguration = {
 }
 
 export function getUserId(req: Request): string {
-  if (req.session === undefined) {
+  return getUserIdFromSession(req.session)
+}
+
+export function getUserIdFromSession(session?: Express.Session): string {
+  if (session === undefined) {
     throw new Error('there is no session')
   }
-  return req.session.userId
+  return session.userId
 }
 
 export function signUserIn(req: Request, userId: string) {
