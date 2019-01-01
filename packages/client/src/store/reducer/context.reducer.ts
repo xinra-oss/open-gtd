@@ -3,7 +3,7 @@ import { Reducer } from 'react'
 import { getType } from 'typesafe-actions'
 import { AppAction } from '..'
 import { arrayToDictionary } from '../../util'
-import { loadingActions, syncActions } from '../actions'
+import { contextActions, loadingActions, syncActions } from '../actions'
 import { ContextState } from '../state/context.state'
 
 export const contextReducer: Reducer<ContextState, AppAction> = (
@@ -26,6 +26,13 @@ export const contextReducer: Reducer<ContextState, AppAction> = (
               break
           }
         }
+        break
+      case getType(contextActions.createContext.success):
+      case getType(contextActions.updateContext.success):
+        draft[action.payload._id] = action.payload
+        break
+      case getType(contextActions.deleteContext.success):
+        action.payload.forEach(c => delete draft[c._id])
         break
     }
     return

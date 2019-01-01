@@ -14,5 +14,5 @@ export const ContextApi = defineAPI({
     .body(Context)
     .response(ContextEntity),
   deleteContext: DELETE `/contexts/${'id'}` // prettier-ignore
-    .response(Entity)
+    .response(Array(Entity))
 })

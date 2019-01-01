@@ -71,7 +71,7 @@ export const ContextRouter: RouterDefinition<typeof ContextApi> = {
       },
       req
     )
-    return { _id: context._id }
+    return [{ _id: context._id }]
   },
   updateContext: async (req, res) => {
     const oldContext = await db

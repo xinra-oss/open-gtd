@@ -3,7 +3,12 @@ import { Draft, produce } from 'immer'
 import { Reducer } from 'react'
 import { getType } from 'typesafe-actions'
 import { AppAction } from '..'
-import { loadingActions, syncActions } from '../actions'
+import {
+  contextActions,
+  loadingActions,
+  syncActions,
+  taskActions
+} from '../actions'
 import { TaskState } from '../state/task.state'
 
 export const taskReducer: Reducer<TaskState, AppAction> = (
@@ -31,6 +36,14 @@ export const taskReducer: Reducer<TaskState, AppAction> = (
           return removeContextReferences(draft, action.payload.payload)
         }
         break
+      case getType(taskActions.createTask.success):
+        return createTask(draft, action.payload)
+      case getType(taskActions.updateTask.success):
+        return updateTask(draft, action.payload)
+      case getType(taskActions.deleteTask.success):
+        return deleteTask(draft, action.payload)
+      case getType(contextActions.deleteContext.success):
+        return removeContextReferences(draft, action.payload)
     }
     return
   })
