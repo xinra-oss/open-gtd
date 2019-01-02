@@ -56,6 +56,7 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
     } else if (task.userId !== getUserId(req)) {
       throw new ForbiddenHttpException()
     }
+    await checkIsNotInboxTask(task, getUserId(req))
 
     const taskAndAllDecendants = [
       task._id,
@@ -186,4 +187,14 @@ async function getAllDescendantIds(taskId: EntityId) {
     descendantIds = descendantIds.concat(await getAllDescendantIds(childId))
   }
   return descendantIds
+}
+
+async function checkIsNotInboxTask(task: TaskEntity, userId: EntityId) {
+  const user = await db.userCollection().findOne({ _id: new ObjectId(userId) })
+  if (user === null) {
+    throw new Error('checkIsNotInboxTask: user does not exist')
+  }
+  if (user.inboxTaskId === task._id.toString()) {
+    throw new ForbiddenHttpException('Inbox task cannot be deleted.')
+  }
 }
