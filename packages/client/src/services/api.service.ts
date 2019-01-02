@@ -7,8 +7,6 @@ import {
 } from '@open-gtd/api'
 import Axios from 'axios'
 import { createConsumer } from 'rest-ts-axios'
-import { of } from 'rxjs'
-import { ApiErrorHandler } from '.'
 import { AppStore } from '../store'
 
 const storeHolder = {
@@ -17,15 +15,17 @@ const storeHolder = {
 
 const driver = Axios.create({
   baseURL: 'http://localhost:3001/api',
-  withCredentials: true,
-  transformRequest: [
-    (data, headers) => {
-      headers['Content-Type'] = 'application/json'
-      headers['CSRF-Token'] = storeHolder.store.getState().session.csrfToken
-      return JSON.stringify(data)
-    }
-  ]
+  withCredentials: true
 })
+driver.interceptors.request.use(
+  config => {
+    const { csrfToken } = storeHolder.store.getState().session
+    config.headers['CSRF-Token'] = csrfToken
+    return config
+  },
+  err => Promise.reject(err)
+)
+driver.interceptors.response.use(res => res, handleOpenGtdApiError)
 
 export const openGtdApi = {
   ...createConsumer(OpenGtdApi, driver),
@@ -34,16 +34,13 @@ export const openGtdApi = {
 
 export type OpenGtdApiConsumer = typeof openGtdApi
 
-export const handleOpenGtdApiError: ApiErrorHandler = failureActionCreator => (
-  err,
-  caught
-) => {
-  // See https://gist.github.com/fgilio/230ccd514e9381fafa51608fcf137253
+function handleOpenGtdApiError(err: any) {
+  // See https://github.com/axios/axios#handling-errors
   if (err.response) {
     // The request was made and the server responded with a non 2xx status code
     err = reconstructOriginalHttpException(err.response.data)
   }
-  return of(failureActionCreator(err))
+  return Promise.reject(err)
 }
 
 type ClassType<T> = new (...args: any[]) => T

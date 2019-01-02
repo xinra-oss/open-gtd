@@ -1,12 +1,19 @@
-import { Credentials } from '@open-gtd/api'
+import { Credentials, ValidationErrors } from '@open-gtd/api'
 import { Button, Form, Icon, Input } from 'antd'
 import { FormComponentProps } from 'antd/lib/form/Form'
 import React from 'react'
 import { connect } from 'react-redux'
-import { DispatchProps, mapDispatchToProps } from '../store'
+import { AppState, DispatchProps, mapDispatchToProps } from '../store'
 import { userActions } from '../store/actions'
+import { getFormItemValidationProps } from '../util'
 
-interface RegistrationProps extends DispatchProps, FormComponentProps {}
+interface RegistrationProps extends DispatchProps, FormComponentProps {
+  validationErrors: ValidationErrors<Credentials>
+}
+
+const mapStateToProps = (state: AppState) => ({
+  validationErrors: state.info.validationErrors
+})
 
 interface RegistrationState {
   readonly showPassword: boolean
@@ -43,26 +50,27 @@ class RegisterForm extends React.Component<
 
   public render() {
     const { getFieldDecorator } = this.props.form
+    const { validationErrors } = this.props
     const { showPassword } = this.state
 
     return (
       <Form onSubmit={this.handleSubmit} className="login-form">
-        <FormItem>
+        <FormItem {...getFormItemValidationProps(validationErrors, 'email')}>
           {getFieldDecorator('email', {
             rules: [
               {
                 type: 'email',
-                message: 'The input is not valid E-mail!'
+                message: 'Please input a valid e-mail address.'
               },
               {
                 required: true,
-                message: 'Please input your E-mail!'
+                message: 'Please input your e-mail address.'
               }
             ]
           })(
             <Input
               prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
-              placeholder="Email"
+              placeholder="E-mail"
             />
           )}
         </FormItem>
@@ -70,8 +78,8 @@ class RegisterForm extends React.Component<
           {getFieldDecorator('password', {
             rules: [
               {
-                required: true,
-                message: 'Please input password!'
+                min: 8,
+                message: 'Password must be at least 8 characters long.'
               }
             ]
           })(
@@ -96,4 +104,7 @@ class RegisterForm extends React.Component<
   }
 }
 
-export default connect(mapDispatchToProps)(Form.create()(RegisterForm))
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Form.create()(RegisterForm))
