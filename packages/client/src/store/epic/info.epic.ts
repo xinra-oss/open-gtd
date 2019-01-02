@@ -17,6 +17,7 @@ const handleAsyncErrors: AppEpic = (action$, state$, { info }) =>
           info.errorMessage(action.payload.message)
         } else {
           info.errorMessage('An unknown error occured.')
+          // show error to advanced users
           // tslint:disable-next-line
           console.error(action.payload)
         }
