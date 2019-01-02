@@ -1,7 +1,9 @@
 import { combineEpics } from 'redux-observable'
-import { catchError, filter, flatMap, map, switchMap } from 'rxjs/operators'
+import { from } from 'rxjs'
+import { catchError, filter, flatMap, map, mergeMap } from 'rxjs/operators'
 import { isActionOf } from 'typesafe-actions'
 import { AppEpic } from '.'
+import { OpenGtdApiConsumer } from '../../services/api.service'
 import {
   AppAction,
   loadingActions,
@@ -17,13 +19,20 @@ const loadContent: AppEpic = (
 ) =>
   action$.pipe(
     filter(isActionOf(loadingActions.loadContent.request)),
-    switchMap(async () => ({
-      tasks: (await openGtdApi.getTaskList()).data,
-      contexts: (await openGtdApi.getContextList()).data
-    })),
-    map(content => loadingActions.loadContent.success(content)),
-    catchError(handleOpenGtdApiError(loadingActions.loadContent.failure))
+    mergeMap(() =>
+      from(loadContentFromApi(openGtdApi)).pipe(
+        map(content => loadingActions.loadContent.success(content)),
+        catchError(handleOpenGtdApiError(loadingActions.loadContent.failure))
+      )
+    )
   )
+
+async function loadContentFromApi(openGtdApi: OpenGtdApiConsumer) {
+  return {
+    tasks: (await openGtdApi.getTaskList()).data,
+    contexts: (await openGtdApi.getContextList()).data
+  }
+}
 
 const loadContentSuccess: AppEpic = (action$, state$) =>
   action$.pipe(
