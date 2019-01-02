@@ -16,13 +16,6 @@ const storeHolder = {
 const driver = Axios.create({
   baseURL: 'http://localhost:3001/api',
   withCredentials: true
-  /*transformRequest: [
-    (data, headers) => {
-      headers['Content-Type'] = 'application/json'
-      headers['CSRF-Token'] = storeHolder.store.getState().session.csrfToken
-      return JSON.stringify(data)
-    }
-  ]*/
 })
 driver.interceptors.request.use(
   config => {
