@@ -1,5 +1,6 @@
 import { Entity, EntityId } from '@open-gtd/api'
-import { catchError, filter, map, switchMap } from 'rxjs/operators'
+import { from } from 'rxjs'
+import { catchError, filter, map, mergeMap } from 'rxjs/operators'
 import { isActionOf } from 'typesafe-actions'
 import { AppEpic } from '.'
 import { AppState } from '..'
@@ -26,9 +27,12 @@ export function createDefaultApiEpic<REQ_A extends AppAction, OUT>(
   return (action$, state$, { openGtdApi, handleOpenGtdApiError }) =>
     action$.pipe(
       filter(isActionOf(apiActionCreator.request)),
-      switchMap(action => mapActionToApiResult(openGtdApi, action)),
-      map(res => apiActionCreator.success(res.data)),
-      catchError(handleOpenGtdApiError(apiActionCreator.failure))
+      mergeMap(action =>
+        from(mapActionToApiResult(openGtdApi, action)).pipe(
+          map(res => apiActionCreator.success(res.data)),
+          catchError(handleOpenGtdApiError(apiActionCreator.failure))
+        )
+      )
     )
 }
 
