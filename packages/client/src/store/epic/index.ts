@@ -8,6 +8,7 @@ import { Services } from '../../services'
 import { AppAction } from '../actions'
 import { AppState } from '../state/app.state'
 import { contextEpic } from './context.epic'
+import { infoEpic } from './info.epic'
 import { loadingEpic } from './loading.epic'
 import { authEpic } from './session.epic'
 import { syncEpic } from './sync.epic'
@@ -22,7 +23,8 @@ export const appEpic = combineEpics(
   taskEpic,
   contextEpic,
   loadingEpic,
-  syncEpic
+  syncEpic,
+  infoEpic
 )
 
 export function createAppEpicMiddleware(

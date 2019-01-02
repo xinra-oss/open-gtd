@@ -1,11 +1,7 @@
 import { Observable } from 'rxjs'
 import { PayloadAction, PayloadCreator } from 'typesafe-actions/dist/types'
-import {
-  handleOpenGtdApiError,
-  openGtdApi,
-  OpenGtdApiConsumer
-} from './api.service'
-import { antDesignFeedback, FeedbackService } from './feedback.service'
+import { openGtdApi, OpenGtdApiConsumer } from './api.service'
+import { antDesignInfo, InfoService } from './info.service'
 import { SyncService } from './sync.service'
 
 export type ApiErrorHandler = <T, CREATOR extends PayloadCreator<any, Error>>(
@@ -14,9 +10,8 @@ export type ApiErrorHandler = <T, CREATOR extends PayloadCreator<any, Error>>(
 
 export interface Services {
   openGtdApi: OpenGtdApiConsumer
-  handleOpenGtdApiError: ApiErrorHandler
-  feedback: FeedbackService
+  info: InfoService
   sync: SyncService
 }
 
-export { openGtdApi, handleOpenGtdApiError, antDesignFeedback }
+export { openGtdApi, antDesignInfo }

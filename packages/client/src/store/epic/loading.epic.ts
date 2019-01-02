@@ -1,5 +1,5 @@
 import { combineEpics } from 'redux-observable'
-import { from } from 'rxjs'
+import { from, of } from 'rxjs'
 import { catchError, filter, flatMap, map, mergeMap } from 'rxjs/operators'
 import { isActionOf } from 'typesafe-actions'
 import { AppEpic } from '.'
@@ -12,17 +12,13 @@ import {
 } from '../actions'
 import { isCurrentPageLoginOrRegister } from './util'
 
-const loadContent: AppEpic = (
-  action$,
-  state$,
-  { openGtdApi, handleOpenGtdApiError }
-) =>
+const loadContent: AppEpic = (action$, state$, { openGtdApi }) =>
   action$.pipe(
     filter(isActionOf(loadingActions.loadContent.request)),
     mergeMap(() =>
       from(loadContentFromApi(openGtdApi)).pipe(
         map(content => loadingActions.loadContent.success(content)),
-        catchError(handleOpenGtdApiError(loadingActions.loadContent.failure))
+        catchError(err => of(loadingActions.loadContent.failure(err)))
       )
     )
   )

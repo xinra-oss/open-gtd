@@ -1,6 +1,6 @@
 import { combineEpics } from 'redux-observable'
 import { of } from 'rxjs'
-import { catchError, filter, map, mergeMap, tap } from 'rxjs/operators'
+import { catchError, filter, map, mergeMap } from 'rxjs/operators'
 import { isActionOf } from 'typesafe-actions'
 import { AppEpic } from '.'
 import { syncActions } from '../actions'
