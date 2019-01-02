@@ -1,5 +1,5 @@
 import { AuthApi, UnauthorizedHttpException, UserEntity } from '@open-gtd/api'
-import { compare } from 'bcrypt'
+import { compare } from 'bcryptjs'
 import { ObjectId } from 'mongodb'
 import { RouterDefinition } from 'rest-ts-express'
 import { getUserId, isUserSignedIn, signUserIn, signUserOut } from '../auth'
