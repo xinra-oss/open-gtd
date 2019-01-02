@@ -7,7 +7,7 @@ import {
   UserEntity,
   ValidationException
 } from '@open-gtd/api'
-import { hash } from 'bcrypt'
+import { hash } from 'bcryptjs'
 import { RouterDefinition } from 'rest-ts-express'
 import { WILL_BE_GENERATED_PLACEHOLDER } from '.'
 import { db } from '../db'
