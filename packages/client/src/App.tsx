@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Route, Switch } from 'react-router-dom'
 
-import Main from './components/Main'
+import Main from './components/Main/Main'
 import RegisterForm from './components/RegisterForm'
 
 import { Spin } from 'antd'
@@ -9,7 +9,6 @@ import { connect } from 'react-redux'
 import './App.scss'
 import LoginPage from './LoginPage'
 import { AppState } from './store'
-import { TaskList } from './TaskList'
 
 interface AppProps {
   loading: boolean
@@ -33,8 +32,7 @@ class App extends React.Component<AppProps> {
       <Switch>
         <Route path="/register" component={RegisterForm} />
         <Route path="/login" component={LoginPage} />
-        <Route path="/" exact component={Main} />
-        <Route path="/tasks" component={TaskList} />
+        <Route path="/" component={Main} />
       </Switch>
     )
   }
