@@ -3,14 +3,10 @@ import { Checkbox, Table } from 'antd'
 
 import { CheckboxChangeEvent } from 'antd/lib/checkbox'
 import { ColumnProps } from 'antd/lib/table'
-import {
-  AppState,
-  DispatchProps,
-  mapDispatchToProps
-} from 'packages/client/src/store'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { Dictionary } from 'ts-essentials'
+import { AppState, DispatchProps, mapDispatchToProps } from '../../../store'
 
 function onChange(e: CheckboxChangeEvent) {
   // tslint:disable-next-line
