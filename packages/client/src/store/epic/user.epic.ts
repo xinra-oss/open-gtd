@@ -10,11 +10,11 @@ const createUser = createDefaultCreateEntityApiEpic(
   api => api.createUser
 )
 
-const createUserSuccess: AppEpic = (action$, _, { feedback }) =>
+const createUserSuccess: AppEpic = (action$, _, { info }) =>
   action$.pipe(
     filter(isActionOf(userActions.createUser.success)),
     tap(() =>
-      feedback.successMessage(
+      info.successMessage(
         'Your account has been created successfully. You can now use it to log in.',
         5
       )

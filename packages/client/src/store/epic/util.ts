@@ -1,5 +1,6 @@
 import { Entity, EntityId } from '@open-gtd/api'
-import { catchError, filter, map, switchMap } from 'rxjs/operators'
+import { EMPTY, from, Observable, of } from 'rxjs'
+import { catchError, filter, map, mergeMap } from 'rxjs/operators'
 import { isActionOf } from 'typesafe-actions'
 import { AppEpic } from '.'
 import { AppState } from '..'
@@ -23,12 +24,15 @@ export function createDefaultApiEpic<REQ_A extends AppAction, OUT>(
     action: REQ_A
   ) => Promise<{ data: OUT }>
 ): AppEpic {
-  return (action$, state$, { openGtdApi, handleOpenGtdApiError }) =>
+  return (action$, state$, { openGtdApi }) =>
     action$.pipe(
       filter(isActionOf(apiActionCreator.request)),
-      switchMap(action => mapActionToApiResult(openGtdApi, action)),
-      map(res => apiActionCreator.success(res.data)),
-      catchError(handleOpenGtdApiError(apiActionCreator.failure))
+      mergeMap(action =>
+        from(mapActionToApiResult(openGtdApi, action)).pipe(
+          map(res => apiActionCreator.success(res.data)),
+          catchError(err => of(apiActionCreator.failure(err)))
+        )
+      )
     )
 }
 
@@ -68,3 +72,5 @@ export function createDefaultDeleteEntityApiEpic<OUT>(
     apiMethodSelector(openGtdApi)({ params: { id: action.payload } })
   )
 }
+
+export const noopAction = () => EMPTY as Observable<AppAction>

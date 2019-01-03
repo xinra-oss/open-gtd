@@ -4,12 +4,7 @@ import * as ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { MemoryRouter } from 'react-router'
 import App from './App'
-import {
-  antDesignFeedback,
-  handleOpenGtdApiError,
-  openGtdApi,
-  Services
-} from './services'
+import { antDesignInfo, openGtdApi, Services } from './services'
 import { createAppStore } from './store'
 
 const noop = () => {
@@ -21,8 +16,7 @@ it('renders without crashing', () => {
 
   const services: Services = {
     openGtdApi,
-    handleOpenGtdApiError,
-    feedback: antDesignFeedback,
+    info: antDesignInfo,
     sync: {
       setStore: noop,
       start: noop

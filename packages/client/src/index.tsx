@@ -6,20 +6,14 @@ import { Provider } from 'react-redux'
 import App from './App'
 import './index.scss'
 import registerServiceWorker from './registerServiceWorker'
-import {
-  antDesignFeedback,
-  handleOpenGtdApiError,
-  openGtdApi,
-  Services
-} from './services'
+import { antDesignInfo, openGtdApi, Services } from './services'
 import { WebsocketSync } from './services/sync.service'
 import { createAppStore } from './store'
 import { sessionActions } from './store/actions'
 
 const services: Services = {
   openGtdApi,
-  handleOpenGtdApiError,
-  feedback: antDesignFeedback,
+  info: antDesignInfo,
   sync: new WebsocketSync('ws://localhost:3001/sync')
 }
 

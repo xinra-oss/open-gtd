@@ -29,10 +29,10 @@ const deleteSession = createDefaultApiEpic(sessionActions.deleteSession, api =>
   api.deleteSession()
 )
 
-const deleteSessionSuccess: AppEpic = (action$, _, { feedback }) =>
+const deleteSessionSuccess: AppEpic = (action$, _, { info }) =>
   action$.pipe(
     filter(isActionOf(sessionActions.deleteSession.success)),
-    tap(() => feedback.successMessage("You've been successfully signed out.")),
+    tap(() => info.successMessage("You've been successfully signed out.")),
     flatMap(() => [
       routerActions.push('/login'),
       loadingActions.finishLoading()
