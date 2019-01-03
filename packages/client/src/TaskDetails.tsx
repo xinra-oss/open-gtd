@@ -37,11 +37,15 @@ export class TaskDetails extends React.Component<TaskFormProps> {
                 <Col span={8}>
                   <Checkbox value="A">Folder</Checkbox>
                 </Col>
+              </Row>
+              <Row>
                 <Col span={8}>
                   <Checkbox disabled value="B">
                     Never Active
                   </Checkbox>
                 </Col>
+              </Row>
+              <Row>
                 <Col span={8}>
                   <Checkbox value="C">Project</Checkbox>
                 </Col>
