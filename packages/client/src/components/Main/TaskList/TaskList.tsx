@@ -1,5 +1,5 @@
-import { TaskEntity } from '@open-gtd/api'
-import { Checkbox, Table } from 'antd'
+import { EntityId, TaskEntity } from '@open-gtd/api'
+import { Button, Checkbox, Table } from 'antd'
 
 import { CheckboxChangeEvent } from 'antd/lib/checkbox'
 import { ColumnProps } from 'antd/lib/table'
@@ -29,12 +29,20 @@ const columns: Array<ColumnProps<TaskEntity>> = [
   }
 ]
 
-export interface TaskListProps extends DispatchProps {
+interface TaskListProps extends DispatchProps {
   tasks: Dictionary<TaskEntity>
   filter?: (task: TaskEntity) => boolean
 }
 
-class TaskList extends React.Component<TaskListProps> {
+interface TaskListState {
+  selectedTaskIds: EntityId[]
+}
+
+class TaskList extends React.Component<TaskListProps, TaskListState> {
+  public readonly state: TaskListState = {
+    selectedTaskIds: []
+  }
+
   public render() {
     const filter = this.props.filter || (() => true)
     const rootTasks: TaskEntity[] = []
@@ -46,7 +54,33 @@ class TaskList extends React.Component<TaskListProps> {
       }
     })
 
-    return <Table columns={columns} dataSource={rootTasks} />
+    return (
+      <div>
+        {this.renderToolbar()}
+        <Table columns={columns} dataSource={rootTasks} />
+      </div>
+    )
+  }
+
+  private renderToolbar() {
+    const { selectedTaskIds } = this.state
+
+    return (
+      <div style={{ marginBottom: 10 }}>
+        <Button.Group>
+          <Button type="primary" icon="plus-square">
+            New task
+          </Button>
+          <Button
+            type="primary"
+            icon="plus"
+            disabled={selectedTaskIds.length !== 1}
+          >
+            New subtask
+          </Button>
+        </Button.Group>
+      </div>
+    )
   }
 }
 
