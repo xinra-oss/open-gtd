@@ -22,7 +22,11 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
       userId: getUserId(req)
     }
     if (task.parentId !== null) {
-      const parentError = await checkParentTask(task.parentId, task.userId)
+      const parentError = await checkParentTask(
+        task._id,
+        task.parentId,
+        task.userId
+      )
       if (parentError) {
         throw new ValidationException<Task>({
           parentId: parentError
@@ -113,6 +117,7 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
 
     if (newTask.parentId !== null) {
       const parentError = await checkParentTask(
+        newTask._id,
         newTask.parentId,
         newTask.userId
       )
@@ -148,17 +153,53 @@ export const TaskRouter: RouterDefinition<typeof TaskApi> = {
   }
 }
 
-async function checkParentTask(parentId: string, userId: string) {
-  const task = await db
+async function checkParentTask(
+  taskId: string,
+  parentId: string,
+  userId: string
+) {
+  if (
+    taskId !== WILL_BE_GENERATED_PLACEHOLDER &&
+    taskId.toString() === parentId
+  ) {
+    return 'Task cannot have itself as parent.'
+  }
+
+  const parentTask = await db
     .taskCollection()
     .findOne({ _id: new ObjectId(parentId) })
-  if (!task) {
+  if (!parentTask) {
     return 'Parent does not exist.'
   }
-  if (task.userId !== userId) {
+  if (parentTask.userId !== userId) {
     return 'Parent belongs to different user.'
   }
+
+  if (
+    parentTask.parentId &&
+    taskId !== WILL_BE_GENERATED_PLACEHOLDER &&
+    !(await checkParentHierarchy(taskId.toString(), parentTask.parentId))
+  ) {
+    return 'ParentId creates circular reference.'
+  }
   return null
+}
+
+async function checkParentHierarchy(
+  taskId: string,
+  parentId: string
+): Promise<boolean> {
+  if (taskId === parentId) {
+    return false
+  }
+  const parentTask = await db
+    .taskCollection()
+    .findOne({ _id: new ObjectId(parentId) })
+
+  if (parentTask && parentTask.parentId !== null) {
+    return await checkParentHierarchy(taskId, parentTask.parentId)
+  }
+  return true
 }
 
 async function checkContextIds(contextIds: string[], userId: string) {
