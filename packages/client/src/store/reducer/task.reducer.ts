@@ -1,4 +1,4 @@
-import { Entity, TaskEntity } from '@open-gtd/api'
+import { Entity } from '@open-gtd/api'
 import { Draft, produce } from 'immer'
 import { Reducer } from 'react'
 import { getType } from 'typesafe-actions'
@@ -12,7 +12,7 @@ import {
 import { TaskState } from '../state/task.state'
 
 export const taskReducer: Reducer<TaskState, AppAction> = (
-  state = [],
+  state = {},
   action
 ) =>
   produce(state, draft => {
@@ -23,11 +23,12 @@ export const taskReducer: Reducer<TaskState, AppAction> = (
         if (action.payload.payloadType === 'task') {
           switch (action.payload.eventType) {
             case 'create':
-              return createTask(draft, action.payload.payload)
             case 'update':
-              return updateTask(draft, action.payload.payload)
+              draft[action.payload.payload._id] = action.payload.payload
+              break
             case 'delete':
-              return deleteTask(draft, action.payload.payload)
+              action.payload.payload.forEach(t => delete draft[t._id])
+              break
           }
         } else if (
           action.payload.payloadType === 'context' &&
@@ -37,49 +38,24 @@ export const taskReducer: Reducer<TaskState, AppAction> = (
         }
         break
       case getType(taskActions.createTask.success):
-        return createTask(draft, action.payload)
       case getType(taskActions.updateTask.success):
-        return updateTask(draft, action.payload)
+        draft[action.payload._id] = action.payload
+        break
       case getType(taskActions.deleteTask.success):
-        return deleteTask(draft, action.payload)
+        action.payload.forEach(t => delete draft[t._id])
+        break
       case getType(contextActions.deleteContext.success):
         return removeContextReferences(draft, action.payload)
     }
     return
   })
 
-type CrudHandler<T = TaskEntity> = (
+const removeContextReferences = (
   draft: Draft<TaskState>,
-  payload: T
-) => TaskState
-
-const createTask: CrudHandler = (draft, task) => {
-  if (draft.find(t => t._id === task._id) === undefined) {
-    draft.push(task)
-  }
-  return draft
-}
-
-const updateTask: CrudHandler = (draft, newTask) => {
-  const oldIndex = draft.findIndex(t => t._id === newTask._id)
-  if (oldIndex > -1) {
-    draft[oldIndex] = newTask
-  }
-  return draft
-}
-
-const deleteTask: CrudHandler<Entity[]> = (draft, tasks) => {
-  tasks.forEach(task => {
-    const index = draft.findIndex(t => t._id === task._id)
-    if (index > -1) {
-      draft.splice(index, 1)
-    }
-  })
-  return draft
-}
-
-const removeContextReferences: CrudHandler<Entity[]> = (draft, contexts) => {
-  draft.forEach(task => {
+  contexts: Entity[]
+) => {
+  Object.keys(draft).forEach(taskId => {
+    const task = draft[taskId]
     contexts.forEach(context => {
       const index = task.contextIds.findIndex(id => id === context._id)
       if (index > -1) {

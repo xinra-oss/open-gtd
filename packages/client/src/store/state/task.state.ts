@@ -1,3 +1,7 @@
 import { TaskEntity } from '@open-gtd/api'
+import { Dictionary } from 'ts-essentials'
 
-export type TaskState = TaskEntity[]
+/**
+ * key = task._id
+ */
+export type TaskState = Dictionary<TaskEntity>
