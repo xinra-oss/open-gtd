@@ -1,4 +1,5 @@
 import * as convict from 'convict'
+import * as fs from 'fs'
 
 export const config = convict({
   db: {
@@ -19,10 +20,6 @@ export const config = convict({
     port: {
       default: 27017,
       format: 'port'
-    },
-    uri: {
-      format: String,
-      default: 'mongodb://localhost:27017/'
     }
   },
   env: {
@@ -35,5 +32,13 @@ export const config = convict({
     format: 'port'
   }
 })
+
+const localConfigFile = process.cwd() + '/config.local.json'
+if (fs.existsSync(localConfigFile)) {
+  // Cannot use logger here because it depends on config
+  // tslint:disable-next-line
+  console.info('Using local configuration file ' + localConfigFile)
+  config.loadFile(localConfigFile)
+}
 
 config.validate()
