@@ -61,16 +61,37 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
 
     return (
       <div>
+        {this.state.selectedTaskIds.length}
         {this.renderToolbar()}
         <EditableTable
           columns={this.columns}
           dataSource={rootTasks}
           handleSave={this.handleSave}
           rowKey="_id"
+          onRow={this.onRow}
         />
       </div>
     )
   }
+
+  private onRow = (row: TaskEntity) => ({
+    onClick: (e: React.MouseEvent<HTMLElement>) => {
+      let { selectedTaskIds } = this.state
+      if (e.ctrlKey) {
+        const index = selectedTaskIds.indexOf(row._id)
+        if (index > -1) {
+          selectedTaskIds.splice(index, 1)
+        } else {
+          selectedTaskIds.push(row._id)
+        }
+      } else {
+        selectedTaskIds = [row._id]
+      }
+      this.setState({
+        selectedTaskIds
+      })
+    }
+  })
 
   private handleSave = (task: TaskEntity) => {
     this.props.dispatch(taskActions.updateTask.request(task))
@@ -82,12 +103,16 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
     return (
       <div style={{ marginBottom: 10 }}>
         <Button.Group>
-          <Button type="primary" icon="plus-square">
+          <Button
+            type="primary"
+            icon="plus"
+            disabled={selectedTaskIds.length > 1}
+          >
             New task
           </Button>
           <Button
             type="primary"
-            icon="plus"
+            icon="plus-square"
             disabled={selectedTaskIds.length !== 1}
           >
             New subtask
