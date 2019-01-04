@@ -2,11 +2,11 @@ import { EntityId, TaskEntity } from '@open-gtd/api'
 import { Button, Checkbox } from 'antd'
 
 import { CheckboxChangeEvent } from 'antd/lib/checkbox'
-import { taskActions } from 'packages/client/src/store/actions'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { Dictionary } from 'ts-essentials'
 import { AppState, DispatchProps, mapDispatchToProps } from '../../../store'
+import { taskActions } from '../../../store/actions'
 import EditableTable, {
   EditableColumnProps
 } from '../../EditableTable/EditableTable'
