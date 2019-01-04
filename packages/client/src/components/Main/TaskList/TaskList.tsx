@@ -1,22 +1,26 @@
 import { EntityId, TaskEntity } from '@open-gtd/api'
-import { Button, Checkbox, Table } from 'antd'
+import { Button, Checkbox } from 'antd'
 
 import { CheckboxChangeEvent } from 'antd/lib/checkbox'
-import { ColumnProps } from 'antd/lib/table'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { Dictionary } from 'ts-essentials'
 import { AppState, DispatchProps, mapDispatchToProps } from '../../../store'
+import { taskActions } from '../../../store/actions'
+import EditableTable, {
+  EditableColumnProps
+} from '../../EditableTable/EditableTable'
 
 function onChange(e: CheckboxChangeEvent) {
   // tslint:disable-next-line
   console.log(`checked = ${e.target.checked}`)
 }
-const columns: Array<ColumnProps<TaskEntity>> = [
+const columns: Array<EditableColumnProps<TaskEntity>> = [
   {
     title: 'Task Name',
     dataIndex: 'title',
-    render: text => text
+    render: text => text,
+    editable: true
   },
   {
     title: 'Status',
@@ -57,9 +61,18 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
     return (
       <div>
         {this.renderToolbar()}
-        <Table columns={columns} dataSource={rootTasks} />
+        <EditableTable
+          columns={columns}
+          dataSource={rootTasks}
+          handleSave={this.handleSave}
+          rowKey="_id"
+        />
       </div>
     )
+  }
+
+  private handleSave = (task: TaskEntity) => {
+    this.props.dispatch(taskActions.updateTask.request(task))
   }
 
   private renderToolbar() {
