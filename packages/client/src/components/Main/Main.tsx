@@ -1,12 +1,11 @@
+import { UserEntity } from '@open-gtd/api'
 import { Breadcrumb, Icon, Layout, Menu } from 'antd'
 import * as React from 'react'
-import '../App.scss'
-
-import { UserEntity } from '@open-gtd/api'
-
 import { connect } from 'react-redux'
-import { AppState, DispatchProps, mapDispatchToProps } from '../store'
-import { sessionActions } from '../store/actions'
+import { Redirect, Route, Switch } from 'react-router'
+import { AppState, DispatchProps, mapDispatchToProps } from '../../store'
+import { sessionActions } from '../../store/actions'
+import AllTasks from './AllTasks/AllTasks'
 
 interface MainProps extends DispatchProps {
   user: UserEntity
@@ -130,7 +129,10 @@ class Main extends React.Component<MainProps, State> {
                 minHeight: 280
               }}
             >
-              Content
+              <Switch>
+                <Route path="/tasks/all" component={AllTasks} />
+                <Redirect to="/tasks/all" />
+              </Switch>
             </Content>
           </Layout>
         </Layout>
