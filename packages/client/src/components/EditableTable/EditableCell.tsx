@@ -58,13 +58,15 @@ export class EditableCell<T> extends React.Component<
   }
 
   public save = () => {
-    const { record, handleSave } = this.props
+    const { record, handleSave, dataIndex } = this.props
     this.form.validateFields((error, values) => {
       if (error) {
         return
       }
       this.toggleEdit()
-      handleSave({ ...record, ...values })
+      if (record[dataIndex] !== values[dataIndex]) {
+        handleSave({ ...record, ...values })
+      }
     })
   }
 
