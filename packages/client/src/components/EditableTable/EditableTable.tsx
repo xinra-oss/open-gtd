@@ -2,6 +2,7 @@ import Table, { ColumnProps, TableProps } from 'antd/lib/table'
 import React from 'react'
 import { EditableCell } from './EditableCell'
 import { EditableFormRow } from './EditableFormRow'
+import './EditableTable.scss'
 
 export type EditableColumnProps<T> = ColumnProps<T> & { editable?: boolean }
 
@@ -19,7 +20,7 @@ class EditableTable<T> extends React.Component<EditableTableProps<T>> {
       }
     }
 
-    const { columns, handleSave, ...restProps } = this.props
+    const { columns, handleSave, className, ...restProps } = this.props
 
     const editableColumns = columns.map(col => {
       if (!col.editable) {
@@ -40,8 +41,22 @@ class EditableTable<T> extends React.Component<EditableTableProps<T>> {
     })
 
     return (
-      <Table {...restProps} components={components} columns={editableColumns} />
+      <Table
+        {...restProps}
+        className={(className || '') + ' EditableTable'}
+        rowClassName={this.rowClassName}
+        components={components}
+        columns={editableColumns}
+      />
     )
+  }
+
+  private rowClassName = (record: T, index: number) => {
+    let className = 'editable-row'
+    if (this.props.rowClassName) {
+      className += ' ' + this.props.rowClassName(record, index)
+    }
+    return className
   }
 }
 
