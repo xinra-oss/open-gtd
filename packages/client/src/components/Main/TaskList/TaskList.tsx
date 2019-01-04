@@ -1,4 +1,4 @@
-import { EntityId, TaskEntity } from '@open-gtd/api'
+import { EntityId, Task, TaskEntity } from '@open-gtd/api'
 import { Button, Checkbox } from 'antd'
 
 import { CheckboxChangeEvent } from 'antd/lib/checkbox'
@@ -15,6 +15,7 @@ function onChange(e: CheckboxChangeEvent) {
   // tslint:disable-next-line
   console.log(`checked = ${e.target.checked}`)
 }
+
 const columns: Array<EditableColumnProps<TaskEntity>> = [
   {
     title: 'Task Name',
@@ -75,13 +76,33 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
     this.props.dispatch(taskActions.updateTask.request(task))
   }
 
+  private handleNewTask = () => {
+    const newTask: Task = {
+      contextIds: [],
+      dueDate: null,
+      isDone: false,
+      isFolder: true,
+      isNeverActive: true,
+      isProject: false,
+      notes: null,
+      parentId: null,
+      startDate: null,
+      title: '<New Task>'
+    }
+    this.props.dispatch(taskActions.createTask.request(newTask))
+  }
+
   private renderToolbar() {
     const { selectedTaskIds } = this.state
 
     return (
       <div style={{ marginBottom: 10 }}>
         <Button.Group>
-          <Button type="primary" icon="plus-square">
+          <Button
+            type="primary"
+            icon="plus-square"
+            onClick={this.handleNewTask}
+          >
             New task
           </Button>
           <Button
