@@ -15,7 +15,7 @@ export class WebsocketSync implements SyncService {
     this.store.getState()
 
     this.ws.addEventListener('message', event => {
-      this.store.dispatch(syncActions.receivedSyncEvent(event.data))
+      this.store.dispatch(syncActions.receivedSyncEvent(JSON.parse(event.data)))
     })
   }
   public setStore(store: AppStore) {

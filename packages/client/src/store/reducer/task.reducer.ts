@@ -3,6 +3,7 @@ import { Draft, produce } from 'immer'
 import { Reducer } from 'react'
 import { getType } from 'typesafe-actions'
 import { AppAction } from '..'
+import { arrayToDictionary } from '../../util'
 import {
   contextActions,
   loadingActions,
@@ -18,7 +19,7 @@ export const taskReducer: Reducer<TaskState, AppAction> = (
   produce(state, draft => {
     switch (action.type) {
       case getType(loadingActions.loadContent.success):
-        return action.payload.tasks
+        return arrayToDictionary(action.payload.tasks, t => t._id)
       case getType(syncActions.receivedSyncEvent):
         if (action.payload.payloadType === 'task') {
           switch (action.payload.eventType) {

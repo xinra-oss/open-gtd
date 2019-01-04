@@ -5,10 +5,11 @@ export function arrayToDictionary<T>(
   array: T[],
   mapItemToKey: (item: T) => string
 ): Dictionary<T> {
-  return array.reduce((dict, item) => {
+  const dict: Dictionary<T> = {}
+  for (const item of array) {
     dict[mapItemToKey(item)] = item
-    return item
-  }, {})
+  }
+  return dict
 }
 
 export function getFormItemValidationProps<T>(

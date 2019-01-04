@@ -1,33 +1,13 @@
 import { EntityId, TaskEntity } from '@open-gtd/api'
-import { Button, Checkbox, Table } from 'antd'
-
-import { CheckboxChangeEvent } from 'antd/lib/checkbox'
-import { ColumnProps } from 'antd/lib/table'
+import { Button, Checkbox } from 'antd'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { Dictionary } from 'ts-essentials'
 import { AppState, DispatchProps, mapDispatchToProps } from '../../../store'
-
-function onChange(e: CheckboxChangeEvent) {
-  // tslint:disable-next-line
-  console.log(`checked = ${e.target.checked}`)
-}
-const columns: Array<ColumnProps<TaskEntity>> = [
-  {
-    title: 'Task Name',
-    dataIndex: 'title',
-    render: text => text
-  },
-  {
-    title: 'Status',
-    dataIndex: 'isDone',
-    render: (text, record) => (
-      <span>
-        <Checkbox onChange={onChange}>Done</Checkbox>
-      </span>
-    )
-  }
-]
+import { taskActions } from '../../../store/actions'
+import EditableTable, {
+  EditableColumnProps
+} from '../../EditableTable/EditableTable'
 
 interface TaskListProps extends DispatchProps {
   tasks: Dictionary<TaskEntity>
@@ -43,6 +23,31 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
     selectedTaskIds: []
   }
 
+  private columns: Array<EditableColumnProps<TaskEntity>> = [
+    {
+      title: 'Task Name',
+      dataIndex: 'title',
+      render: text => text,
+      editable: true
+    },
+    {
+      title: 'Status',
+      dataIndex: 'isDone',
+      render: (text, record) => (
+        <span>
+          <Checkbox
+            data-task={record}
+            onChange={(
+              e // tslint:disable-next-line
+            ) => this.handleSave({ ...record, isDone: e.target.checked })}
+          >
+            Done
+          </Checkbox>
+        </span>
+      )
+    }
+  ]
+
   public render() {
     const filter = this.props.filter || (() => true)
     const rootTasks: TaskEntity[] = []
@@ -57,9 +62,18 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
     return (
       <div>
         {this.renderToolbar()}
-        <Table columns={columns} dataSource={rootTasks} />
+        <EditableTable
+          columns={this.columns}
+          dataSource={rootTasks}
+          handleSave={this.handleSave}
+          rowKey="_id"
+        />
       </div>
     )
+  }
+
+  private handleSave = (task: TaskEntity) => {
+    this.props.dispatch(taskActions.updateTask.request(task))
   }
 
   private renderToolbar() {
