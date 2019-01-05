@@ -126,6 +126,21 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
   }
 
   private handleNewTask = () => {
+    if (this.state.selectedTaskIds.length > 0) {
+      this.createNewTask(
+        this.props.tasks[this.state.selectedTaskIds[0]].parentId,
+        'New Task'
+      )
+    } else {
+      this.createNewTask(null, 'New Root Task')
+    }
+  }
+
+  private handleSubTask = () => {
+    this.createNewTask(this.state.selectedTaskIds[0], 'New Sub Task')
+  }
+
+  private createNewTask = (parentID: string | null, testTitle: string) => {
     const newTask: Task = {
       contextIds: [],
       dueDate: null,
@@ -134,9 +149,9 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
       isNeverActive: true,
       isProject: false,
       notes: null,
-      parentId: null,
+      parentId: parentID,
       startDate: null,
-      title: '<New Task>'
+      title: testTitle
     }
     this.props.dispatch(taskActions.createTask.request(newTask))
   }
@@ -158,6 +173,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
           <Button
             type="primary"
             icon="plus-square"
+            onClick={this.handleSubTask}
             disabled={selectedTaskIds.length !== 1}
           >
             New subtask
