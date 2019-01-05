@@ -1,10 +1,10 @@
 import { EntityId, TaskEntity } from '@open-gtd/api'
 import { Alert, Button, Checkbox, Input } from 'antd'
 import { CheckboxChangeEvent } from 'antd/lib/checkbox'
-import { taskActions } from 'packages/client/src/store/actions'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { DispatchProps, mapDispatchToProps } from '../../../store'
+import { taskActions } from '../../../store/actions'
 import arrowImage from './task-details-arrow.png'
 
 const { TextArea } = Input
