@@ -1,4 +1,4 @@
-import { EntityId, TaskEntity } from '@open-gtd/api'
+import { EntityId, Task, TaskEntity } from '@open-gtd/api'
 import { Button, Checkbox } from 'antd'
 import * as React from 'react'
 import OutsideClickHandler from 'react-outside-click-handler'
@@ -109,6 +109,22 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
     this.props.dispatch(taskActions.updateTask.request(task))
   }
 
+  private handleNewTask = () => {
+    const newTask: Task = {
+      contextIds: [],
+      dueDate: null,
+      isDone: false,
+      isFolder: true,
+      isNeverActive: true,
+      isProject: false,
+      notes: null,
+      parentId: null,
+      startDate: null,
+      title: '<New Task>'
+    }
+    this.props.dispatch(taskActions.createTask.request(newTask))
+  }
+
   private renderToolbar() {
     const { selectedTaskIds } = this.state
 
@@ -118,6 +134,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
           <Button
             type="primary"
             icon="plus"
+            onClick={this.handleNewTask}
             disabled={selectedTaskIds.length > 1}
           >
             New task
