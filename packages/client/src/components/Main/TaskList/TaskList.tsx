@@ -63,9 +63,8 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
 
     return (
       <div className="TaskList">
-        {this.state.selectedTaskIds.length}
-        {this.renderToolbar()}
-        <OutsideClickHandler onOutsideClick={this.onOutsideClick}>
+        <OutsideClickHandler onOutsideClick={this.clearSelection}>
+          {this.renderToolbar()}
           <EditableTable
             columns={this.columns}
             dataSource={rootTasks}
@@ -79,7 +78,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
     )
   }
 
-  private onOutsideClick = () => this.setState({ selectedTaskIds: [] })
+  private clearSelection = () => this.setState({ selectedTaskIds: [] })
 
   private onRow = (row: TaskEntity) => ({
     onClick: (e: React.MouseEvent<HTMLElement>) => {
