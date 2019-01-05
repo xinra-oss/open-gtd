@@ -1,6 +1,7 @@
 import { EntityId, TaskEntity } from '@open-gtd/api'
 import { Button, Checkbox } from 'antd'
 import * as React from 'react'
+import OutsideClickHandler from 'react-outside-click-handler'
 import { connect } from 'react-redux'
 import { Dictionary } from 'ts-essentials'
 import { AppState, DispatchProps, mapDispatchToProps } from '../../../store'
@@ -8,6 +9,7 @@ import { taskActions } from '../../../store/actions'
 import EditableTable, {
   EditableColumnProps
 } from '../../EditableTable/EditableTable'
+import './TaskList.scss'
 
 interface TaskListProps extends DispatchProps {
   tasks: Dictionary<TaskEntity>
@@ -38,7 +40,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
           <Checkbox
             data-task={record}
             onChange={(
-              e // tslint:disable-next-line
+              e /* tslint:disable-next-line */ // need to bind `record`
             ) => this.handleSave({ ...record, isDone: e.target.checked })}
           >
             Done
@@ -60,16 +62,47 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
     })
 
     return (
-      <div>
-        {this.renderToolbar()}
-        <EditableTable
-          columns={this.columns}
-          dataSource={rootTasks}
-          handleSave={this.handleSave}
-          rowKey="_id"
-        />
+      <div className="TaskList">
+        <OutsideClickHandler onOutsideClick={this.clearSelection}>
+          {this.renderToolbar()}
+          <EditableTable
+            columns={this.columns}
+            dataSource={rootTasks}
+            handleSave={this.handleSave}
+            rowKey="_id"
+            onRow={this.onRow}
+            rowClassName={this.rowClassName}
+          />
+        </OutsideClickHandler>
       </div>
     )
+  }
+
+  private clearSelection = () => this.setState({ selectedTaskIds: [] })
+
+  private onRow = (row: TaskEntity) => ({
+    onClick: (e: React.MouseEvent<HTMLElement>) => {
+      let { selectedTaskIds } = this.state
+      if (e.ctrlKey) {
+        const index = selectedTaskIds.indexOf(row._id)
+        if (index > -1) {
+          selectedTaskIds.splice(index, 1)
+        } else {
+          selectedTaskIds.push(row._id)
+        }
+      } else {
+        selectedTaskIds = [row._id]
+      }
+      this.setState({
+        selectedTaskIds
+      })
+    }
+  })
+
+  private rowClassName = (row: TaskEntity) => {
+    return this.state.selectedTaskIds.indexOf(row._id) > -1
+      ? 'selected-row'
+      : ''
   }
 
   private handleSave = (task: TaskEntity) => {
@@ -82,12 +115,16 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
     return (
       <div style={{ marginBottom: 10 }}>
         <Button.Group>
-          <Button type="primary" icon="plus-square">
+          <Button
+            type="primary"
+            icon="plus"
+            disabled={selectedTaskIds.length > 1}
+          >
             New task
           </Button>
           <Button
             type="primary"
-            icon="plus"
+            icon="plus-square"
             disabled={selectedTaskIds.length !== 1}
           >
             New subtask
