@@ -112,8 +112,8 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
   private handleNewTask = () => {
     if (this.state.selectedTaskIds.length > 0) {
       this.createNewTask(
-        this.props.tasks[this.state.selectedTaskIds[0]]._id,
-        'New Tast'
+        this.props.tasks[this.state.selectedTaskIds[0]].parentId,
+        'New Task'
       )
     } else {
       this.createNewTask(null, 'New Root Task')
