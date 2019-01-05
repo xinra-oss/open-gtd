@@ -41,7 +41,10 @@ export class EditableCell<T> extends React.Component<
     }
   }
 
-  public toggleEdit = () => {
+  public toggleEdit = (e?: React.MouseEvent<HTMLElement>) => {
+    if (e) {
+      e.stopPropagation()
+    }
     const editing = !this.state.editing
     this.setState({ editing }, () => {
       if (editing) {

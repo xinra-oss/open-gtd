@@ -8,6 +8,7 @@ import { taskActions } from '../../../store/actions'
 import EditableTable, {
   EditableColumnProps
 } from '../../EditableTable/EditableTable'
+import './TaskList.scss'
 
 interface TaskListProps extends DispatchProps {
   tasks: Dictionary<TaskEntity>
@@ -60,7 +61,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
     })
 
     return (
-      <div>
+      <div className="TaskList">
         {this.state.selectedTaskIds.length}
         {this.renderToolbar()}
         <EditableTable
@@ -69,6 +70,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
           handleSave={this.handleSave}
           rowKey="_id"
           onRow={this.onRow}
+          rowClassName={this.rowClassName}
         />
       </div>
     )
@@ -92,6 +94,12 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
       })
     }
   })
+
+  private rowClassName = (row: TaskEntity) => {
+    return this.state.selectedTaskIds.indexOf(row._id) > -1
+      ? 'selected-row'
+      : ''
+  }
 
   private handleSave = (task: TaskEntity) => {
     this.props.dispatch(taskActions.updateTask.request(task))
