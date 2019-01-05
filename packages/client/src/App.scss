@@ -50,4 +50,12 @@
     margin: 16px 28px 16px 0;
     float: left;
   }
+
+  /* Firefox Ctrl+Click, see https://stackoverflow.com/a/32070426/5519485 */
+  td {
+    -moz-user-select: none;
+    > * {
+      -moz-user-select: text;
+    }
+  }
 }

@@ -41,7 +41,10 @@ export class EditableCell<T> extends React.Component<
     }
   }
 
-  public toggleEdit = () => {
+  public toggleEdit = (e?: React.MouseEvent<HTMLElement>) => {
+    if (e) {
+      e.stopPropagation()
+    }
     const editing = !this.state.editing
     this.setState({ editing }, () => {
       if (editing) {
@@ -58,13 +61,15 @@ export class EditableCell<T> extends React.Component<
   }
 
   public save = () => {
-    const { record, handleSave } = this.props
+    const { record, handleSave, dataIndex } = this.props
     this.form.validateFields((error, values) => {
       if (error) {
         return
       }
       this.toggleEdit()
-      handleSave({ ...record, ...values })
+      if (record[dataIndex] !== values[dataIndex]) {
+        handleSave({ ...record, ...values })
+      }
     })
   }
 
