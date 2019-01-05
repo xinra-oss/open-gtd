@@ -1,28 +1,28 @@
 import { EntityId, TaskEntity } from '@open-gtd/api'
-import { Alert, Button, Checkbox, Col, Form, Input, Row } from 'antd'
-import { FormComponentProps } from 'antd/lib/form/Form'
+import { Alert, Button, Checkbox, Input } from 'antd'
+import { CheckboxChangeEvent } from 'antd/lib/checkbox'
+import { taskActions } from 'packages/client/src/store/actions'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { DispatchProps, mapDispatchToProps } from '../../../store'
 import arrowImage from './task-details-arrow.png'
 
-const FormItem = Form.Item
-
 const { TextArea } = Input
-interface TaskFormProps extends FormComponentProps, DispatchProps {
+interface TaskFormProps extends DispatchProps {
   selected: TaskEntity | EntityId[]
   clearSelection(): void
 }
 
-class TaskDetails extends React.Component<TaskFormProps> {
-  public handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    this.props.form.validateFields((err, values) => {
-      if (!err) {
-        // tslint:disable-next-line
-        console.log(`Input Received`)
-      }
-    })
+interface TaskDetailsState {
+  notes: string
+}
+
+class TaskDetails extends React.Component<TaskFormProps, TaskDetailsState> {
+  public state: TaskDetailsState = {
+    notes:
+      Array.isArray(this.props.selected) || this.props.selected.notes === null
+        ? ''
+        : this.props.selected.notes
   }
 
   public render() {
@@ -36,46 +36,98 @@ class TaskDetails extends React.Component<TaskFormProps> {
     }
   }
 
+  private getSelectedTask = () => {
+    const { selected } = this.props
+    if (Array.isArray(selected)) {
+      throw new Error('More than one task is selected!')
+    }
+    return selected
+  }
+
   private renderTaskProperties(task: TaskEntity) {
-    const { getFieldDecorator } = this.props.form
     return (
       <div>
         <h2>Properties</h2>
-        <Form onSubmit={this.handleSubmit} className="task-details">
-          <FormItem>
-            {getFieldDecorator('checkbox-group', {
-              initialValue: ['A']
-            })(
-              <Checkbox.Group style={{ width: '100%' }}>
-                <Row>
-                  <Col span={8}>
-                    <Checkbox value="A">Folder</Checkbox>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col span={8}>
-                    <Checkbox disabled value="B">
-                      Never Active
-                    </Checkbox>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col span={8}>
-                    <Checkbox value="C">Project</Checkbox>
-                  </Col>
-                </Row>
-              </Checkbox.Group>
-            )}
-          </FormItem>
-          <FormItem>
-            <TextArea
-              placeholder="Notes!"
-              autosize={{ minRows: 2, maxRows: 6 }}
-            />
-          </FormItem>
-        </Form>
+        <p>
+          <Checkbox
+            defaultChecked={task.isFolder}
+            onChange={this.onIsFolderChange}
+          >
+            Folder
+          </Checkbox>
+        </p>
+        <p>
+          <Checkbox
+            defaultChecked={task.isProject}
+            onChange={this.onIsProjectChange}
+          >
+            Project
+          </Checkbox>
+        </p>
+        <p>
+          <Checkbox
+            defaultChecked={task.isNeverActive}
+            onChange={this.onIsNeverActiveChange}
+          >
+            Hide in TODO list
+          </Checkbox>
+        </p>
+        <p>
+          Notes
+          <TextArea
+            value={this.state.notes}
+            placeholder="Add some details!"
+            autosize={{ minRows: 4, maxRows: 8 }}
+            onChange={this.onNotesChange}
+            onBlur={this.onNotesBlur}
+          />
+        </p>
       </div>
     )
+  }
+
+  private onIsFolderChange = (e: CheckboxChangeEvent) => {
+    this.props.dispatch(
+      taskActions.updateTask.request({
+        ...this.getSelectedTask(),
+        isFolder: e.target.checked
+      })
+    )
+  }
+
+  private onIsProjectChange = (e: CheckboxChangeEvent) => {
+    this.props.dispatch(
+      taskActions.updateTask.request({
+        ...this.getSelectedTask(),
+        isProject: e.target.checked
+      })
+    )
+  }
+
+  private onIsNeverActiveChange = (e: CheckboxChangeEvent) => {
+    this.props.dispatch(
+      taskActions.updateTask.request({
+        ...this.getSelectedTask(),
+        isNeverActive: e.target.checked
+      })
+    )
+  }
+
+  private onNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    this.setState({
+      notes: e.target.value
+    })
+  }
+
+  private onNotesBlur = () => {
+    const selectedTask = this.getSelectedTask()
+    const value = this.state.notes.trim()
+    const newNotes = value === '' ? null : value
+    if (newNotes !== selectedTask.notes) {
+      this.props.dispatch(
+        taskActions.updateTask.request({ ...selectedTask, notes: newNotes })
+      )
+    }
   }
 
   private renderMultiSelectActions(selectedTaskIds: EntityId[]) {
@@ -110,4 +162,4 @@ class TaskDetails extends React.Component<TaskFormProps> {
   }
 }
 
-export default connect(mapDispatchToProps)(Form.create()(TaskDetails))
+export default connect(mapDispatchToProps)(TaskDetails)
