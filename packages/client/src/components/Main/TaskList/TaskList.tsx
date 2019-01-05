@@ -10,6 +10,7 @@ import EditableTable, {
   EditableColumnProps
 } from '../../EditableTable/EditableTable'
 import TaskDetails from './TaskDetails'
+import './TaskList.scss'
 
 interface TaskListProps extends DispatchProps {
   tasks: Dictionary<TaskEntity>
@@ -53,7 +54,6 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
   public render() {
     const filter = this.props.filter || (() => true)
     const rootTasks: TaskEntity[] = []
-
     Object.keys(this.props.tasks).forEach(id => {
       const task = this.props.tasks[id]
       if (filter(task)) {
@@ -61,12 +61,18 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
       }
     })
 
+    const { selectedTaskIds } = this.state
+    const selected =
+      selectedTaskIds.length === 1
+        ? this.props.tasks[selectedTaskIds[0]]
+        : selectedTaskIds
+
     return (
       <div className="TaskList">
         <OutsideClickHandler onOutsideClick={this.clearSelection}>
           {this.renderToolbar()}
           <Row gutter={16}>
-            <Col span={16}>
+            <Col span={18}>
               <EditableTable
                 columns={this.columns}
                 dataSource={rootTasks}
@@ -76,8 +82,11 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
                 rowClassName={this.rowClassName}
               />
             </Col>
-            <Col span={8}>
-              <TaskDetails />
+            <Col span={6}>
+              <TaskDetails
+                selected={selected}
+                clearSelection={this.clearSelection}
+              />
             </Col>
           </Row>
         </OutsideClickHandler>
@@ -89,7 +98,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
 
   private onRow = (row: TaskEntity) => ({
     onClick: (e: React.MouseEvent<HTMLElement>) => {
-      let { selectedTaskIds } = this.state
+      let selectedTaskIds = [...this.state.selectedTaskIds]
       if (e.ctrlKey) {
         const index = selectedTaskIds.indexOf(row._id)
         if (index > -1) {
