@@ -1,5 +1,5 @@
 import { EntityId, Task, TaskEntity } from '@open-gtd/api'
-import { Button, Checkbox } from 'antd'
+import { Button, Checkbox, Col, Row } from 'antd'
 import * as React from 'react'
 import OutsideClickHandler from 'react-outside-click-handler'
 import { connect } from 'react-redux'
@@ -9,6 +9,7 @@ import { taskActions } from '../../../store/actions'
 import EditableTable, {
   EditableColumnProps
 } from '../../EditableTable/EditableTable'
+import TaskDetails from './TaskDetails'
 import './TaskList.scss'
 
 interface TaskListProps extends DispatchProps {
@@ -53,7 +54,6 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
   public render() {
     const filter = this.props.filter || (() => true)
     const rootTasks: TaskEntity[] = []
-
     Object.keys(this.props.tasks).forEach(id => {
       const task = this.props.tasks[id]
       if (filter(task)) {
@@ -61,18 +61,34 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
       }
     })
 
+    const { selectedTaskIds } = this.state
+    const selected =
+      selectedTaskIds.length === 1
+        ? this.props.tasks[selectedTaskIds[0]]
+        : selectedTaskIds
+
     return (
       <div className="TaskList">
         <OutsideClickHandler onOutsideClick={this.clearSelection}>
           {this.renderToolbar()}
-          <EditableTable
-            columns={this.columns}
-            dataSource={rootTasks}
-            handleSave={this.handleSave}
-            rowKey="_id"
-            onRow={this.onRow}
-            rowClassName={this.rowClassName}
-          />
+          <Row gutter={16}>
+            <Col span={18}>
+              <EditableTable
+                columns={this.columns}
+                dataSource={rootTasks}
+                handleSave={this.handleSave}
+                rowKey="_id"
+                onRow={this.onRow}
+                rowClassName={this.rowClassName}
+              />
+            </Col>
+            <Col span={6}>
+              <TaskDetails
+                selected={selected}
+                clearSelection={this.clearSelection}
+              />
+            </Col>
+          </Row>
         </OutsideClickHandler>
       </div>
     )
@@ -82,7 +98,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
 
   private onRow = (row: TaskEntity) => ({
     onClick: (e: React.MouseEvent<HTMLElement>) => {
-      let { selectedTaskIds } = this.state
+      let selectedTaskIds = [...this.state.selectedTaskIds]
       if (e.ctrlKey) {
         const index = selectedTaskIds.indexOf(row._id)
         if (index > -1) {
