@@ -1,6 +1,7 @@
 import { EntityId, TaskEntity } from '@open-gtd/api'
 import { Button, Checkbox } from 'antd'
 import * as React from 'react'
+import OutsideClickHandler from 'react-outside-click-handler'
 import { connect } from 'react-redux'
 import { Dictionary } from 'ts-essentials'
 import { AppState, DispatchProps, mapDispatchToProps } from '../../../store'
@@ -39,7 +40,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
           <Checkbox
             data-task={record}
             onChange={(
-              e // tslint:disable-next-line
+              e /* tslint:disable-next-line */ // need to bind `record`
             ) => this.handleSave({ ...record, isDone: e.target.checked })}
           >
             Done
@@ -64,17 +65,21 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
       <div className="TaskList">
         {this.state.selectedTaskIds.length}
         {this.renderToolbar()}
-        <EditableTable
-          columns={this.columns}
-          dataSource={rootTasks}
-          handleSave={this.handleSave}
-          rowKey="_id"
-          onRow={this.onRow}
-          rowClassName={this.rowClassName}
-        />
+        <OutsideClickHandler onOutsideClick={this.onOutsideClick}>
+          <EditableTable
+            columns={this.columns}
+            dataSource={rootTasks}
+            handleSave={this.handleSave}
+            rowKey="_id"
+            onRow={this.onRow}
+            rowClassName={this.rowClassName}
+          />
+        </OutsideClickHandler>
       </div>
     )
   }
+
+  private onOutsideClick = () => this.setState({ selectedTaskIds: [] })
 
   private onRow = (row: TaskEntity) => ({
     onClick: (e: React.MouseEvent<HTMLElement>) => {
