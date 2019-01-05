@@ -1,5 +1,5 @@
 import { EntityId, Task, TaskEntity } from '@open-gtd/api'
-import { Button, Checkbox } from 'antd'
+import { Button, Checkbox, Col, Row } from 'antd'
 import * as React from 'react'
 import OutsideClickHandler from 'react-outside-click-handler'
 import { connect } from 'react-redux'
@@ -9,7 +9,7 @@ import { taskActions } from '../../../store/actions'
 import EditableTable, {
   EditableColumnProps
 } from '../../EditableTable/EditableTable'
-import './TaskList.scss'
+import TaskDetails from './TaskDetails'
 
 interface TaskListProps extends DispatchProps {
   tasks: Dictionary<TaskEntity>
@@ -65,14 +65,21 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
       <div className="TaskList">
         <OutsideClickHandler onOutsideClick={this.clearSelection}>
           {this.renderToolbar()}
-          <EditableTable
-            columns={this.columns}
-            dataSource={rootTasks}
-            handleSave={this.handleSave}
-            rowKey="_id"
-            onRow={this.onRow}
-            rowClassName={this.rowClassName}
-          />
+          <Row gutter={16}>
+            <Col span={16}>
+              <EditableTable
+                columns={this.columns}
+                dataSource={rootTasks}
+                handleSave={this.handleSave}
+                rowKey="_id"
+                onRow={this.onRow}
+                rowClassName={this.rowClassName}
+              />
+            </Col>
+            <Col span={8}>
+              <TaskDetails />
+            </Col>
+          </Row>
         </OutsideClickHandler>
       </div>
     )
