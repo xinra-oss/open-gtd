@@ -13,17 +13,8 @@ interface TaskFormProps extends DispatchProps {
   clearSelection(): void
 }
 
-interface TaskDetailsState {
-  notes: string
-}
-
-class TaskDetails extends React.Component<TaskFormProps, TaskDetailsState> {
-  public state: TaskDetailsState = {
-    notes:
-      Array.isArray(this.props.selected) || this.props.selected.notes === null
-        ? ''
-        : this.props.selected.notes
-  }
+class TaskDetails extends React.Component<TaskFormProps> {
+  private notesRef = React.createRef<any>()
 
   public render() {
     const { selected } = this.props
@@ -49,24 +40,18 @@ class TaskDetails extends React.Component<TaskFormProps, TaskDetailsState> {
       <div>
         <h2>Properties</h2>
         <p>
-          <Checkbox
-            defaultChecked={task.isFolder}
-            onChange={this.onIsFolderChange}
-          >
+          <Checkbox checked={task.isFolder} onChange={this.onIsFolderChange}>
             Folder
           </Checkbox>
         </p>
         <p>
-          <Checkbox
-            defaultChecked={task.isProject}
-            onChange={this.onIsProjectChange}
-          >
+          <Checkbox checked={task.isProject} onChange={this.onIsProjectChange}>
             Project
           </Checkbox>
         </p>
         <p>
           <Checkbox
-            defaultChecked={task.isNeverActive}
+            checked={task.isNeverActive}
             onChange={this.onIsNeverActiveChange}
           >
             Hide in TODO list
@@ -75,11 +60,13 @@ class TaskDetails extends React.Component<TaskFormProps, TaskDetailsState> {
         <p>
           Notes
           <TextArea
-            value={this.state.notes}
+            ref={this.notesRef}
+            defaultValue={task.notes || ''}
             placeholder="Add some details!"
             autosize={{ minRows: 4, maxRows: 8 }}
             onChange={this.onNotesChange}
             onBlur={this.onNotesBlur}
+            key={task._id}
           />
         </p>
       </div>
@@ -121,7 +108,7 @@ class TaskDetails extends React.Component<TaskFormProps, TaskDetailsState> {
 
   private onNotesBlur = () => {
     const selectedTask = this.getSelectedTask()
-    const value = this.state.notes.trim()
+    const value = this.notesRef.current.textAreaRef.value.trim()
     const newNotes = value === '' ? null : value
     if (newNotes !== selectedTask.notes) {
       this.props.dispatch(
