@@ -8,7 +8,7 @@ export type EditableColumnProps<T> = ColumnProps<T> & { editable?: boolean }
 
 export interface EditableTableProps<T> extends TableProps<T> {
   columns: Array<EditableColumnProps<T>>
-  handleSave: (record: T) => void
+  handleSave: (record: T, values: Partial<T>) => void
 }
 
 class EditableTable<T> extends React.Component<EditableTableProps<T>> {

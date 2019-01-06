@@ -14,7 +14,7 @@ export interface EditableCellProps<T> {
   record: T
   dataIndex: keyof T
   title: string
-  handleSave(record: T): void
+  handleSave(record: T, values: Partial<T>): void
 }
 
 export class EditableCell<T> extends React.Component<
@@ -68,7 +68,7 @@ export class EditableCell<T> extends React.Component<
       }
       this.toggleEdit()
       if (record[dataIndex] !== values[dataIndex]) {
-        handleSave({ ...record, ...values })
+        handleSave(record, values)
       }
     })
   }
