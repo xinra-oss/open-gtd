@@ -16,6 +16,7 @@ import './TaskList.scss'
 interface TaskListProps extends DispatchProps {
   tasks: Dictionary<TaskEntity>
   filter?: (task: TaskEntity) => boolean
+  hierarchical?: boolean
 }
 
 interface TaskListState {
@@ -27,7 +28,7 @@ interface TaskListRowType<T extends string, P> {
   wrapped: P
   key: string
   title: string
-  children: TaskListRow[]
+  children?: TaskListRow[]
   isDone?: boolean
 }
 
@@ -67,22 +68,38 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
   ]
 
   public render() {
+    const hierarchical = !!this.props.hierarchical
     const filter = this.props.filter || (() => true)
-    const rows: TaskListRow[] = []
+    let rows: TaskListRow[] = []
+    const idToChildren: Dictionary<TaskListRow[]> = {}
 
     Object.keys(this.props.tasks).forEach(id => {
       const task = this.props.tasks[id]
+      const row: TaskListRow = {
+        type: 'task',
+        wrapped: task,
+        key: task._id,
+        title: task.title,
+        isDone: task.isDone
+      }
       if (filter(task)) {
-        rows.push({
-          type: 'task',
-          wrapped: task,
-          key: task._id,
-          children: [],
-          title: task.title,
-          isDone: task.isDone
-        })
+        rows.push(row)
+      }
+      if (hierarchical && task.parentId !== null) {
+        if (idToChildren[task.parentId] === undefined) {
+          idToChildren[task.parentId] = [row]
+        } else {
+          idToChildren[task.parentId].push(row)
+        }
       }
     })
+
+    if (hierarchical) {
+      rows.forEach(row => (row.children = idToChildren[row.key]))
+      rows = rows.filter(
+        row => row.type === 'task' && row.wrapped.parentId === null
+      )
+    }
 
     const { selectedTaskIds } = this.state
     const selected =
