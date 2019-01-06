@@ -119,6 +119,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
                 handleSave={this.handleSave}
                 onRow={this.onRow}
                 rowClassName={this.rowClassName}
+                defaultExpandAllRows
               />
             </Col>
             <Col span={6}>
