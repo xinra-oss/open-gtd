@@ -6,6 +6,7 @@ import { Redirect, Route, Switch } from 'react-router'
 import { AppState, DispatchProps, mapDispatchToProps } from '../../store'
 import { sessionActions } from '../../store/actions'
 import AllTasks from './AllTasks/AllTasks'
+import logoImgage from './logo-lila.png'
 
 interface MainProps extends DispatchProps {
   user: UserEntity
@@ -43,7 +44,12 @@ class Main extends React.Component<MainProps, State> {
     return (
       <Layout>
         <Header className="header">
-          <div className="logo" />
+          <img
+            style={{
+              height: '60px'
+            }}
+            src={logoImgage}
+          />
           <Menu
             theme="dark"
             mode="horizontal"
