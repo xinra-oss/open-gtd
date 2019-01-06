@@ -29,6 +29,7 @@ class TaskDetails extends React.Component<TaskFormProps> {
 
   private getSelectedTask = () => {
     const { selected } = this.props
+    console.log(this.props)
     if (Array.isArray(selected)) {
       throw new Error('More than one task is selected!')
     }
@@ -117,12 +118,20 @@ class TaskDetails extends React.Component<TaskFormProps> {
     }
   }
 
+  private handleDelete = () => {
+    if (Array.isArray(this.props.selected)) {
+      this.props.selected.forEach(element => {
+        this.props.dispatch(taskActions.deleteTask.request(element))
+      })
+    }
+  }
+
   private renderMultiSelectActions(selectedTaskIds: EntityId[]) {
     return (
       <div>
         <h2>{selectedTaskIds.length} Tasks selected</h2>
         <p>
-          <Button type="danger" block icon="delete">
+          <Button type="danger" block icon="delete" onClick={this.handleDelete}>
             Delete
           </Button>
         </p>
