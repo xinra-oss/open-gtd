@@ -3,6 +3,7 @@ import { Breadcrumb, Icon, Layout, Menu } from 'antd'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { Redirect, Route, Switch } from 'react-router'
+import '../../App.scss'
 import { AppState, DispatchProps, mapDispatchToProps } from '../../store'
 import { sessionActions } from '../../store/actions'
 import AllTasks from './AllTasks/AllTasks'
@@ -55,7 +56,9 @@ class Main extends React.Component<MainProps, State> {
     return (
       <img
         style={{
+          width: '90px',
           height: '60px'
+          // margin: '16px 28px 16px 0'
         }}
         src={logoImgage}
         // add routing to "mainpage" maybe inbox ?
@@ -69,7 +72,7 @@ class Main extends React.Component<MainProps, State> {
     return (
       <Layout>
         <Header className="header">
-          {this.renderLogo()}
+          <div className="logo">{this.renderLogo()}</div>
           <Menu
             theme="dark"
             mode="horizontal"
