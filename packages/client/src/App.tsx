@@ -1,5 +1,10 @@
 import * as React from 'react'
-import { Route, Switch } from 'react-router-dom'
+import {
+  Route,
+  RouteComponentProps,
+  Switch,
+  withRouter
+} from 'react-router-dom'
 
 import Main from './components/Main/Main'
 import RegisterForm from './components/RegisterForm'
@@ -10,7 +15,7 @@ import './App.scss'
 import LoginPage from './LoginPage'
 import { AppState } from './store'
 
-interface AppProps {
+interface AppProps extends RouteComponentProps<{}> {
   loading: boolean
 }
 
@@ -38,6 +43,8 @@ class App extends React.Component<AppProps> {
   }
 }
 
-export default connect(({ loading }: AppState) => ({
-  loading
-}))(App)
+export default withRouter(
+  connect(({ loading }: AppState) => ({
+    loading
+  }))(App)
+)
