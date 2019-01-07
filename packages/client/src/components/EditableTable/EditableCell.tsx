@@ -7,6 +7,7 @@ const FormItem = Form.Item
 
 export interface EditableCellState {
   editing: boolean
+  dropdownOpen: boolean
 }
 
 export type InputType = false | 'text' | 'select'
@@ -27,7 +28,8 @@ export class EditableCell<T> extends React.Component<
   EditableCellState
 > {
   public state: EditableCellState = {
-    editing: false
+    editing: false,
+    dropdownOpen: false
   }
 
   private input: any
@@ -59,10 +61,19 @@ export class EditableCell<T> extends React.Component<
   }
 
   public handleClickOutside = (e: any) => {
-    const { editing } = this.state
-    if (editing && this.cell !== e.target && !this.cell.contains(e.target)) {
+    const { editing, dropdownOpen } = this.state
+    if (
+      editing &&
+      !dropdownOpen &&
+      this.cell !== e.target &&
+      !this.cell.contains(e.target)
+    ) {
       this.save()
     }
+  }
+
+  public onDropdownVisibleChange = (open: boolean) => {
+    this.setState({ dropdownOpen: open })
   }
 
   public save = () => {
@@ -122,6 +133,7 @@ export class EditableCell<T> extends React.Component<
                       <Select
                         ref={node => (this.input = node)}
                         style={{ width: '100%' }}
+                        onDropdownVisibleChange={this.onDropdownVisibleChange}
                         {...getInputProps(record)}
                       />
                     ) : (
