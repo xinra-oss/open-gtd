@@ -52,11 +52,11 @@ class ContextConfig<T> extends React.Component<ContextProps> {
   }
 
   private handleSave = (
-    context: ContextEntity /*,
-    values: Partial<ContextEntity>*/
+    context: ContextEntity,
+    values: Partial<ContextEntity>
   ) => {
     this.props.dispatch(
-      contextActions.updateContext.request({ ...context /*, ...values */ })
+      contextActions.updateContext.request({ ...context, ...values })
     )
   }
 
