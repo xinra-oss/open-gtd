@@ -270,7 +270,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
         {contexts.map(context => {
           const isTooLong = context.name.length > 20
           const tag = (
-            <Tag key={context._id}>
+            <Tag key={context._id} color="blue">
               {isTooLong ? context.name.slice(0, 17) + '...' : context.name}
             </Tag>
           )
