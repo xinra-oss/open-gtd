@@ -7,6 +7,7 @@ import { AppState, DispatchProps, mapDispatchToProps } from '../../store'
 import { sessionActions } from '../../store/actions'
 import AllTasks from './AllTasks/AllTasks'
 import logoImgage from './logo-lila.png'
+import './Main.scss'
 
 interface MainProps extends DispatchProps {
   user: UserEntity
@@ -14,6 +15,7 @@ interface MainProps extends DispatchProps {
 
 interface State {
   readonly collapsed: boolean
+  readonly rotate: boolean
 }
 
 const { SubMenu, ItemGroup } = Menu
@@ -29,7 +31,8 @@ class Main extends React.Component<MainProps, State> {
   //         }
   //     }
   public readonly state: State = {
-    collapsed: false
+    collapsed: false,
+    rotate: false
   }
 
   public onCollapse = (collapsed: boolean) => {
@@ -40,16 +43,33 @@ class Main extends React.Component<MainProps, State> {
     this.props.dispatch(sessionActions.deleteSession.request())
   }
 
+  public handleIconClick = () => {
+    if (this.state.rotate) {
+      this.setState({ rotate: false })
+    } else {
+      this.setState({ rotate: true })
+    }
+  }
+
+  public renderLogo() {
+    return (
+      <img
+        style={{
+          height: '60px'
+        }}
+        src={logoImgage}
+        // add routing to "mainpage" maybe inbox ?
+        onClick={this.handleIconClick}
+        onAnimationEnd={this.handleIconClick}
+        className={this.state.rotate ? 'rotate' : ''}
+      />
+    )
+  }
   public render() {
     return (
       <Layout>
         <Header className="header">
-          <img
-            style={{
-              height: '60px'
-            }}
-            src={logoImgage}
-          />
+          {this.renderLogo()}
           <Menu
             theme="dark"
             mode="horizontal"
