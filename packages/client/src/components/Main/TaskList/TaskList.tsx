@@ -1,12 +1,13 @@
 import { EntityId, Task, TaskEntity } from '@open-gtd/api'
-import { Button, Checkbox, Col, Row } from 'antd'
+import { Button, Checkbox, Col, Row, Select, Tag, Tooltip } from 'antd'
 import * as React from 'react'
 import OutsideClickHandler from 'react-outside-click-handler'
 import { connect } from 'react-redux'
 import { Dictionary } from 'ts-essentials'
 import { AppState, DispatchProps, mapDispatchToProps } from '../../../store'
 import { taskActions } from '../../../store/actions'
-import { stopEventPropagation } from '../../../util'
+import { ContextState, TaskState } from '../../../store/state'
+import { PROTECTED_SPACE, stopEventPropagation } from '../../../util'
 import EditableTable, {
   EditableColumnProps
 } from '../../EditableTable/EditableTable'
@@ -14,7 +15,8 @@ import TaskDetails from './TaskDetails'
 import './TaskList.scss'
 
 interface TaskListProps extends DispatchProps {
-  tasks: Dictionary<TaskEntity>
+  allTasks: TaskState
+  allContexts: ContextState
   filter?: (task: TaskEntity) => boolean
   hierarchical?: boolean
 }
@@ -30,6 +32,7 @@ interface TaskListRowType<T extends string, P> {
   title: string
   children?: TaskListRow[]
   isDone?: boolean
+  contextIds: EntityId[]
 }
 
 type TaskListRow =
@@ -41,46 +44,21 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
     selectedTaskIds: []
   }
 
-  private columns: Array<EditableColumnProps<TaskListRow>> = [
-    {
-      title: 'Task Name',
-      dataIndex: 'title',
-      render: text => text,
-      editable: true
-    },
-    {
-      title: 'Status',
-      dataIndex: 'isDone',
-      render: (text, row) =>
-        row.type === 'task' ? (
-          <span onClick={stopEventPropagation}>
-            <Checkbox
-              defaultChecked={row.isDone}
-              onChange={(
-                e /* tslint:disable-next-line */ // need to bind `row`
-              ) => this.handleSave(row, { isDone: e.target.checked })}
-            >
-              Done
-            </Checkbox>
-          </span>
-        ) : null
-    }
-  ]
-
   public render() {
     const hierarchical = !!this.props.hierarchical
     const filter = this.props.filter || (() => true)
     let rows: TaskListRow[] = []
     const idToChildren: Dictionary<TaskListRow[]> = {}
 
-    Object.keys(this.props.tasks).forEach(id => {
-      const task = this.props.tasks[id]
+    Object.keys(this.props.allTasks).forEach(id => {
+      const task = this.props.allTasks[id]
       const row: TaskListRow = {
         type: 'task',
         wrapped: task,
         key: task._id,
         title: task.title,
-        isDone: task.isDone
+        isDone: task.isDone,
+        contextIds: task.contextIds
       }
       if (filter(task)) {
         rows.push(row)
@@ -97,14 +75,15 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
     if (hierarchical) {
       rows.forEach(row => (row.children = idToChildren[row.key]))
       rows = rows.filter(
-        row => row.type === 'task' && row.wrapped.parentId === null
+        row =>
+          row.type === 'task' /* always true */ && row.wrapped.parentId === null
       )
     }
 
     const { selectedTaskIds } = this.state
     const selected =
       selectedTaskIds.length === 1
-        ? this.props.tasks[selectedTaskIds[0]]
+        ? this.props.allTasks[selectedTaskIds[0]]
         : selectedTaskIds
 
     return (
@@ -114,7 +93,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
           <Row gutter={16}>
             <Col span={18}>
               <EditableTable
-                columns={this.columns}
+                columns={this.createColumns()}
                 dataSource={rows}
                 handleSave={this.handleSave}
                 onRow={this.onRow}
@@ -132,6 +111,47 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
         </OutsideClickHandler>
       </div>
     )
+  }
+
+  private createColumns(): Array<EditableColumnProps<TaskListRow>> {
+    return [
+      {
+        title: 'Task Name',
+        dataIndex: 'title',
+        render: text => text,
+        editable: 'text',
+        required: true
+      },
+      {
+        title: 'Status',
+        dataIndex: 'isDone',
+        render: (text, row) =>
+          row.type === 'task' ? (
+            <span onClick={stopEventPropagation}>
+              <Checkbox
+                defaultChecked={row.isDone}
+                onChange={(
+                  e /* tslint:disable-next-line */ // need to bind `row`
+                ) => this.handleSave(row, { isDone: e.target.checked })}
+              >
+                Done
+              </Checkbox>
+            </span>
+          ) : null
+      },
+      {
+        title: 'Contexts',
+        dataIndex: 'contextIds',
+        render: this.renderContexts,
+        editable: 'select',
+        inputProps: this.getContextSelectProps,
+        mapValue: (contextIds: EntityId[]) =>
+          contextIds.map(id => ({
+            key: id,
+            label: this.props.allContexts[id].name
+          }))
+      }
+    ]
   }
 
   private clearSelection = () => this.setState({ selectedTaskIds: [] })
@@ -168,6 +188,10 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
 
   private handleSave = (row: TaskListRow, values: Partial<TaskListRow>) => {
     if (row.type === 'task') {
+      values = { ...values }
+      if (values.contextIds) {
+        values.contextIds = values.contextIds.map(c => (c as any).key)
+      }
       this.props.dispatch(
         taskActions.updateTask.request({ ...row.wrapped, ...values })
       )
@@ -177,7 +201,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
   private handleNewTask = () => {
     if (this.state.selectedTaskIds.length > 0) {
       this.createNewTask(
-        this.props.tasks[this.state.selectedTaskIds[0]].parentId,
+        this.props.allTasks[this.state.selectedTaskIds[0]].parentId,
         'New Task'
       )
     } else {
@@ -231,9 +255,58 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
       </div>
     )
   }
+
+  private renderContexts = (text: any, row: TaskListRow) => {
+    if (row.type !== 'task') {
+      return null
+    }
+    const task = row.wrapped
+    const contexts = task.contextIds.map(id => this.props.allContexts[id])
+    if (contexts.length === 0) {
+      return PROTECTED_SPACE
+    }
+    return (
+      <span>
+        {contexts.map(context => {
+          const isTooLong = context.name.length > 20
+          const tag = (
+            <Tag key={context._id}>
+              {isTooLong ? context.name.slice(0, 17) + '...' : context.name}
+            </Tag>
+          )
+          return isTooLong ? (
+            <Tooltip key={context._id} title={context.name}>
+              {tag}
+            </Tooltip>
+          ) : (
+            tag
+          )
+        })}
+      </span>
+    )
+  }
+
+  private getContextSelectProps = (row: TaskListRow) => {
+    if (row.type !== 'task') {
+      return
+    }
+    const { allContexts } = this.props
+    const contextIdsLeft = Object.keys(allContexts).filter(
+      id => row.contextIds.indexOf(id) === -1
+    )
+    return {
+      mode: 'multiple',
+      placeholder: 'Add context...',
+      notFoundContent: 'No context left.',
+      labelInValue: true,
+      children: contextIdsLeft.map(id => {
+        return <Select.Option key={id}>{allContexts[id].name}</Select.Option>
+      })
+    }
+  }
 }
 
 export default connect(
-  ({ tasks }: AppState) => ({ tasks }),
+  (state: AppState) => ({ allTasks: state.tasks, allContexts: state.contexts }),
   mapDispatchToProps
 )(TaskList)

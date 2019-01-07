@@ -1,10 +1,15 @@
 import Table, { ColumnProps, TableProps } from 'antd/lib/table'
 import React from 'react'
-import { EditableCell } from './EditableCell'
+import { EditableCell, InputType } from './EditableCell'
 import { EditableFormRow } from './EditableFormRow'
 import './EditableTable.scss'
 
-export type EditableColumnProps<T> = ColumnProps<T> & { editable?: boolean }
+export type EditableColumnProps<T> = ColumnProps<T> & {
+  editable?: InputType
+  inputProps?: (row: T) => any
+  required?: boolean
+  mapValue?(value: any): any
+}
 
 export interface EditableTableProps<T> extends TableProps<T> {
   columns: Array<EditableColumnProps<T>>
@@ -32,8 +37,11 @@ class EditableTable<T> extends React.Component<EditableTableProps<T>> {
           return {
             record,
             editable: col.editable,
+            inputProps: col.inputProps,
+            required: col.required,
             dataIndex: col.dataIndex,
             title: col.title,
+            mapValue: col.mapValue,
             handleSave
           }
         }
