@@ -69,6 +69,7 @@ class TaskDetails extends React.Component<TaskFormProps> {
             key={task._id}
           />
         </p>
+        <p>{this.renderDeleteButton()}</p>
       </div>
     )
   }
@@ -121,7 +122,6 @@ class TaskDetails extends React.Component<TaskFormProps> {
     if (Array.isArray(this.props.selected)) {
       this.props.selected.forEach(element => {
         this.props.dispatch(taskActions.deleteTask.request(element))
-        this.props.clearSelection()
       })
     } else {
       //
@@ -129,17 +129,22 @@ class TaskDetails extends React.Component<TaskFormProps> {
         taskActions.deleteTask.request(this.getSelectedTask()._id)
       )
     }
+    this.props.clearSelection()
+  }
+
+  private renderDeleteButton() {
+    return (
+      <Button type="danger" block icon="delete" onClick={this.handleDelete}>
+        Delete
+      </Button>
+    )
   }
 
   private renderMultiSelectActions(selectedTaskIds: EntityId[]) {
     return (
       <div>
         <h2>{selectedTaskIds.length} Tasks selected</h2>
-        <p>
-          <Button type="danger" block icon="delete" onClick={this.handleDelete}>
-            Delete
-          </Button>
-        </p>
+        <p>{this.renderDeleteButton()}</p>
         <p>
           <Button onClick={this.props.clearSelection} type="dashed" block>
             Clear selection
