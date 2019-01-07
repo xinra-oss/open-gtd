@@ -9,8 +9,10 @@ import {
   Switch,
   withRouter
 } from 'react-router'
+import { Link } from 'react-router-dom'
 import { AppState, DispatchProps, mapDispatchToProps } from '../../store'
 import { sessionActions } from '../../store/actions'
+import TaskConfig from '../../TaskConfig'
 import AllTasks from './AllTasks/AllTasks'
 
 interface MainProps extends DispatchProps, RouteComponentProps<{}> {
@@ -120,6 +122,11 @@ class Main extends React.Component<MainProps, State> {
                 <Menu.Item key="active">Active</Menu.Item>
                 <Menu.Item key="next7Days">Next 7 Days</Menu.Item>
               </ItemGroup>
+              <ItemGroup title="Settings" key="settings">
+                <Menu.Item key="manage-contexts">
+                  <Link to="/contexts">Manage Contexts</Link>
+                </Menu.Item>
+              </ItemGroup>
             </Menu>
           </Sider>
           <Layout style={{ padding: '0 24px 24px' }}>
@@ -137,6 +144,7 @@ class Main extends React.Component<MainProps, State> {
             >
               <Switch>
                 <Route path="/tasks/all" component={AllTasks} />
+                <Route path="/contexts" component={TaskConfig} />
                 <Redirect to="/tasks/all" />
               </Switch>
             </Content>
