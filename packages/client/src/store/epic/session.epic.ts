@@ -34,7 +34,7 @@ const deleteSessionSuccess: AppEpic = (action$, _, { info }) =>
     filter(isActionOf(sessionActions.deleteSession.success)),
     tap(() => info.successMessage("You've been successfully signed out.")),
     flatMap(() => [
-      routerActions.push('/login'),
+      routerActions.replace('/login'),
       loadingActions.finishLoading()
     ])
   )
@@ -52,7 +52,7 @@ const getSessionSuccess: AppEpic = (action$, state$) =>
       }
       const actions: AppAction[] = []
       if (!isCurrentPageLoginOrRegister(state$)) {
-        actions.push(routerActions.push('/login'))
+        actions.push(routerActions.replace('/login'))
       }
       actions.push(loadingActions.finishLoading())
       return actions
