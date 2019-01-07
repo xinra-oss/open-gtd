@@ -6,6 +6,7 @@ import { connect } from 'react-redux'
 import { Dictionary } from 'ts-essentials'
 import { AppState, DispatchProps, mapDispatchToProps } from '../../../store'
 import { taskActions } from '../../../store/actions'
+import { stopEventPropagation } from '../../../util'
 import EditableTable, {
   EditableColumnProps
 } from '../../EditableTable/EditableTable'
@@ -15,18 +16,32 @@ import './TaskList.scss'
 interface TaskListProps extends DispatchProps {
   tasks: Dictionary<TaskEntity>
   filter?: (task: TaskEntity) => boolean
+  hierarchical?: boolean
 }
 
 interface TaskListState {
   selectedTaskIds: EntityId[]
 }
 
+interface TaskListRowType<T extends string, P> {
+  type: T
+  wrapped: P
+  key: string
+  title: string
+  children?: TaskListRow[]
+  isDone?: boolean
+}
+
+type TaskListRow =
+  | TaskListRowType<'category', void>
+  | TaskListRowType<'task', TaskEntity>
+
 class TaskList extends React.Component<TaskListProps, TaskListState> {
   public readonly state: TaskListState = {
     selectedTaskIds: []
   }
 
-  private columns: Array<EditableColumnProps<TaskEntity>> = [
+  private columns: Array<EditableColumnProps<TaskListRow>> = [
     {
       title: 'Task Name',
       dataIndex: 'title',
@@ -36,30 +51,55 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
     {
       title: 'Status',
       dataIndex: 'isDone',
-      render: (text, record) => (
-        <span>
-          <Checkbox
-            data-task={record}
-            onChange={(
-              e /* tslint:disable-next-line */ // need to bind `record`
-            ) => this.handleSave({ ...record, isDone: e.target.checked })}
-          >
-            Done
-          </Checkbox>
-        </span>
-      )
+      render: (text, row) =>
+        row.type === 'task' ? (
+          <span onClick={stopEventPropagation}>
+            <Checkbox
+              defaultChecked={row.isDone}
+              onChange={(
+                e /* tslint:disable-next-line */ // need to bind `row`
+              ) => this.handleSave(row, { isDone: e.target.checked })}
+            >
+              Done
+            </Checkbox>
+          </span>
+        ) : null
     }
   ]
 
   public render() {
+    const hierarchical = !!this.props.hierarchical
     const filter = this.props.filter || (() => true)
-    const rootTasks: TaskEntity[] = []
+    let rows: TaskListRow[] = []
+    const idToChildren: Dictionary<TaskListRow[]> = {}
+
     Object.keys(this.props.tasks).forEach(id => {
       const task = this.props.tasks[id]
+      const row: TaskListRow = {
+        type: 'task',
+        wrapped: task,
+        key: task._id,
+        title: task.title,
+        isDone: task.isDone
+      }
       if (filter(task)) {
-        rootTasks.push(task)
+        rows.push(row)
+      }
+      if (hierarchical && task.parentId !== null) {
+        if (idToChildren[task.parentId] === undefined) {
+          idToChildren[task.parentId] = [row]
+        } else {
+          idToChildren[task.parentId].push(row)
+        }
       }
     })
+
+    if (hierarchical) {
+      rows.forEach(row => (row.children = idToChildren[row.key]))
+      rows = rows.filter(
+        row => row.type === 'task' && row.wrapped.parentId === null
+      )
+    }
 
     const { selectedTaskIds } = this.state
     const selected =
@@ -75,11 +115,11 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
             <Col span={18}>
               <EditableTable
                 columns={this.columns}
-                dataSource={rootTasks}
+                dataSource={rows}
                 handleSave={this.handleSave}
-                rowKey="_id"
                 onRow={this.onRow}
                 rowClassName={this.rowClassName}
+                defaultExpandAllRows
               />
             </Col>
             <Col span={6}>
@@ -96,33 +136,42 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
 
   private clearSelection = () => this.setState({ selectedTaskIds: [] })
 
-  private onRow = (row: TaskEntity) => ({
-    onClick: (e: React.MouseEvent<HTMLElement>) => {
-      let selectedTaskIds = [...this.state.selectedTaskIds]
-      if (e.ctrlKey) {
-        const index = selectedTaskIds.indexOf(row._id)
-        if (index > -1) {
-          selectedTaskIds.splice(index, 1)
-        } else {
-          selectedTaskIds.push(row._id)
-        }
-      } else {
-        selectedTaskIds = [row._id]
-      }
-      this.setState({
-        selectedTaskIds
-      })
-    }
+  private onRow = (row: TaskListRow) => ({
+    onClick:
+      row.type === 'task'
+        ? (e: React.MouseEvent<HTMLElement>) => {
+            const task = row.wrapped
+            let selectedTaskIds = [...this.state.selectedTaskIds]
+            if (e.ctrlKey) {
+              const index = selectedTaskIds.indexOf(task._id)
+              if (index > -1) {
+                selectedTaskIds.splice(index, 1)
+              } else {
+                selectedTaskIds.push(task._id)
+              }
+            } else {
+              selectedTaskIds = [task._id]
+            }
+            this.setState({
+              selectedTaskIds
+            })
+          }
+        : this.clearSelection()
   })
 
-  private rowClassName = (row: TaskEntity) => {
-    return this.state.selectedTaskIds.indexOf(row._id) > -1
+  private rowClassName = (row: TaskListRow) => {
+    return row.type === 'task' &&
+      this.state.selectedTaskIds.indexOf(row.wrapped._id) > -1
       ? 'selected-row'
       : ''
   }
 
-  private handleSave = (task: TaskEntity) => {
-    this.props.dispatch(taskActions.updateTask.request(task))
+  private handleSave = (row: TaskListRow, values: Partial<TaskListRow>) => {
+    if (row.type === 'task') {
+      this.props.dispatch(
+        taskActions.updateTask.request({ ...row.wrapped, ...values })
+      )
+    }
   }
 
   private handleNewTask = () => {
