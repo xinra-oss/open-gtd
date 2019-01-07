@@ -301,7 +301,13 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
       labelInValue: true,
       children: contextIdsLeft.map(id => {
         return <Select.Option key={id}>{allContexts[id].name}</Select.Option>
-      })
+      }),
+      filterOption: (
+        inputValue: string,
+        option: { props: { children: string } }
+      ) => {
+        return new RegExp(`.*${inputValue}.*`, 'i').test(option.props.children)
+      }
     }
   }
 }
