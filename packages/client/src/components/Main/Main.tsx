@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import { Redirect, Route, Switch } from 'react-router'
 import { AppState, DispatchProps, mapDispatchToProps } from '../../store'
 import { sessionActions } from '../../store/actions'
+import TaskConfig from '../../TaskConfig'
 import AllTasks from './AllTasks/AllTasks'
 
 interface MainProps extends DispatchProps {
@@ -131,6 +132,7 @@ class Main extends React.Component<MainProps, State> {
             >
               <Switch>
                 <Route path="/tasks/all" component={AllTasks} />
+                <Route path="/contexts" component={TaskConfig} />
                 <Redirect to="/tasks/all" />
               </Switch>
             </Content>
