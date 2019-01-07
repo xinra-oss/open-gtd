@@ -58,7 +58,6 @@ class Main extends React.Component<MainProps, State> {
         style={{
           width: '90px',
           height: '60px'
-          // margin: '16px 28px 16px 0'
         }}
         src={logoImgage}
         // add routing to "mainpage" maybe inbox ?
