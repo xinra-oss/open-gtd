@@ -25,3 +25,6 @@ export function getFormItemValidationProps<T>(
   }
   return {}
 }
+
+export const stopEventPropagation = (e: { stopPropagation(): void }) =>
+  e.stopPropagation()

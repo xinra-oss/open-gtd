@@ -2,13 +2,19 @@ import { UserEntity } from '@open-gtd/api'
 import { Breadcrumb, Icon, Layout, Menu } from 'antd'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { Redirect, Route, Switch } from 'react-router'
+import {
+  Redirect,
+  Route,
+  RouteComponentProps,
+  Switch,
+  withRouter
+} from 'react-router'
 import { AppState, DispatchProps, mapDispatchToProps } from '../../store'
 import { sessionActions } from '../../store/actions'
 import TaskConfig from '../../TaskConfig'
 import AllTasks from './AllTasks/AllTasks'
 
-interface MainProps extends DispatchProps {
+interface MainProps extends DispatchProps, RouteComponentProps<{}> {
   user: UserEntity
 }
 
@@ -143,7 +149,9 @@ class Main extends React.Component<MainProps, State> {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Main)
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(Main)
+)
