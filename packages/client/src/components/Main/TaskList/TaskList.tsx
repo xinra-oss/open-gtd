@@ -14,6 +14,8 @@ import EditableTable, {
 import TaskDetails from './TaskDetails'
 import './TaskList.scss'
 
+const INDENT = 15
+
 interface TaskListProps extends DispatchProps {
   allTasks: TaskState
   allContexts: ContextState
@@ -82,8 +84,9 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
       children: undefined
     }))
 
-    const displayedRows = hierarchical ? taskRowTree : taskRowsFlat
-    this.applyFilter(displayedRows)
+    let displayedRows = hierarchical ? taskRowTree : taskRowsFlat
+    displayedRows = this.applyFilter(displayedRows)
+    this.determineHierarchyLevels(displayedRows)
 
     const { selectedTaskIds } = this.state
     const selected =
@@ -109,6 +112,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
                   height: '100%',
                   overflow: 'auto'
                 }}
+                indentSize={INDENT}
               />
             </Col>
             <Col span={6}>
@@ -166,6 +170,18 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
     return filterdRows
   }
 
+  private determineHierarchyLevels(
+    rows: TaskListRow[],
+    currentLevel: number = 0
+  ) {
+    for (const row of rows) {
+      row.hierarchyLevel = currentLevel
+      if (row.children) {
+        this.determineHierarchyLevels(row.children, currentLevel + 1)
+      }
+    }
+  }
+
   private createColumns(): Array<EditableColumnProps<TaskListRow>> {
     return [
       {
@@ -195,7 +211,11 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
       {
         title: 'Title',
         dataIndex: 'title',
-        render: text => text,
+        render: (text, row) => (
+          <span style={{ paddingLeft: row.hierarchyLevel * INDENT }}>
+            {text}
+          </span>
+        ),
         className: 'TaskList-title',
         editable: 'text',
         required: true
