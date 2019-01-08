@@ -68,7 +68,6 @@ class TaskDetails extends React.Component<TaskFormProps> {
             key={task._id}
           />
         </p>
-        <p>{this.renderDeleteButton()}</p>
       </div>
     )
   }
@@ -111,23 +110,9 @@ class TaskDetails extends React.Component<TaskFormProps> {
     }
   }
 
-  private handleDelete = () => {
-    if (Array.isArray(this.props.selected)) {
-      this.props.selected.forEach(element => {
-        this.props.dispatch(taskActions.deleteTask.request(element))
-      })
-    } else {
-      //
-      this.props.dispatch(
-        taskActions.deleteTask.request(this.getSelectedTask()._id)
-      )
-    }
-    this.props.clearSelection()
-  }
-
   private renderDeleteButton() {
     return (
-      <Button type="danger" block icon="delete" onClick={this.handleDelete}>
+      <Button type="danger" block icon="delete" disabled>
         Delete
       </Button>
     )

@@ -242,6 +242,17 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
 
   private clearSelection = () => this.setState({ selectedTaskIds: [] })
 
+  private deleteTask = (taskId: EntityId) => {
+    const selectedTaskIds = [...this.state.selectedTaskIds]
+    const index = selectedTaskIds.indexOf(taskId)
+    if (index > -1) {
+      selectedTaskIds.splice(index, 1)
+    }
+    this.setState({ selectedTaskIds }, () =>
+      this.props.dispatch(taskActions.deleteTask.request(taskId))
+    )
+  }
+
   private onRow = (row: TaskListRow) => ({
     onClick:
       row.type === 'task'
@@ -390,10 +401,20 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
     )
   }
 
-  private renderTaskActionButtons = () => {
+  private renderTaskActionButtons = (text: string, row: TaskListRow) => {
+    if (row.type !== 'task') {
+      return null
+    }
     return (
       <span className="TaskList-actions">
-        <Button type="danger" icon="delete">
+        <Button
+          type="danger"
+          icon="delete" /* tslint:disable-next-line */
+          onClick={(e: React.MouseEvent) => {
+            e.stopPropagation()
+            this.deleteTask(row.wrapped._id)
+          }}
+        >
           Delete
         </Button>
       </span>
