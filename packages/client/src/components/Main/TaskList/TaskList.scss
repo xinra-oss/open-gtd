@@ -24,6 +24,15 @@
     */
   }
 
+  .TaskList-row {
+    .TaskList-actions {
+      display: none;
+    }
+    &:hover .TaskList-actions {
+      display: inline;
+    }
+  }
+
   .row-project {
     .TaskList-title {
       font-style: italic;

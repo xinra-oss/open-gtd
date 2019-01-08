@@ -231,11 +231,27 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
             key: id,
             label: this.props.allContexts[id].name
           }))
+      },
+      {
+        key: 'actions',
+        render: this.renderTaskActionButtons,
+        width: 200
       }
     ]
   }
 
   private clearSelection = () => this.setState({ selectedTaskIds: [] })
+
+  private deleteTask = (taskId: EntityId) => {
+    const selectedTaskIds = [...this.state.selectedTaskIds]
+    const index = selectedTaskIds.indexOf(taskId)
+    if (index > -1) {
+      selectedTaskIds.splice(index, 1)
+    }
+    this.setState({ selectedTaskIds }, () =>
+      this.props.dispatch(taskActions.deleteTask.request(taskId))
+    )
+  }
 
   private onRow = (row: TaskListRow) => ({
     onClick:
@@ -261,11 +277,11 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
   })
 
   private rowClassName = (row: TaskListRow) => {
+    let classes = 'TaskList-row'
     if (row.type === 'category') {
-      return 'row-category'
+      classes = ' row-category'
     }
     if (row.type === 'task') {
-      let classes = ''
       if (this.state.selectedTaskIds.indexOf(row.wrapped._id) > -1) {
         classes += ' row-selected'
       }
@@ -281,9 +297,8 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
       if (row.isActive) {
         classes += ' row-active'
       }
-      return classes
     }
-    return ''
+    return classes
   }
 
   private handleSave = (row: TaskListRow, values: Partial<TaskListRow>) => {
@@ -382,6 +397,26 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
             tag
           )
         })}
+      </span>
+    )
+  }
+
+  private renderTaskActionButtons = (text: string, row: TaskListRow) => {
+    if (row.type !== 'task') {
+      return null
+    }
+    return (
+      <span className="TaskList-actions">
+        <Button
+          type="danger"
+          icon="delete" /* tslint:disable-next-line */
+          onClick={(e: React.MouseEvent) => {
+            e.stopPropagation()
+            this.deleteTask(row.wrapped._id)
+          }}
+        >
+          Delete
+        </Button>
       </span>
     )
   }

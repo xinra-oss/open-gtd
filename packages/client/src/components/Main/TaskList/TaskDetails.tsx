@@ -110,15 +110,19 @@ class TaskDetails extends React.Component<TaskFormProps> {
     }
   }
 
+  private renderDeleteButton() {
+    return (
+      <Button type="danger" block icon="delete" disabled>
+        Delete
+      </Button>
+    )
+  }
+
   private renderMultiSelectActions(selectedTaskIds: EntityId[]) {
     return (
       <div>
         <h2>{selectedTaskIds.length} Tasks selected</h2>
-        <p>
-          <Button type="danger" block icon="delete">
-            Delete
-          </Button>
-        </p>
+        <p>{this.renderDeleteButton()}</p>
         <p>
           <Button onClick={this.props.clearSelection} type="dashed" block>
             Clear selection
