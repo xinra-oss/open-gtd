@@ -234,7 +234,8 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
       },
       {
         key: 'actions',
-        render: this.renderDeleteButton
+        render: this.renderTaskActionButtons,
+        width: 200
       }
     ]
   }
@@ -265,11 +266,11 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
   })
 
   private rowClassName = (row: TaskListRow) => {
+    let classes = 'TaskList-row'
     if (row.type === 'category') {
-      return 'row-category'
+      classes = ' row-category'
     }
     if (row.type === 'task') {
-      let classes = ''
       if (this.state.selectedTaskIds.indexOf(row.wrapped._id) > -1) {
         classes += ' row-selected'
       }
@@ -285,9 +286,8 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
       if (row.isActive) {
         classes += ' row-active'
       }
-      return classes
     }
-    return ''
+    return classes
   }
 
   private handleSave = (row: TaskListRow, values: Partial<TaskListRow>) => {
@@ -390,16 +390,13 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
     )
   }
 
-  private renderDeleteButton() {
+  private renderTaskActionButtons = () => {
     return (
-      <Button
-        type="danger"
-        block
-        icon="delete"
-        style={{ width: '100px', visibility: 'hidden' }}
-      >
-        Delete
-      </Button>
+      <span className="TaskList-actions">
+        <Button type="danger" icon="delete">
+          Delete
+        </Button>
+      </span>
     )
   }
 
