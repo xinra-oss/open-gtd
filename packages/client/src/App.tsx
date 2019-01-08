@@ -11,7 +11,7 @@ import {
 import './App.scss'
 import Main from './components/Main/Main'
 import RegisterForm from './components/RegisterForm'
-import LoginPage from './LoginPage'
+import LoginForm from './LoginForm'
 import { AppState } from './store'
 
 interface AppProps extends RouteComponentProps<{}> {
@@ -23,8 +23,8 @@ class App extends React.Component<AppProps> {
     return (
       <div className="App">
         {this.props.loading ? (
-          <Center>
-            <Spin className="App-loading" size="large" />
+          <Center style={{ height: '100%' }}>
+            <Spin size="large" />
           </Center>
         ) : (
           this.renderContent()
@@ -37,7 +37,7 @@ class App extends React.Component<AppProps> {
     return (
       <Switch>
         <Route path="/register" component={RegisterForm} />
-        <Route path="/login" component={LoginPage} />
+        <Route path="/login" component={LoginForm} />
         <Route path="/" component={Main} />
       </Switch>
     )
