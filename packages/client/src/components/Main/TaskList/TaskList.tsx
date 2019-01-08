@@ -33,6 +33,7 @@ interface TaskListRowType<T extends string, P> {
   children?: TaskListRow[]
   isDone?: boolean
   contextIds: EntityId[]
+  isActive: boolean
 }
 
 type TaskListRow =
@@ -58,7 +59,8 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
         key: task._id,
         title: task.title,
         isDone: task.isDone,
-        contextIds: task.contextIds
+        contextIds: task.contextIds,
+        isActive: true
       }
       if (filter(task)) {
         rows.push(row)
@@ -145,9 +147,10 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
           ) : null
       },
       {
-        title: 'Task Name',
+        title: 'Title',
         dataIndex: 'title',
         render: text => text,
+        className: 'TaskList-title',
         editable: 'text',
         required: true
       },
@@ -192,10 +195,29 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
   })
 
   private rowClassName = (row: TaskListRow) => {
-    return row.type === 'task' &&
-      this.state.selectedTaskIds.indexOf(row.wrapped._id) > -1
-      ? 'selected-row'
-      : ''
+    if (row.type === 'category') {
+      return 'row-category'
+    }
+    if (row.type === 'task') {
+      let classes = ''
+      if (this.state.selectedTaskIds.indexOf(row.wrapped._id) > -1) {
+        classes += ' row-selected'
+      }
+      if (row.wrapped.isDone) {
+        classes += ' row-done'
+      }
+      if (row.wrapped.isProject) {
+        classes += ' row-project'
+      }
+      if (row.wrapped.isNeverActive) {
+        classes += ' row-never-active'
+      }
+      if (row.isActive) {
+        classes += ' row-active'
+      }
+      return classes
+    }
+    return ''
   }
 
   private handleSave = (row: TaskListRow, values: Partial<TaskListRow>) => {
@@ -282,7 +304,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
         {contexts.map(context => {
           const isTooLong = context.name.length > 20
           const tag = (
-            <Tag key={context._id} color="blue">
+            <Tag key={context._id} color={task.isDone ? undefined : 'blue'}>
               {isTooLong ? context.name.slice(0, 17) + '...' : context.name}
             </Tag>
           )

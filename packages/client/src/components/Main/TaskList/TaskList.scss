@@ -1,12 +1,12 @@
 .TaskList {
   height: 100%;
 
+  /* OutsideClickHandler */
   > div {
-    /* OutsideClickHandler */
     height: 100%;
   }
 
-  .selected-row {
+  .row-selected {
     &:not(.ant-table-expanded-row) > td {
       background-color: #4da9ff;
     }
@@ -22,5 +22,33 @@
     height: 64px;
     width: 50px;
     */
+  }
+
+  .row-project {
+    .TaskList-title {
+      font-style: italic;
+    }
+  }
+  .row-active {
+    .TaskList-title {
+      color: rgb(21, 124, 0);
+    }
+  }
+  .row-never-active,
+  .row-done {
+    &,
+    .TaskList-title {
+      color: rgb(148, 148, 148);
+    }
+  }
+  .row-done {
+    .TaskList-title {
+      text-decoration: line-through;
+    }
+  }
+  .row-category {
+    .TaskList-title {
+      font-weight: bold;
+    }
   }
 }
