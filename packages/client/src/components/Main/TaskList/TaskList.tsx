@@ -34,6 +34,7 @@ interface TaskListRowType<T extends string, P> {
   isDone?: boolean
   contextIds: EntityId[]
   isActive: boolean
+  hierarchyLevel: number
 }
 
 type TaskListTaskRow = TaskListRowType<'task', TaskEntity>
@@ -48,38 +49,41 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
 
   public render() {
     const hierarchical = !!this.props.hierarchical
-    const filter = this.props.filter || (() => true)
-    const rows: TaskListTaskRow[] = []
+    const allTaskRows: TaskListTaskRow[] = []
     const idToChildren: Dictionary<TaskListTaskRow[]> = {}
 
     Object.keys(this.props.allTasks).forEach(id => {
       const task = this.props.allTasks[id]
-      const row: TaskListTaskRow = {
+      const taskRow: TaskListTaskRow = {
         type: 'task',
         wrapped: task,
         key: task._id,
         title: task.title,
         isDone: task.isDone,
         contextIds: task.contextIds,
-        isActive: true
+        isActive: true,
+        hierarchyLevel: 0
       }
-      if (filter(task)) {
-        rows.push(row)
-      }
+      allTaskRows.push(taskRow)
       if (task.parentId !== null) {
         if (idToChildren[task.parentId] === undefined) {
-          idToChildren[task.parentId] = [row]
+          idToChildren[task.parentId] = [taskRow]
         } else {
-          idToChildren[task.parentId].push(row)
+          idToChildren[task.parentId].push(taskRow)
         }
       }
     })
 
-    rows.forEach(row => (row.children = idToChildren[row.key]))
-    const rootRows = rows.filter(row => row.wrapped.parentId === null)
-    this.determineActiveTasks(rootRows)
+    allTaskRows.forEach(row => (row.children = idToChildren[row.key]))
+    const taskRowTree = allTaskRows.filter(row => row.wrapped.parentId === null)
+    this.determineActiveTasks(taskRowTree)
+    const taskRowsFlat = allTaskRows.map(row => ({
+      ...row,
+      children: undefined
+    }))
 
-    const dataSource = hierarchical ? rootRows : rows
+    const displayedRows = hierarchical ? taskRowTree : taskRowsFlat
+    this.applyFilter(displayedRows)
 
     const { selectedTaskIds } = this.state
     const selected =
@@ -95,7 +99,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
             <Col span={18} style={{ height: '100%' }}>
               <EditableTable
                 columns={this.createColumns()}
-                dataSource={dataSource}
+                dataSource={displayedRows}
                 handleSave={this.handleSave}
                 onRow={this.onRow}
                 rowClassName={this.rowClassName}
@@ -143,6 +147,23 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
         !task.isNeverActive &&
         !task.isDone
     }
+  }
+
+  private applyFilter(rows: TaskListTaskRow[]) {
+    if (!this.props.filter) {
+      return rows
+    }
+    const filterdRows: TaskListTaskRow[] = []
+    for (const row of rows) {
+      if (this.props.filter(row.wrapped)) {
+        const filteredRow = { ...row }
+        if (filteredRow.children) {
+          filteredRow.children = this.applyFilter(filteredRow.children)
+        }
+        filterdRows.push(filteredRow)
+      }
+    }
+    return filterdRows
   }
 
   private createColumns(): Array<EditableColumnProps<TaskListRow>> {
