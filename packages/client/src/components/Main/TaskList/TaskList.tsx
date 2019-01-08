@@ -1,5 +1,5 @@
 import { EntityId, Task, TaskEntity } from '@open-gtd/api'
-import { Button, Checkbox, Col, Row, Select, Tag, Tooltip } from 'antd'
+import { Button, Checkbox, Col, Icon, Row, Select, Tag, Tooltip } from 'antd'
 import * as React from 'react'
 import OutsideClickHandler from 'react-outside-click-handler'
 import { connect } from 'react-redux'
@@ -100,7 +100,10 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
                 rowClassName={this.rowClassName}
                 defaultExpandAllRows
                 pagination={false}
-                style={{ height: '100%', overflow: 'auto' }}
+                style={{
+                  height: '100%',
+                  overflow: 'auto'
+                }}
               />
             </Col>
             <Col span={6}>
@@ -118,28 +121,35 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
   private createColumns(): Array<EditableColumnProps<TaskListRow>> {
     return [
       {
+        key: 'col1',
+        width: 10,
+        className: 'TaskList-col1',
+        render: (text, row) =>
+          row.type === 'task' ? (
+            row.wrapped.isFolder ? (
+              <Icon
+                type="folder"
+                theme="filled"
+                style={{ fontSize: 20, position: 'relative', top: 2 }}
+              />
+            ) : (
+              <span onClick={stopEventPropagation}>
+                <Checkbox
+                  defaultChecked={row.isDone}
+                  onChange={(
+                    e /* tslint:disable-next-line */ // need to bind `row`
+                  ) => this.handleSave(row, { isDone: e.target.checked })}
+                />
+              </span>
+            )
+          ) : null
+      },
+      {
         title: 'Task Name',
         dataIndex: 'title',
         render: text => text,
         editable: 'text',
         required: true
-      },
-      {
-        title: 'Status',
-        dataIndex: 'isDone',
-        render: (text, row) =>
-          row.type === 'task' ? (
-            <span onClick={stopEventPropagation}>
-              <Checkbox
-                defaultChecked={row.isDone}
-                onChange={(
-                  e /* tslint:disable-next-line */ // need to bind `row`
-                ) => this.handleSave(row, { isDone: e.target.checked })}
-              >
-                Done
-              </Checkbox>
-            </span>
-          ) : null
       },
       {
         title: 'Contexts',
@@ -220,8 +230,8 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
       contextIds: [],
       dueDate: null,
       isDone: false,
-      isFolder: true,
-      isNeverActive: true,
+      isFolder: false,
+      isNeverActive: false,
       isProject: false,
       notes: null,
       parentId: parentID,

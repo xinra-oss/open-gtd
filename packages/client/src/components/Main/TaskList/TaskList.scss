@@ -2,6 +2,7 @@
   height: 100%;
 
   > div {
+    /* OutsideClickHandler */
     height: 100%;
   }
 
@@ -12,5 +13,14 @@
     &:hover:not(.ant-table-expanded-row) > td {
       background-color: #1890ff;
     }
+  }
+
+  .TaskList-col1 {
+    white-space: nowrap;
+    /*
+    display: inline-block;
+    height: 64px;
+    width: 50px;
+    */
   }
 }
