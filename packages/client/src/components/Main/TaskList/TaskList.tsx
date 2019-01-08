@@ -90,8 +90,8 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
       <div className="TaskList">
         <OutsideClickHandler onOutsideClick={this.clearSelection}>
           {this.renderToolbar()}
-          <Row gutter={16}>
-            <Col span={18}>
+          <Row gutter={16} style={{ height: 'calc(100% - 18px)' }}>
+            <Col span={18} style={{ height: '100%' }}>
               <EditableTable
                 columns={this.createColumns()}
                 dataSource={rows}
@@ -99,6 +99,8 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
                 onRow={this.onRow}
                 rowClassName={this.rowClassName}
                 defaultExpandAllRows
+                pagination={false}
+                style={{ height: '100%', overflow: 'auto' }}
               />
             </Col>
             <Col span={6}>
