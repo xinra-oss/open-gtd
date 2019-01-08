@@ -75,12 +75,7 @@ class LoginForm extends React.Component<LoginFormProps> {
                 />
               )}
             </FormItem>
-            <Button
-              type="primary"
-              htmlType="submit"
-              className="login-form-button"
-              block
-            >
+            <Button type="primary" htmlType="submit" block>
               Log in
             </Button>
           </Form>
