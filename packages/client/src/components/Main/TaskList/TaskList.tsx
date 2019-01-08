@@ -152,6 +152,10 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
             key: id,
             label: this.props.allContexts[id].name
           }))
+      },
+      {
+        key: 'actions',
+        render: this.renderDeleteButton
       }
     ]
   }
@@ -285,6 +289,19 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
           )
         })}
       </span>
+    )
+  }
+
+  private renderDeleteButton() {
+    return (
+      <Button
+        type="danger"
+        block
+        icon="delete"
+        style={{ width: '100px', visibility: 'hidden' }}
+      >
+        Delete
+      </Button>
     )
   }
 
