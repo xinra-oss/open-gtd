@@ -62,11 +62,10 @@ class Main extends React.Component<MainProps, State> {
                       position: 'relative',
                       top: 4
                     }}
-                    theme="outlined"
                   />
                   {this.props.user.email}
                   {PROTECTED_SPACE}
-                  <Icon type="caret-down" theme="outlined" />
+                  <Icon type="caret-down" />
                 </span>
               }
             >
@@ -86,20 +85,25 @@ class Main extends React.Component<MainProps, State> {
           >
             <Menu
               mode="inline"
-              defaultSelectedKeys={['1']}
-              defaultOpenKeys={['sub1']}
+              defaultSelectedKeys={[this.props.location.pathname]}
               style={{ height: '100%', borderRight: 0 }}
             >
-              <Menu.Item key="inbox">
-                <Icon type="inbox" style={{ fontSize: '16px' }} />
-                {this.state.collapsed ? '' : 'inbox'}
+              <Menu.Item key="/tasks/inbox">
+                <Link to="/tasks/inbox">
+                  <Icon type="inbox" style={{ fontSize: '16px' }} />
+                  {this.state.collapsed ? '' : 'Inbox'}
+                </Link>
               </Menu.Item>
-              <ItemGroup key="g1" title="Tasks">
-                <Menu.Item key="active">Active</Menu.Item>
-                <Menu.Item key="next7Days">Next 7 Days</Menu.Item>
+              <ItemGroup key="outline" title="Outline">
+                <Menu.Item key="/tasks/all">
+                  <Link to="/tasks/all">All Tasks</Link>
+                </Menu.Item>
+              </ItemGroup>
+              <ItemGroup key="todo" title="TODO">
+                <Menu.Item key="/tasks/active">Active Tasks</Menu.Item>
               </ItemGroup>
               <ItemGroup title="Settings" key="settings">
-                <Menu.Item key="manage-contexts">
+                <Menu.Item key="/contexts">
                   <Link to="/contexts">Manage Contexts</Link>
                 </Menu.Item>
               </ItemGroup>
