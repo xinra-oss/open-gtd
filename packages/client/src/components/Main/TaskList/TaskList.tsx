@@ -1,5 +1,5 @@
 import { EntityId, Task, TaskEntity } from '@open-gtd/api'
-import { Button, Checkbox, Col, Row, Select, Tag, Tooltip } from 'antd'
+import { Button, Checkbox, Col, Icon, Row, Select, Tag, Tooltip } from 'antd'
 import * as React from 'react'
 import OutsideClickHandler from 'react-outside-click-handler'
 import { connect } from 'react-redux'
@@ -13,6 +13,8 @@ import EditableTable, {
 } from '../../EditableTable/EditableTable'
 import TaskDetails from './TaskDetails'
 import './TaskList.scss'
+
+const INDENT = 15
 
 interface TaskListProps extends DispatchProps {
   allTasks: TaskState
@@ -30,14 +32,17 @@ interface TaskListRowType<T extends string, P> {
   wrapped: P
   key: string
   title: string
-  children?: TaskListRow[]
+  children?: TaskListTaskRow[]
   isDone?: boolean
   contextIds: EntityId[]
+  isActive: boolean
+  hierarchyLevel: number
 }
 
-type TaskListRow =
-  | TaskListRowType<'category', void>
-  | TaskListRowType<'task', TaskEntity>
+type TaskListTaskRow = TaskListRowType<'task', TaskEntity>
+type TaskListCategoryRow = TaskListRowType<'category', void>
+
+type TaskListRow = TaskListTaskRow | TaskListCategoryRow
 
 class TaskList extends React.Component<TaskListProps, TaskListState> {
   public readonly state: TaskListState = {
@@ -46,39 +51,42 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
 
   public render() {
     const hierarchical = !!this.props.hierarchical
-    const filter = this.props.filter || (() => true)
-    let rows: TaskListRow[] = []
-    const idToChildren: Dictionary<TaskListRow[]> = {}
+    const allTaskRows: TaskListTaskRow[] = []
+    const idToChildren: Dictionary<TaskListTaskRow[]> = {}
 
     Object.keys(this.props.allTasks).forEach(id => {
       const task = this.props.allTasks[id]
-      const row: TaskListRow = {
+      const taskRow: TaskListTaskRow = {
         type: 'task',
         wrapped: task,
         key: task._id,
         title: task.title,
         isDone: task.isDone,
-        contextIds: task.contextIds
+        contextIds: task.contextIds,
+        isActive: true,
+        hierarchyLevel: 0
       }
-      if (filter(task)) {
-        rows.push(row)
-      }
-      if (hierarchical && task.parentId !== null) {
+      allTaskRows.push(taskRow)
+      if (task.parentId !== null) {
         if (idToChildren[task.parentId] === undefined) {
-          idToChildren[task.parentId] = [row]
+          idToChildren[task.parentId] = [taskRow]
         } else {
-          idToChildren[task.parentId].push(row)
+          idToChildren[task.parentId].push(taskRow)
         }
       }
     })
 
-    if (hierarchical) {
-      rows.forEach(row => (row.children = idToChildren[row.key]))
-      rows = rows.filter(
-        row =>
-          row.type === 'task' /* always true */ && row.wrapped.parentId === null
-      )
-    }
+    allTaskRows.forEach(row => (row.children = idToChildren[row.key]))
+    const taskRowTree = allTaskRows.filter(row => row.wrapped.parentId === null)
+    this.determineActiveTasks(taskRowTree)
+    const taskRowsFlat = allTaskRows.map(row => ({
+      ...row,
+      children: undefined
+    }))
+
+    let displayedRows = hierarchical ? taskRowTree : taskRowsFlat
+    displayedRows = this.applyFilter(displayedRows)
+    this.determineHierarchyLevels(displayedRows)
 
     const { selectedTaskIds } = this.state
     const selected =
@@ -94,13 +102,17 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
             <Col span={18} style={{ height: '100%' }}>
               <EditableTable
                 columns={this.createColumns()}
-                dataSource={rows}
+                dataSource={displayedRows}
                 handleSave={this.handleSave}
                 onRow={this.onRow}
                 rowClassName={this.rowClassName}
                 defaultExpandAllRows
                 pagination={false}
-                style={{ height: '100%', overflow: 'auto' }}
+                style={{
+                  height: '100%',
+                  overflow: 'auto'
+                }}
+                indentSize={INDENT}
               />
             </Col>
             <Col span={6}>
@@ -115,31 +127,98 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
     )
   }
 
+  /**
+   * A task is active if all following conditions are met
+   * * start date in the past or no start date
+   * * not marked as 'never active'
+   * * not done
+   * * doesn't have children that are active or have a start date
+   * @param rows the root of the rows (sub)tree
+   */
+  private determineActiveTasks(rows: TaskListTaskRow[]) {
+    for (const row of rows) {
+      let hasCurrentOrFutureActiveChildren = false
+      if (row.children) {
+        this.determineActiveTasks(row.children)
+        hasCurrentOrFutureActiveChildren = row.children.some(
+          child => child.isActive || child.wrapped.startDate !== null
+        )
+      }
+      const task = row.wrapped
+      row.isActive =
+        !hasCurrentOrFutureActiveChildren &&
+        task.startDate === null && // TODO: start date in the past
+        !task.isNeverActive &&
+        !task.isDone
+    }
+  }
+
+  private applyFilter(rows: TaskListTaskRow[]) {
+    if (!this.props.filter) {
+      return rows
+    }
+    const filterdRows: TaskListTaskRow[] = []
+    for (const row of rows) {
+      if (this.props.filter(row.wrapped)) {
+        const filteredRow = { ...row }
+        if (filteredRow.children) {
+          filteredRow.children = this.applyFilter(filteredRow.children)
+        }
+        filterdRows.push(filteredRow)
+      }
+    }
+    return filterdRows
+  }
+
+  private determineHierarchyLevels(
+    rows: TaskListRow[],
+    currentLevel: number = 0
+  ) {
+    for (const row of rows) {
+      row.hierarchyLevel = currentLevel
+      if (row.children) {
+        this.determineHierarchyLevels(row.children, currentLevel + 1)
+      }
+    }
+  }
+
   private createColumns(): Array<EditableColumnProps<TaskListRow>> {
     return [
       {
-        title: 'Task Name',
-        dataIndex: 'title',
-        render: text => text,
-        editable: 'text',
-        required: true
-      },
-      {
-        title: 'Status',
-        dataIndex: 'isDone',
+        key: 'col1',
+        width: 10,
+        className: 'TaskList-col1',
         render: (text, row) =>
           row.type === 'task' ? (
-            <span onClick={stopEventPropagation}>
-              <Checkbox
-                defaultChecked={row.isDone}
-                onChange={(
-                  e /* tslint:disable-next-line */ // need to bind `row`
-                ) => this.handleSave(row, { isDone: e.target.checked })}
-              >
-                Done
-              </Checkbox>
-            </span>
+            row.wrapped.isFolder ? (
+              <Icon
+                type="folder"
+                theme="filled"
+                style={{ fontSize: 20, position: 'relative', top: 2 }}
+              />
+            ) : (
+              <span onClick={stopEventPropagation}>
+                <Checkbox
+                  defaultChecked={row.isDone}
+                  onChange={(
+                    e /* tslint:disable-next-line */ // need to bind `row`
+                  ) => this.handleSave(row, { isDone: e.target.checked })}
+                />
+              </span>
+            )
           ) : null
+      },
+      {
+        title: 'Title',
+        dataIndex: 'title',
+        render: (text, row) => (
+          <span style={{ paddingLeft: row.hierarchyLevel * INDENT }}>
+            {text}
+          </span>
+        ),
+        className: 'TaskList-title',
+        editable: 'text',
+        required: true
       },
       {
         title: 'Contexts',
@@ -182,10 +261,29 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
   })
 
   private rowClassName = (row: TaskListRow) => {
-    return row.type === 'task' &&
-      this.state.selectedTaskIds.indexOf(row.wrapped._id) > -1
-      ? 'selected-row'
-      : ''
+    if (row.type === 'category') {
+      return 'row-category'
+    }
+    if (row.type === 'task') {
+      let classes = ''
+      if (this.state.selectedTaskIds.indexOf(row.wrapped._id) > -1) {
+        classes += ' row-selected'
+      }
+      if (row.wrapped.isDone) {
+        classes += ' row-done'
+      }
+      if (row.wrapped.isProject) {
+        classes += ' row-project'
+      }
+      if (row.wrapped.isNeverActive) {
+        classes += ' row-never-active'
+      }
+      if (row.isActive) {
+        classes += ' row-active'
+      }
+      return classes
+    }
+    return ''
   }
 
   private handleSave = (row: TaskListRow, values: Partial<TaskListRow>) => {
@@ -220,8 +318,8 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
       contextIds: [],
       dueDate: null,
       isDone: false,
-      isFolder: true,
-      isNeverActive: true,
+      isFolder: false,
+      isNeverActive: false,
       isProject: false,
       notes: null,
       parentId: parentID,
@@ -272,7 +370,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
         {contexts.map(context => {
           const isTooLong = context.name.length > 20
           const tag = (
-            <Tag key={context._id} color="blue">
+            <Tag key={context._id} color={task.isDone ? undefined : 'blue'}>
               {isTooLong ? context.name.slice(0, 17) + '...' : context.name}
             </Tag>
           )

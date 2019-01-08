@@ -64,7 +64,6 @@ class TaskDetails extends React.Component<TaskFormProps> {
             defaultValue={task.notes || ''}
             placeholder="Add some details!"
             autosize={{ minRows: 4, maxRows: 8 }}
-            onChange={this.onNotesChange}
             onBlur={this.onNotesBlur}
             key={task._id}
           />
@@ -98,12 +97,6 @@ class TaskDetails extends React.Component<TaskFormProps> {
         isNeverActive: e.target.checked
       })
     )
-  }
-
-  private onNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    this.setState({
-      notes: e.target.value
-    })
   }
 
   private onNotesBlur = () => {
