@@ -1,13 +1,23 @@
 import { UserEntity } from '@open-gtd/api'
-import { Breadcrumb, Icon, Layout, Menu } from 'antd'
+import { Icon, Layout, Menu } from 'antd'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { Redirect, Route, Switch } from 'react-router'
+import {
+  Redirect,
+  Route,
+  RouteComponentProps,
+  Switch,
+  withRouter
+} from 'react-router'
+import { Link } from 'react-router-dom'
 import { AppState, DispatchProps, mapDispatchToProps } from '../../store'
 import { sessionActions } from '../../store/actions'
+import TaskConfig from '../../TaskConfig'
+import { PROTECTED_SPACE } from '../../util'
 import AllTasks from './AllTasks/AllTasks'
+import './Main.scss'
 
-interface MainProps extends DispatchProps {
+interface MainProps extends DispatchProps, RouteComponentProps<{}> {
   user: UserEntity
 }
 
@@ -21,12 +31,6 @@ const { Header, Content, Sider } = Layout
 const mapStateToProps = (state: AppState) => ({ user: state.session.user })
 
 class Main extends React.Component<MainProps, State> {
-  //   constructor(props: any) {
-  //     super(props)
-  //     this.state = {
-  //         collapsed: false
-  //         }
-  //     }
   public readonly state: State = {
     collapsed: false
   }
@@ -41,23 +45,10 @@ class Main extends React.Component<MainProps, State> {
 
   public render() {
     return (
-      <Layout>
-        <Header className="header">
+      <Layout className="Main">
+        <Header className="Main-header">
           <div className="logo" />
-          <Menu
-            theme="dark"
-            mode="horizontal"
-            defaultSelectedKeys={['2']}
-            style={{ lineHeight: '64px' }}
-          >
-            <Menu.Item key="1" className="item-left">
-              <Icon
-                type="plus-square"
-                style={{ fontSize: '24px', color: '#fff' }}
-                theme="outlined"
-              />
-              Create Task
-            </Menu.Item>
+          <Menu theme="dark" mode="horizontal" style={{ lineHeight: '64px' }}>
             <SubMenu
               key="3"
               className="item-right"
@@ -65,22 +56,22 @@ class Main extends React.Component<MainProps, State> {
                 <span>
                   <Icon
                     type="user"
-                    style={{ fontSize: '24px', color: '#fff' }}
-                    theme="outlined"
+                    style={{
+                      color: '#fff',
+                      fontSize: 20,
+                      position: 'relative',
+                      top: 4
+                    }}
                   />
                   {this.props.user.email}
-                  <Icon
-                    type="caret-down"
-                    style={{ fontSize: '24px', color: '#fff' }}
-                    theme="outlined"
-                  />
+                  {PROTECTED_SPACE}
+                  <Icon type="caret-down" />
                 </span>
               }
             >
               <Menu.Item key="logout" onClick={this.onLogout}>
                 Logout
               </Menu.Item>
-              <Menu.Item key="cancel">Cancel</Menu.Item>
             </SubMenu>
           </Menu>
         </Header>
@@ -94,43 +85,43 @@ class Main extends React.Component<MainProps, State> {
           >
             <Menu
               mode="inline"
-              defaultSelectedKeys={['1']}
-              defaultOpenKeys={['sub1']}
+              defaultSelectedKeys={[this.props.location.pathname]}
               style={{ height: '100%', borderRight: 0 }}
             >
-              <Menu.Item key="inbox">
-                <Icon type="inbox" style={{ fontSize: '16px' }} />
-                {this.state.collapsed ? '' : 'inbox'}
+              <Menu.Item key="/tasks/inbox">
+                <Link to="/tasks/inbox">
+                  <Icon type="inbox" style={{ fontSize: '16px' }} />
+                  {this.state.collapsed ? '' : 'Inbox'}
+                </Link>
               </Menu.Item>
-              <ItemGroup
-                key="g1"
-                title="Tasks"
-                // <span>
-                //   <Icon type="folder" />
-                //   {this.state.collapsed ? '' : 'projekt'}
-                // </span>
-                // }
-              >
-                <Menu.Item key="active">Active</Menu.Item>
-                <Menu.Item key="next7Days">Next 7 Days</Menu.Item>
+              <ItemGroup key="outline" title="Outline">
+                <Menu.Item key="/tasks/all">
+                  <Link to="/tasks/all">All Tasks</Link>
+                </Menu.Item>
+              </ItemGroup>
+              <ItemGroup key="todo" title="TODO">
+                <Menu.Item key="/tasks/active">Active Tasks</Menu.Item>
+              </ItemGroup>
+              <ItemGroup title="Settings" key="settings">
+                <Menu.Item key="/contexts">
+                  <Link to="/contexts">Manage Contexts</Link>
+                </Menu.Item>
               </ItemGroup>
             </Menu>
           </Sider>
-          <Layout style={{ padding: '0 24px 24px' }}>
-            <Breadcrumb style={{ margin: '16px 0' }}>
-              <Breadcrumb.Item>Projekt</Breadcrumb.Item>
-              <Breadcrumb.Item>Task1</Breadcrumb.Item>
-            </Breadcrumb>
+          <Layout style={{ height: '100%' }}>
             <Content
               style={{
                 background: '#fff',
                 padding: 24,
-                margin: 0,
-                minHeight: 280
+                margin: 24,
+                height: '100%',
+                overflow: 'auto'
               }}
             >
               <Switch>
                 <Route path="/tasks/all" component={AllTasks} />
+                <Route path="/contexts" component={TaskConfig} />
                 <Redirect to="/tasks/all" />
               </Switch>
             </Content>
@@ -141,7 +132,9 @@ class Main extends React.Component<MainProps, State> {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Main)
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(Main)
+)

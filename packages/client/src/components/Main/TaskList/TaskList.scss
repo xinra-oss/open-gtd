@@ -1,4 +1,10 @@
 .TaskList {
+  height: 100%;
+
+  > div {
+    height: 100%;
+  }
+
   .selected-row {
     &:not(.ant-table-expanded-row) > td {
       background-color: #4da9ff;
