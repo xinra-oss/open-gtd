@@ -30,15 +30,16 @@ interface TaskListRowType<T extends string, P> {
   wrapped: P
   key: string
   title: string
-  children?: TaskListRow[]
+  children?: TaskListTaskRow[]
   isDone?: boolean
   contextIds: EntityId[]
   isActive: boolean
 }
 
-type TaskListRow =
-  | TaskListRowType<'category', void>
-  | TaskListRowType<'task', TaskEntity>
+type TaskListTaskRow = TaskListRowType<'task', TaskEntity>
+type TaskListCategoryRow = TaskListRowType<'category', void>
+
+type TaskListRow = TaskListTaskRow | TaskListCategoryRow
 
 class TaskList extends React.Component<TaskListProps, TaskListState> {
   public readonly state: TaskListState = {
@@ -48,12 +49,12 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
   public render() {
     const hierarchical = !!this.props.hierarchical
     const filter = this.props.filter || (() => true)
-    let rows: TaskListRow[] = []
-    const idToChildren: Dictionary<TaskListRow[]> = {}
+    const rows: TaskListTaskRow[] = []
+    const idToChildren: Dictionary<TaskListTaskRow[]> = {}
 
     Object.keys(this.props.allTasks).forEach(id => {
       const task = this.props.allTasks[id]
-      const row: TaskListRow = {
+      const row: TaskListTaskRow = {
         type: 'task',
         wrapped: task,
         key: task._id,
@@ -65,7 +66,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
       if (filter(task)) {
         rows.push(row)
       }
-      if (hierarchical && task.parentId !== null) {
+      if (task.parentId !== null) {
         if (idToChildren[task.parentId] === undefined) {
           idToChildren[task.parentId] = [row]
         } else {
@@ -74,13 +75,11 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
       }
     })
 
-    if (hierarchical) {
-      rows.forEach(row => (row.children = idToChildren[row.key]))
-      rows = rows.filter(
-        row =>
-          row.type === 'task' /* always true */ && row.wrapped.parentId === null
-      )
-    }
+    rows.forEach(row => (row.children = idToChildren[row.key]))
+    const rootRows = rows.filter(row => row.wrapped.parentId === null)
+    this.determineActiveTasks(rootRows)
+
+    const dataSource = hierarchical ? rootRows : rows
 
     const { selectedTaskIds } = this.state
     const selected =
@@ -96,7 +95,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
             <Col span={18} style={{ height: '100%' }}>
               <EditableTable
                 columns={this.createColumns()}
-                dataSource={rows}
+                dataSource={dataSource}
                 handleSave={this.handleSave}
                 onRow={this.onRow}
                 rowClassName={this.rowClassName}
@@ -118,6 +117,32 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
         </OutsideClickHandler>
       </div>
     )
+  }
+
+  /**
+   * A task is active if all following conditions are met
+   * * start date in the past or no start date
+   * * not marked as 'never active'
+   * * not done
+   * * doesn't have children that are active or have a start date
+   * @param rows the root of the rows (sub)tree
+   */
+  private determineActiveTasks(rows: TaskListTaskRow[]) {
+    for (const row of rows) {
+      let hasCurrentOrFutureActiveChildren = false
+      if (row.children) {
+        this.determineActiveTasks(row.children)
+        hasCurrentOrFutureActiveChildren = row.children.some(
+          child => child.isActive || child.wrapped.startDate !== null
+        )
+      }
+      const task = row.wrapped
+      row.isActive =
+        !hasCurrentOrFutureActiveChildren &&
+        task.startDate === null && // TODO: start date in the past
+        !task.isNeverActive &&
+        !task.isDone
+    }
   }
 
   private createColumns(): Array<EditableColumnProps<TaskListRow>> {
