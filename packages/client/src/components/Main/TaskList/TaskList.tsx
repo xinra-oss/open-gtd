@@ -317,19 +317,18 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
   private handleNewTask = () => {
     if (this.state.selectedTaskIds.length > 0) {
       this.createNewTask(
-        this.props.allTasks[this.state.selectedTaskIds[0]].parentId,
-        'New Task'
+        this.props.allTasks[this.state.selectedTaskIds[0]].parentId
       )
     } else {
-      this.createNewTask(null, 'New Root Task')
+      this.createNewTask(null)
     }
   }
 
   private handleSubTask = () => {
-    this.createNewTask(this.state.selectedTaskIds[0], 'New Sub Task')
+    this.createNewTask(this.state.selectedTaskIds[0])
   }
 
-  private createNewTask = (parentID: string | null, testTitle: string) => {
+  private createNewTask = (parentID: string | null) => {
     const newTask: Task = {
       contextIds: [],
       dueDate: null,
@@ -340,7 +339,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
       notes: null,
       parentId: parentID,
       startDate: null,
-      title: testTitle
+      title: 'New task'
     }
     this.props.dispatch(taskActions.createTask.request(newTask))
   }
