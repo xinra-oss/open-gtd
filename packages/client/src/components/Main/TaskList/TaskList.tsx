@@ -14,7 +14,8 @@ import EditableTable, {
 import TaskDetails from './TaskDetails'
 import './TaskList.scss'
 
-const INDENT = 15
+/** pixels */
+const CHILD_ROWS_INDENT = 15
 
 interface TaskListProps extends DispatchProps {
   allTasks: TaskState
@@ -112,7 +113,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
                   height: '100%',
                   overflow: 'auto'
                 }}
-                indentSize={INDENT}
+                indentSize={CHILD_ROWS_INDENT}
               />
             </Col>
             <Col span={6}>
@@ -212,7 +213,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
         title: 'Title',
         dataIndex: 'title',
         render: (text, row) => (
-          <span style={{ paddingLeft: row.hierarchyLevel * INDENT }}>
+          <span style={{ paddingLeft: row.hierarchyLevel * CHILD_ROWS_INDENT }}>
             {text}
           </span>
         ),
