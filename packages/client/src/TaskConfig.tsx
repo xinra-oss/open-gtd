@@ -63,7 +63,7 @@ class ContextConfig<T> extends React.Component<ContextProps> {
   private renderToolbar() {
     return (
       <div style={{ marginBottom: 10 }}>
-        <Button type="primary" icon="plus-square" onClick={this.createContext}>
+        <Button type="primary" icon="plus" onClick={this.createContext}>
           Add
         </Button>
       </div>
