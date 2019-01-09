@@ -59,16 +59,28 @@ class Main extends React.Component<MainProps, State> {
 
   public renderLogo() {
     return (
-      <img
-        style={{
-          width: '90px',
-          height: '60px'
-        }}
-        src={logoImgage}
-        onClick={this.handleIconClick}
-        onAnimationEnd={this.handleIconClick}
-        className={this.state.rotate ? 'rotate' : ''}
-      />
+      <div className="logo">
+        <img
+          style={{
+            height: '45px',
+            position: 'relative',
+            top: -4
+          }}
+          src={logoImgage}
+          onClick={this.handleIconClick}
+          onAnimationEnd={this.handleIconClick}
+          className={this.state.rotate ? 'rotate' : ''}
+        />
+        <span
+          style={{
+            color: '#fff',
+            // fontWeight: 'bold',
+            fontSize: 24
+          }}
+        >
+          OpenGTD
+        </span>
+      </div>
     )
   }
   public render() {
@@ -76,7 +88,7 @@ class Main extends React.Component<MainProps, State> {
       <Layout className="Main">
         <Header className="Main-header">
           <Link to="/tasks/all" onClick={this.handleIconClick}>
-            <div className="logo">OpenGTD{this.renderLogo()}</div>
+            {this.renderLogo()}
           </Link>
           <Menu theme="dark" mode="horizontal" style={{ lineHeight: '64px' }}>
             <SubMenu
