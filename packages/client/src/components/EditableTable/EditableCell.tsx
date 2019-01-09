@@ -13,7 +13,7 @@ export interface EditableCellState {
 export type InputType = false | 'text' | 'select'
 
 export interface EditableCellProps<T> {
-  editable: InputType
+  editable: (row: T) => InputType
   required: boolean
   record: T
   inputProps: (row: T) => any
@@ -92,7 +92,7 @@ export class EditableCell<T> extends React.Component<
   public render() {
     const { editing } = this.state
     const {
-      editable,
+      editable: getEditableType,
       dataIndex,
       title,
       record,
@@ -103,6 +103,7 @@ export class EditableCell<T> extends React.Component<
       ...restProps
     } = this.props
     const getInputProps = inputProps || (() => null)
+    const editable = getEditableType ? getEditableType(record) : false
     return (
       <td
         ref={node => (this.cell = node as HTMLTableDataCellElement)}

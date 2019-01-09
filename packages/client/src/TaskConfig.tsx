@@ -18,7 +18,7 @@ class ContextConfig<T> extends React.Component<ContextProps> {
     {
       title: 'Name',
       dataIndex: 'name',
-      editable: 'text'
+      editable: () => 'text'
     }
   ]
 

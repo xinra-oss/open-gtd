@@ -20,13 +20,20 @@ const CHILD_ROWS_INDENT = 15
 interface TaskListProps extends DispatchProps {
   allTasks: TaskState
   allContexts: ContextState
-  filter?: (task: TaskListTaskRow) => boolean
+  filter?: (taskRow: TaskListTaskRow) => boolean
   hierarchical?: boolean
   rootTaskId?: EntityId
+  categories?: (taskRows: TaskListTaskRow[]) => TaskListCategory[]
 }
 
 interface TaskListState {
   selectedTaskIds: EntityId[]
+}
+
+export interface TaskListCategory {
+  key: string
+  title: string
+  children?: TaskListTaskRow[]
 }
 
 interface TaskListRowType<T extends string, P> {
@@ -65,7 +72,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
         title: task.title,
         isDone: task.isDone,
         contextIds: task.contextIds,
-        isActive: true,
+        isActive: false,
         hierarchyLevel: 0
       }
       allTaskRows.push(taskRow)
@@ -88,8 +95,25 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
       )
     }
 
-    let displayedRows = hierarchical ? taskRowTree : this.flatten(taskRowTree)
-    displayedRows = this.applyFilter(displayedRows)
+    let displayedTaskRows = hierarchical
+      ? taskRowTree
+      : this.flattenRowTree(taskRowTree)
+    displayedTaskRows = this.applyFilter(displayedTaskRows)
+
+    const displayedRows = this.props.categories
+      ? this.props.categories(displayedTaskRows).map(category => {
+          const row: TaskListCategoryRow = {
+            ...category,
+            type: 'category',
+            contextIds: [],
+            isActive: false,
+            hierarchyLevel: 0,
+            wrapped: undefined as void
+          }
+          return row
+        })
+      : displayedTaskRows
+
     this.determineHierarchyLevels(displayedRows)
 
     const { selectedTaskIds } = this.state
@@ -131,12 +155,12 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
     )
   }
 
-  private flatten(rowTree: TaskListTaskRow[]) {
+  private flattenRowTree(rowTree: TaskListTaskRow[]) {
     const flattened: TaskListTaskRow[] = []
     for (const row of rowTree) {
       flattened.push({ ...row, children: undefined })
       if (row.children) {
-        this.flatten(row.children).forEach(c => flattened.push(c))
+        this.flattenRowTree(row.children).forEach(c => flattened.push(c))
       }
     }
     return flattened
@@ -232,14 +256,15 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
           </span>
         ),
         className: 'TaskList-title',
-        editable: 'text',
+        editable: (row: TaskListRow) => (row.type === 'task' ? 'text' : false),
         required: true
       },
       {
         title: 'Contexts',
         dataIndex: 'contextIds',
         render: this.renderContexts,
-        editable: 'select',
+        editable: (row: TaskListRow) =>
+          row.type === 'task' ? 'select' : false,
         width: 400,
         inputProps: this.getContextSelectProps,
         mapValue: (contextIds: EntityId[]) =>
@@ -289,7 +314,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
               selectedTaskIds
             })
           }
-        : this.clearSelection()
+        : this.clearSelection
   })
 
   private rowClassName = (row: TaskListRow) => {

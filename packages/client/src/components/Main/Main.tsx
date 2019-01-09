@@ -15,6 +15,7 @@ import { sessionActions } from '../../store/actions'
 import TaskConfig from '../../TaskConfig'
 import { PROTECTED_SPACE } from '../../util'
 import './Main.scss'
+import ActiveByContext from './TaskListViews/ActiveByContext'
 import ActiveTasks from './TaskListViews/ActiveTasks'
 import AllTasks from './TaskListViews/AllTasks'
 import Inbox from './TaskListViews/Inbox'
@@ -105,6 +106,9 @@ class Main extends React.Component<MainProps, State> {
                 <Menu.Item key="/tasks/active">
                   <Link to="/tasks/active">Active Tasks</Link>
                 </Menu.Item>
+                <Menu.Item key="/tasks/active-by-context">
+                  <Link to="/tasks/active-by-context">Active by Context</Link>
+                </Menu.Item>
               </ItemGroup>
               <ItemGroup title="Settings" key="settings">
                 <Menu.Item key="/contexts">
@@ -126,6 +130,10 @@ class Main extends React.Component<MainProps, State> {
               <Switch>
                 <Route path="/tasks/all" component={AllTasks} />
                 <Route path="/tasks/inbox" component={Inbox} />
+                <Route
+                  path="/tasks/active-by-context"
+                  component={ActiveByContext}
+                />
                 <Route path="/tasks/active" component={ActiveTasks} />
                 <Route path="/contexts" component={TaskConfig} />
                 <Redirect to="/tasks/all" />
