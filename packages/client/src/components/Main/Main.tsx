@@ -14,8 +14,9 @@ import { AppState, DispatchProps, mapDispatchToProps } from '../../store'
 import { sessionActions } from '../../store/actions'
 import TaskConfig from '../../TaskConfig'
 import { PROTECTED_SPACE } from '../../util'
-import AllTasks from './AllTasks/AllTasks'
 import './Main.scss'
+import ActiveTasks from './TaskListViews/ActiveTasks'
+import AllTasks from './TaskListViews/AllTasks'
 
 interface MainProps extends DispatchProps, RouteComponentProps<{}> {
   user: UserEntity
@@ -100,7 +101,9 @@ class Main extends React.Component<MainProps, State> {
                 </Menu.Item>
               </ItemGroup>
               <ItemGroup key="todo" title="TODO">
-                <Menu.Item key="/tasks/active">Active Tasks</Menu.Item>
+                <Menu.Item key="/tasks/active">
+                  <Link to="/tasks/active">Active Tasks</Link>
+                </Menu.Item>
               </ItemGroup>
               <ItemGroup title="Settings" key="settings">
                 <Menu.Item key="/contexts">
@@ -121,6 +124,7 @@ class Main extends React.Component<MainProps, State> {
             >
               <Switch>
                 <Route path="/tasks/all" component={AllTasks} />
+                <Route path="/tasks/active" component={ActiveTasks} />
                 <Route path="/contexts" component={TaskConfig} />
                 <Redirect to="/tasks/all" />
               </Switch>

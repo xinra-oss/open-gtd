@@ -19,7 +19,7 @@ const INDENT = 15
 interface TaskListProps extends DispatchProps {
   allTasks: TaskState
   allContexts: ContextState
-  filter?: (task: TaskEntity) => boolean
+  filter?: (task: TaskListTaskRow) => boolean
   hierarchical?: boolean
 }
 
@@ -39,7 +39,7 @@ interface TaskListRowType<T extends string, P> {
   hierarchyLevel: number
 }
 
-type TaskListTaskRow = TaskListRowType<'task', TaskEntity>
+export type TaskListTaskRow = TaskListRowType<'task', TaskEntity>
 type TaskListCategoryRow = TaskListRowType<'category', void>
 
 type TaskListRow = TaskListTaskRow | TaskListCategoryRow
@@ -159,7 +159,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
     }
     const filterdRows: TaskListTaskRow[] = []
     for (const row of rows) {
-      if (this.props.filter(row.wrapped)) {
+      if (this.props.filter(row)) {
         const filteredRow = { ...row }
         if (filteredRow.children) {
           filteredRow.children = this.applyFilter(filteredRow.children)
@@ -225,6 +225,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
         dataIndex: 'contextIds',
         render: this.renderContexts,
         editable: 'select',
+        width: 400,
         inputProps: this.getContextSelectProps,
         mapValue: (contextIds: EntityId[]) =>
           contextIds.map(id => ({
