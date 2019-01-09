@@ -257,7 +257,8 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
         ),
         className: 'TaskList-title',
         editable: (row: TaskListRow) => (row.type === 'task' ? 'text' : false),
-        required: true
+        required: true,
+        width: 400
       },
       {
         title: 'Contexts',
@@ -265,7 +266,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
         render: this.renderContexts,
         editable: (row: TaskListRow) =>
           row.type === 'task' ? 'select' : false,
-        width: 400,
+        width: 300,
         inputProps: this.getContextSelectProps,
         mapValue: (contextIds: EntityId[]) =>
           contextIds.map(id => ({
