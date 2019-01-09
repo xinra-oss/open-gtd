@@ -14,6 +14,7 @@ import { AppState, DispatchProps, mapDispatchToProps } from '../../store'
 import { sessionActions } from '../../store/actions'
 import TaskConfig from '../../TaskConfig'
 import { PROTECTED_SPACE } from '../../util'
+import logoImgage from './logo-lila.png'
 import './Main.scss'
 import ActiveByContext from './TaskListViews/ActiveByContext'
 import ActiveTasks from './TaskListViews/ActiveTasks'
@@ -26,6 +27,7 @@ interface MainProps extends DispatchProps, RouteComponentProps<{}> {
 
 interface State {
   readonly collapsed: boolean
+  readonly rotate: boolean
 }
 
 const { SubMenu, ItemGroup } = Menu
@@ -35,7 +37,8 @@ const mapStateToProps = (state: AppState) => ({ user: state.session.user })
 
 class Main extends React.Component<MainProps, State> {
   public readonly state: State = {
-    collapsed: false
+    collapsed: false,
+    rotate: false
   }
 
   public onCollapse = (collapsed: boolean) => {
@@ -46,11 +49,47 @@ class Main extends React.Component<MainProps, State> {
     this.props.dispatch(sessionActions.deleteSession.request())
   }
 
+  public handleIconClick = () => {
+    if (this.state.rotate) {
+      this.setState({ rotate: false })
+    } else {
+      this.setState({ rotate: true })
+    }
+  }
+
+  public renderLogo() {
+    return (
+      <div className="logo">
+        <img
+          style={{
+            height: '45px',
+            position: 'relative',
+            top: -4
+          }}
+          src={logoImgage}
+          onClick={this.handleIconClick}
+          onAnimationEnd={this.handleIconClick}
+          className={this.state.rotate ? 'rotate' : ''}
+        />
+        <span
+          style={{
+            color: '#fff',
+            // fontWeight: 'bold',
+            fontSize: 24
+          }}
+        >
+          OpenGTD
+        </span>
+      </div>
+    )
+  }
   public render() {
     return (
       <Layout className="Main">
         <Header className="Main-header">
-          <div className="logo" />
+          <Link to="/tasks/all" onClick={this.handleIconClick}>
+            {this.renderLogo()}
+          </Link>
           <Menu theme="dark" mode="horizontal" style={{ lineHeight: '64px' }}>
             <SubMenu
               key="3"
@@ -90,6 +129,7 @@ class Main extends React.Component<MainProps, State> {
               mode="inline"
               defaultSelectedKeys={[this.props.location.pathname]}
               style={{ height: '100%', borderRight: 0 }}
+              key={this.props.location.pathname}
             >
               <Menu.Item key="/tasks/inbox">
                 <Link to="/tasks/inbox">
