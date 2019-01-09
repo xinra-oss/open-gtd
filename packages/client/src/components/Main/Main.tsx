@@ -73,7 +73,7 @@ class Main extends React.Component<MainProps, State> {
       <Layout className="Main">
         <Header className="Main-header">
           <Link to="/tasks/all" onClick={this.handleIconClick}>
-            <div className="logo">Open-GTD{this.renderLogo()}</div>
+            <div className="logo">OpenGTD{this.renderLogo()}</div>
           </Link>
           <Menu theme="dark" mode="horizontal" style={{ lineHeight: '64px' }}>
             <SubMenu
@@ -114,6 +114,7 @@ class Main extends React.Component<MainProps, State> {
               mode="inline"
               defaultSelectedKeys={[this.props.location.pathname]}
               style={{ height: '100%', borderRight: 0 }}
+              key={this.props.location.pathname}
             >
               <Menu.Item key="/tasks/inbox">
                 <Link to="/tasks/inbox">
