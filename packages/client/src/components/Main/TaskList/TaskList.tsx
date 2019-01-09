@@ -22,6 +22,7 @@ interface TaskListProps extends DispatchProps {
   allContexts: ContextState
   filter?: (task: TaskListTaskRow) => boolean
   hierarchical?: boolean
+  rootTaskId?: EntityId
 }
 
 interface TaskListState {
@@ -78,14 +79,16 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
     })
 
     allTaskRows.forEach(row => (row.children = idToChildren[row.key]))
-    const taskRowTree = allTaskRows.filter(row => row.wrapped.parentId === null)
+    let taskRowTree = allTaskRows.filter(row => row.wrapped.parentId === null)
     this.determineActiveTasks(taskRowTree)
-    const taskRowsFlat = allTaskRows.map(row => ({
-      ...row,
-      children: undefined
-    }))
 
-    let displayedRows = hierarchical ? taskRowTree : taskRowsFlat
+    if (this.props.rootTaskId) {
+      taskRowTree = allTaskRows.filter(
+        row => row.wrapped.parentId === this.props.rootTaskId
+      )
+    }
+
+    let displayedRows = hierarchical ? taskRowTree : this.flatten(taskRowTree)
     displayedRows = this.applyFilter(displayedRows)
     this.determineHierarchyLevels(displayedRows)
 
@@ -126,6 +129,17 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
         </OutsideClickHandler>
       </div>
     )
+  }
+
+  private flatten(rowTree: TaskListTaskRow[]) {
+    const flattened: TaskListTaskRow[] = []
+    for (const row of rowTree) {
+      flattened.push({ ...row, children: undefined })
+      if (row.children) {
+        this.flatten(row.children).forEach(c => flattened.push(c))
+      }
+    }
+    return flattened
   }
 
   /**
@@ -321,7 +335,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
         this.props.allTasks[this.state.selectedTaskIds[0]].parentId
       )
     } else {
-      this.createNewTask(null)
+      this.createNewTask(this.props.rootTaskId || null)
     }
   }
 

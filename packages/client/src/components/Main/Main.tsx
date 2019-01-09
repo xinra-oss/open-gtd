@@ -17,6 +17,7 @@ import { PROTECTED_SPACE } from '../../util'
 import './Main.scss'
 import ActiveTasks from './TaskListViews/ActiveTasks'
 import AllTasks from './TaskListViews/AllTasks'
+import Inbox from './TaskListViews/Inbox'
 
 interface MainProps extends DispatchProps, RouteComponentProps<{}> {
   user: UserEntity
@@ -124,6 +125,7 @@ class Main extends React.Component<MainProps, State> {
             >
               <Switch>
                 <Route path="/tasks/all" component={AllTasks} />
+                <Route path="/tasks/inbox" component={Inbox} />
                 <Route path="/tasks/active" component={ActiveTasks} />
                 <Route path="/contexts" component={TaskConfig} />
                 <Redirect to="/tasks/all" />
