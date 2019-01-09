@@ -1,6 +1,11 @@
 import { ValidationErrors } from '@open-gtd/api'
 import { Dictionary } from 'ts-essentials'
 
+/**
+ * Normal space ` ` is omited in JSX. Use this to actually output a space.
+ */
+export const PROTECTED_SPACE = '\u00A0'
+
 export function arrayToDictionary<T>(
   array: T[],
   mapItemToKey: (item: T) => string
@@ -25,3 +30,6 @@ export function getFormItemValidationProps<T>(
   }
   return {}
 }
+
+export const stopEventPropagation = (e: { stopPropagation(): void }) =>
+  e.stopPropagation()

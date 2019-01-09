@@ -1,5 +1,6 @@
 .App {
   height: 100%;
+  background: linear-gradient(135deg, #ffffff 0%, #7ccaff 100%);
 
   .App-header {
     background-color: #222;
@@ -16,30 +17,6 @@
     }
   }
 
-  .App-loading {
-    top: calc(50% - 16px);
-    position: absolute;
-  }
-
-  .App-intro {
-    font-size: large;
-  }
-  .login-form {
-    flex-direction: column;
-  }
-  .login-form {
-    width: 400px;
-    margin: auto;
-    //max-width: 300px;
-
-    //margin-left: 150px;
-  }
-  .login-form-forgot {
-    float: centre;
-  }
-  .login-form-button {
-    width: 50%;
-  }
   .item-right {
     float: right;
   }

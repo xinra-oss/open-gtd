@@ -9,6 +9,7 @@
     "connected-react-router": "^6.0.0",
     "immer": "^1.9.3",
     "react": "^16.6.1",
+    "react-center": "^1.1.1",
     "react-dom": "^16.6.1",
     "react-outside-click-handler": "^1.2.2",
     "react-redux": "^6.0.0",

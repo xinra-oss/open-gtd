@@ -36,7 +36,7 @@ const loadContentSuccess: AppEpic = (action$, state$) =>
     flatMap(() => {
       const actions: AppAction[] = []
       if (isCurrentPageLoginOrRegister(state$)) {
-        actions.push(routerActions.push('/'))
+        actions.push(routerActions.replace('/'))
       }
       actions.push(loadingActions.finishLoading())
       actions.push(syncActions.enableSync.request())
