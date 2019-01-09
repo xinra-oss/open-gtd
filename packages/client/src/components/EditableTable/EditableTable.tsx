@@ -5,7 +5,7 @@ import { EditableFormRow } from './EditableFormRow'
 import './EditableTable.scss'
 
 export type EditableColumnProps<T> = ColumnProps<T> & {
-  editable?: InputType
+  editable?: (row: T) => InputType
   inputProps?: (row: T) => any
   required?: boolean
   mapValue?(value: any): any
