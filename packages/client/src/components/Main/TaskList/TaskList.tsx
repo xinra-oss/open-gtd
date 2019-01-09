@@ -14,17 +14,26 @@ import EditableTable, {
 import TaskDetails from './TaskDetails'
 import './TaskList.scss'
 
-const INDENT = 15
+/** pixels */
+const CHILD_ROWS_INDENT = 15
 
 interface TaskListProps extends DispatchProps {
   allTasks: TaskState
   allContexts: ContextState
-  filter?: (task: TaskEntity) => boolean
+  filter?: (taskRow: TaskListTaskRow) => boolean
   hierarchical?: boolean
+  rootTaskId?: EntityId
+  categories?: (taskRows: TaskListTaskRow[]) => TaskListCategory[]
 }
 
 interface TaskListState {
   selectedTaskIds: EntityId[]
+}
+
+export interface TaskListCategory {
+  key: string
+  title: string
+  children?: TaskListTaskRow[]
 }
 
 interface TaskListRowType<T extends string, P> {
@@ -39,7 +48,7 @@ interface TaskListRowType<T extends string, P> {
   hierarchyLevel: number
 }
 
-type TaskListTaskRow = TaskListRowType<'task', TaskEntity>
+export type TaskListTaskRow = TaskListRowType<'task', TaskEntity>
 type TaskListCategoryRow = TaskListRowType<'category', void>
 
 type TaskListRow = TaskListTaskRow | TaskListCategoryRow
@@ -63,7 +72,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
         title: task.title,
         isDone: task.isDone,
         contextIds: task.contextIds,
-        isActive: true,
+        isActive: false,
         hierarchyLevel: 0
       }
       allTaskRows.push(taskRow)
@@ -77,15 +86,34 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
     })
 
     allTaskRows.forEach(row => (row.children = idToChildren[row.key]))
-    const taskRowTree = allTaskRows.filter(row => row.wrapped.parentId === null)
+    let taskRowTree = allTaskRows.filter(row => row.wrapped.parentId === null)
     this.determineActiveTasks(taskRowTree)
-    const taskRowsFlat = allTaskRows.map(row => ({
-      ...row,
-      children: undefined
-    }))
 
-    let displayedRows = hierarchical ? taskRowTree : taskRowsFlat
-    displayedRows = this.applyFilter(displayedRows)
+    if (this.props.rootTaskId) {
+      taskRowTree = allTaskRows.filter(
+        row => row.wrapped.parentId === this.props.rootTaskId
+      )
+    }
+
+    let displayedTaskRows = hierarchical
+      ? taskRowTree
+      : this.flattenRowTree(taskRowTree)
+    displayedTaskRows = this.applyFilter(displayedTaskRows)
+
+    const displayedRows = this.props.categories
+      ? this.props.categories(displayedTaskRows).map(category => {
+          const row: TaskListCategoryRow = {
+            ...category,
+            type: 'category',
+            contextIds: [],
+            isActive: false,
+            hierarchyLevel: 0,
+            wrapped: undefined as void
+          }
+          return row
+        })
+      : displayedTaskRows
+
     this.determineHierarchyLevels(displayedRows)
 
     const { selectedTaskIds } = this.state
@@ -112,7 +140,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
                   height: '100%',
                   overflow: 'auto'
                 }}
-                indentSize={INDENT}
+                indentSize={CHILD_ROWS_INDENT}
               />
             </Col>
             <Col span={6}>
@@ -125,6 +153,17 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
         </OutsideClickHandler>
       </div>
     )
+  }
+
+  private flattenRowTree(rowTree: TaskListTaskRow[]) {
+    const flattened: TaskListTaskRow[] = []
+    for (const row of rowTree) {
+      flattened.push({ ...row, children: undefined })
+      if (row.children) {
+        this.flattenRowTree(row.children).forEach(c => flattened.push(c))
+      }
+    }
+    return flattened
   }
 
   /**
@@ -159,7 +198,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
     }
     const filterdRows: TaskListTaskRow[] = []
     for (const row of rows) {
-      if (this.props.filter(row.wrapped)) {
+      if (this.props.filter(row)) {
         const filteredRow = { ...row }
         if (filteredRow.children) {
           filteredRow.children = this.applyFilter(filteredRow.children)
@@ -212,30 +251,49 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
         title: 'Title',
         dataIndex: 'title',
         render: (text, row) => (
-          <span style={{ paddingLeft: row.hierarchyLevel * INDENT }}>
+          <span style={{ paddingLeft: row.hierarchyLevel * CHILD_ROWS_INDENT }}>
             {text}
           </span>
         ),
         className: 'TaskList-title',
-        editable: 'text',
-        required: true
+        editable: (row: TaskListRow) => (row.type === 'task' ? 'text' : false),
+        required: true,
+        width: 400
       },
       {
         title: 'Contexts',
         dataIndex: 'contextIds',
         render: this.renderContexts,
-        editable: 'select',
+        editable: (row: TaskListRow) =>
+          row.type === 'task' ? 'select' : false,
+        width: 300,
         inputProps: this.getContextSelectProps,
         mapValue: (contextIds: EntityId[]) =>
           contextIds.map(id => ({
             key: id,
             label: this.props.allContexts[id].name
           }))
+      },
+      {
+        key: 'actions',
+        render: this.renderTaskActionButtons,
+        width: 200
       }
     ]
   }
 
   private clearSelection = () => this.setState({ selectedTaskIds: [] })
+
+  private deleteTask = (taskId: EntityId) => {
+    const selectedTaskIds = [...this.state.selectedTaskIds]
+    const index = selectedTaskIds.indexOf(taskId)
+    if (index > -1) {
+      selectedTaskIds.splice(index, 1)
+    }
+    this.setState({ selectedTaskIds }, () =>
+      this.props.dispatch(taskActions.deleteTask.request(taskId))
+    )
+  }
 
   private onRow = (row: TaskListRow) => ({
     onClick:
@@ -257,15 +315,15 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
               selectedTaskIds
             })
           }
-        : this.clearSelection()
+        : this.clearSelection
   })
 
   private rowClassName = (row: TaskListRow) => {
+    let classes = 'TaskList-row'
     if (row.type === 'category') {
-      return 'row-category'
+      classes = ' row-category'
     }
     if (row.type === 'task') {
-      let classes = ''
       if (this.state.selectedTaskIds.indexOf(row.wrapped._id) > -1) {
         classes += ' row-selected'
       }
@@ -281,9 +339,8 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
       if (row.isActive) {
         classes += ' row-active'
       }
-      return classes
     }
-    return ''
+    return classes
   }
 
   private handleSave = (row: TaskListRow, values: Partial<TaskListRow>) => {
@@ -301,19 +358,18 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
   private handleNewTask = () => {
     if (this.state.selectedTaskIds.length > 0) {
       this.createNewTask(
-        this.props.allTasks[this.state.selectedTaskIds[0]].parentId,
-        'New Task'
+        this.props.allTasks[this.state.selectedTaskIds[0]].parentId
       )
     } else {
-      this.createNewTask(null, 'New Root Task')
+      this.createNewTask(this.props.rootTaskId || null)
     }
   }
 
   private handleSubTask = () => {
-    this.createNewTask(this.state.selectedTaskIds[0], 'New Sub Task')
+    this.createNewTask(this.state.selectedTaskIds[0])
   }
 
-  private createNewTask = (parentID: string | null, testTitle: string) => {
+  private createNewTask = (parentID: string | null) => {
     const newTask: Task = {
       contextIds: [],
       dueDate: null,
@@ -324,7 +380,7 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
       notes: null,
       parentId: parentID,
       startDate: null,
-      title: testTitle
+      title: 'New task'
     }
     this.props.dispatch(taskActions.createTask.request(newTask))
   }
@@ -382,6 +438,26 @@ class TaskList extends React.Component<TaskListProps, TaskListState> {
             tag
           )
         })}
+      </span>
+    )
+  }
+
+  private renderTaskActionButtons = (text: string, row: TaskListRow) => {
+    if (row.type !== 'task') {
+      return null
+    }
+    return (
+      <span className="TaskList-actions">
+        <Button
+          type="danger"
+          icon="delete" /* tslint:disable-next-line */
+          onClick={(e: React.MouseEvent) => {
+            e.stopPropagation()
+            this.deleteTask(row.wrapped._id)
+          }}
+        >
+          Delete
+        </Button>
       </span>
     )
   }
